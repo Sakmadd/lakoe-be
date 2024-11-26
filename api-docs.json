@@ -6,6 +6,7 @@
     "description": "Ini adalah dokumentasi untuk spesifikasi API untuk aplikasi E-Commerce Lakoe",
     "contact": { "name": "Ahmad Safii", "email": "ahmadsafii.work@gmail.com" }
   },
+
   "servers": [
     {
       "url": "http://{environment}.lakoe.store/api/v1",
@@ -19,6 +20,43 @@
       }
     }
   ],
+
+  "components": {
+    "parameters": {
+      "userId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "idusernyacontoh"
+        },
+        "description": "Unique identifier for the resource"
+      },
+      "productId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "integer",
+          "example": "11111"
+        },
+        "description": "Unique identifier for the resource"
+      },
+      "orderId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "integer",
+          "example": "22222"
+        },
+        "description": "Unique identifier for the resource"
+      }
+    }
+  },
+
   "paths": {
     "/auth/login": {
       "post": {
@@ -61,6 +99,7 @@
     },
     "/users/{id}": {
       "get": {
+        "parameters": [{ "$ref": "#/components/parameters/userId" }],
         "summary": "Get user by ID",
         "tags": ["Users"],
         "responses": {
@@ -73,6 +112,7 @@
         }
       },
       "patch": {
+        "parameters": [{ "$ref": "#/components/parameters/userId" }],
         "summary": "Update user by ID",
         "tags": ["Users"],
         "responses": {
@@ -87,6 +127,7 @@
     },
     "/users/{id}/locations": {
       "get": {
+        "parameters": [{ "$ref": "#/components/parameters/userId" }],
         "summary": "Get user locations",
         "tags": ["Users"],
         "responses": {
@@ -96,6 +137,7 @@
         }
       },
       "post": {
+        "parameters": [{ "$ref": "#/components/parameters/userId" }],
         "summary": "Add user location",
         "tags": ["Users"],
         "responses": {
@@ -163,6 +205,7 @@
     },
     "/products/{id}": {
       "get": {
+        "parameters": [{ "$ref": "#/components/parameters/productId" }],
         "summary": "Get product by ID",
         "tags": ["Products"],
         "responses": {
@@ -175,6 +218,7 @@
         }
       },
       "patch": {
+        "parameters": [{ "$ref": "#/components/parameters/productId" }],
         "summary": "Update product by ID",
         "tags": ["Products"],
         "responses": {
@@ -187,6 +231,7 @@
         }
       },
       "delete": {
+        "parameters": [{ "$ref": "#/components/parameters/productId" }],
         "summary": "Delete product by ID",
         "tags": ["Products"],
         "responses": {
@@ -201,6 +246,7 @@
     },
     "/products/{id}/toggle-active": {
       "patch": {
+        "parameters": [{ "$ref": "#/components/parameters/productId" }],
         "summary": "Toggle product active status",
         "tags": ["Products"],
         "responses": {
@@ -235,6 +281,7 @@
     },
     "/orders/{id}": {
       "get": {
+        "parameters": [{ "$ref": "#/components/parameters/orderId" }],
         "summary": "Get order by ID",
         "tags": ["Orders"],
         "responses": {
@@ -247,6 +294,7 @@
         }
       },
       "patch": {
+        "parameters": [{ "$ref": "#/components/parameters/orderId" }],
         "summary": "Update order by ID",
         "tags": ["Orders"],
         "responses": {
@@ -259,6 +307,7 @@
         }
       },
       "delete": {
+        "parameters": [{ "$ref": "#/components/parameters/orderId" }],
         "summary": "Delete order by ID",
         "tags": ["Orders"],
         "responses": {
@@ -295,6 +344,7 @@
     },
     "/orders/{id}/shipments": {
       "post": {
+        "parameters": [{ "$ref": "#/components/parameters/orderId" }],
         "summary": "Create shipment for an order",
         "tags": ["Orders"],
         "responses": {
@@ -304,6 +354,7 @@
         }
       },
       "get": {
+        "parameters": [{ "$ref": "#/components/parameters/orderId" }],
         "summary": "Get shipment for an order",
         "tags": ["Orders"],
         "responses": {
@@ -315,6 +366,7 @@
     },
     "/orders/{id}/payment": {
       "post": {
+        "parameters": [{ "$ref": "#/components/parameters/orderId" }],
         "summary": "Create payment for an order",
         "tags": ["Orders"],
         "responses": {
