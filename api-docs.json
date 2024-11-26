@@ -128,6 +128,7 @@
         "summary": "Delete multiple products",
         "tags": ["Products"],
         "requestBody": {
+          "content": {},
           "description": "Array of product IDs",
           "required": true
         },
