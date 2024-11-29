@@ -30,9 +30,20 @@
         "schema": {
           "type": "string",
           "format": "uuid",
-          "example": "idusernyacontoh"
+          "example": "1111"
         },
         "description": "Unique User Id "
+      },
+      "shopId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "4444"
+        },
+        "description": "Unique Shop Id "
       },
       "productId": {
         "name": "id",
@@ -63,13 +74,21 @@
         "summary": "Seller login",
         "tags": ["Authentication"],
         "requestBody": {
-          "description": "",
           "required": false,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "properties": {}
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password"
+                  }
+                }
               }
             }
           }
@@ -83,17 +102,19 @@
                   "type": "object",
                   "properties": {
                     "error": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": "false"
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "Login successful"
                     },
                     "data": {
                       "type": "array",
                       "items": {
                         "type": "object",
                         "properties": {
-                          "name": {
+                          "token": {
                             "type": "string"
                           }
                         }
@@ -112,12 +133,15 @@
                   "type": "object",
                   "properties": {
                     "error": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": "true"
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "Wrong email or password"
                     },
                     "data": {
+                      "default": "null",
                       "type": "array",
                       "items": {
                         "type": "object",
@@ -141,9 +165,26 @@
         "summary": "Seller registration",
         "tags": ["Authentication"],
         "requestBody": {
-          "description": "",
           "required": false,
-          "content": {}
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
         },
         "responses": {
           "201": {
@@ -154,12 +195,15 @@
                   "type": "object",
                   "properties": {
                     "error": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": "true"
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "Registration successful"
                     },
                     "data": {
+                      "default": "null",
                       "type": "array",
                       "items": {
                         "type": "object",
@@ -183,12 +227,15 @@
                   "type": "object",
                   "properties": {
                     "error": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": "true"
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "Validation error"
                     },
                     "data": {
+                      "default": "null",
                       "type": "array",
                       "items": {
                         "type": "object",
@@ -220,17 +267,28 @@
                   "type": "object",
                   "properties": {
                     "error": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": "true"
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "Users retrieved successfully"
                     },
                     "data": {
                       "type": "array",
                       "items": {
                         "type": "object",
                         "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "shop_id": {
+                            "type": "string"
+                          },
                           "name": {
+                            "type": "string"
+                          },
+                          "email": {
                             "type": "string"
                           }
                         }
@@ -258,17 +316,28 @@
                   "type": "object",
                   "properties": {
                     "error": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": "false"
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "user retrieved successfully"
                     },
                     "data": {
                       "type": "array",
                       "items": {
                         "type": "object",
                         "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "shop_id": {
+                            "type": "string"
+                          },
                           "name": {
+                            "type": "string"
+                          },
+                          "email": {
                             "type": "string"
                           }
                         }
@@ -289,9 +358,26 @@
         "summary": "Update user by ID",
         "tags": ["Users"],
         "requestBody": {
-          "description": "",
           "required": false,
-          "content": {}
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
         },
         "responses": {
           "200": {
@@ -302,17 +388,28 @@
                   "type": "object",
                   "properties": {
                     "error": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": "false"
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "user updated successfully"
                     },
                     "data": {
                       "type": "array",
                       "items": {
                         "type": "object",
                         "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "shop_id": {
+                            "type": "string"
+                          },
                           "name": {
+                            "type": "string"
+                          },
+                          "email": {
                             "type": "string"
                           }
                         }
@@ -331,21 +428,16 @@
                   "type": "object",
                   "properties": {
                     "error": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": "false"
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "user not found"
                     },
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "name": {
-                            "type": "string"
-                          }
-                        }
-                      }
+                      "default": "null",
+                      "type": "array"
                     }
                   }
                 }
@@ -355,11 +447,26 @@
         }
       }
     },
-    "/users/{id}/locations": {
+    "/shops/{id}/locations": {
       "get": {
-        "parameters": [{ "$ref": "#/components/parameters/userId" }],
+        "parameters": [{ "$ref": "#/components/parameters/shopId" }],
         "summary": "Get user locations",
-        "tags": ["Users"],
+        "tags": ["Shops"],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "User locations",
@@ -369,18 +476,53 @@
                   "type": "object",
                   "properties": {
                     "error": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": false
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "User locations retrieved successfully"
                     },
                     "data": {
                       "type": "array",
                       "items": {
                         "type": "object",
                         "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "Unique identifier for the location"
+                          },
                           "name": {
-                            "type": "string"
+                            "type": "string",
+                            "description": "Name of the location"
+                          },
+                          "address": {
+                            "type": "string",
+                            "description": "Address of the location"
+                          },
+                          "city": {
+                            "type": "string",
+                            "description": "City of the location"
+                          },
+                          "district": {
+                            "type": "string",
+                            "description": "District of the location"
+                          },
+                          "postal_code": {
+                            "type": "string",
+                            "description": "Postal code of the location"
+                          },
+                          "longitude": {
+                            "type": "string",
+                            "description": "Longitude of the location"
+                          },
+                          "latitude": {
+                            "type": "string",
+                            "description": "Latitude of the location"
+                          },
+                          "is_main": {
+                            "type": "string",
+                            "description": "Indicates if this is the main location"
                           }
                         }
                       }
@@ -393,13 +535,63 @@
         }
       },
       "post": {
-        "parameters": [{ "$ref": "#/components/parameters/userId" }],
+        "parameters": [{ "$ref": "#/components/parameters/shopId" }],
         "summary": "Add user location",
-        "tags": ["Users"],
+        "tags": ["Shops"],
         "requestBody": {
-          "description": "",
-          "required": false,
-          "content": {}
+          "description": "Location data",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Name of the location"
+                  },
+                  "address": {
+                    "type": "string",
+                    "description": "Address of the location"
+                  },
+                  "city": {
+                    "type": "string",
+                    "description": "City of the location"
+                  },
+                  "district": {
+                    "type": "string",
+                    "description": "District of the location"
+                  },
+                  "postal_code": {
+                    "type": "string",
+                    "description": "Postal code of the location"
+                  },
+                  "longitude": {
+                    "type": "string",
+                    "description": "Longitude of the location"
+                  },
+                  "latitude": {
+                    "type": "string",
+                    "description": "Latitude of the location"
+                  },
+                  "is_main": {
+                    "type": "boolean",
+                    "default": "false",
+                    "description": "Indicates if this is the main location"
+                  }
+                },
+                "required": [
+                  "name",
+                  "address",
+                  "city",
+                  "district",
+                  "postal_code",
+                  "longitude",
+                  "latitude"
+                ]
+              }
+            }
+          }
         },
         "responses": {
           "201": {
@@ -410,21 +602,102 @@
                   "type": "object",
                   "properties": {
                     "error": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": "false"
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "user location added successfully"
                     },
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "name": {
-                            "type": "string"
-                          }
-                        }
-                      }
+                      "default": "null",
+                      "type": "array"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "parameters": [{ "$ref": "#/components/parameters/shopId" }],
+        "summary": "Edit user location",
+        "tags": ["Shops"],
+        "requestBody": {
+          "description": "Location data",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Name of the location"
+                  },
+                  "address": {
+                    "type": "string",
+                    "description": "Address of the location"
+                  },
+                  "city": {
+                    "type": "string",
+                    "description": "City of the location"
+                  },
+                  "district": {
+                    "type": "string",
+                    "description": "District of the location"
+                  },
+                  "postal_code": {
+                    "type": "string",
+                    "description": "Postal code of the location"
+                  },
+                  "longitude": {
+                    "type": "string",
+                    "description": "Longitude of the location"
+                  },
+                  "latitude": {
+                    "type": "string",
+                    "description": "Latitude of the location"
+                  },
+                  "is_main": {
+                    "type": "boolean",
+                    "default": "false",
+                    "description": "Indicates if this is the main location"
+                  }
+                },
+                "required": [
+                  "name",
+                  "address",
+                  "city",
+                  "district",
+                  "postal_code",
+                  "longitude",
+                  "latitude"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Location added",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "default": "false"
+                    },
+                    "message": {
+                      "type": "string",
+                      "default": "user location added successfully"
+                    },
+                    "data": {
+                      "default": "null",
+                      "type": "array"
                     }
                   }
                 }
@@ -434,33 +707,202 @@
         }
       }
     },
-    "/products": {
+    "/shops/{id}": {
       "get": {
-        "summary": "Get all products",
-        "tags": ["Products"],
+        "parameters": [{ "$ref": "#/components/parameters/shopId" }],
+        "summary": "Get shops shop by id",
+        "tags": ["Shops"],
         "responses": {
           "200": {
-            "description": "List of products",
+            "description": "shops details",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "error": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": "true"
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "Wrong email or password"
                     },
                     "data": {
                       "type": "array",
                       "items": {
                         "type": "object",
                         "properties": {
-                          "name": {
+                          "id": {
                             "type": "string"
+                          },
+                          "phone": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "slogan": {
+                            "type": "string"
+                          },
+                          "logo": {
+                            "type": "string"
+                          },
+                          "balance": {
+                            "type": "string"
+                          },
+                          "user": {
+                            "type": "object"
+                          },
+                          "products": {
+                            "type": "array",
+                            "items": {
+                              "type": "object"
+                            }
+                          },
+                          "withdraws": {
+                            "type": "array",
+                            "items": {
+                              "type": "object"
+                            }
                           }
                         }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      },
+      "patch": {
+        "parameters": [{ "$ref": "#/components/parameters/userId" }],
+        "summary": "Update Shop by ID",
+        "tags": ["Shops"],
+        "requestBody": {
+          "description": "",
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "phone": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "slogan": {
+                    "type": "string"
+                  },
+                  "logo": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "default": "false"
+                    },
+                    "message": {
+                      "type": "string",
+                      "default": "shop updated successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "phone": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "slogan": {
+                            "type": "string"
+                          },
+                          "logo": {
+                            "type": "string"
+                          },
+                          "balance": {
+                            "type": "string"
+                          },
+                          "user": {
+                            "type": "object"
+                          },
+                          "products": {
+                            "type": "array",
+                            "items": {
+                              "type": "object"
+                            }
+                          },
+                          "withdraws": {
+                            "type": "array",
+                            "items": {
+                              "type": "object"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/products": {
+      "get": {
+        "summary": "Get all products max 20",
+        "tags": ["Products"],
+        "responses": {
+          "201": {
+            "description": "Get all products",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "default": "false"
+                    },
+                    "message": {
+                      "type": "string",
+                      "default": "products retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
                       }
                     }
                   }
@@ -474,9 +916,73 @@
         "summary": "Create a product",
         "tags": ["Products"],
         "requestBody": {
-          "description": "",
-          "required": false,
-          "content": {}
+          "description": "Request body untuk membuat atau memperbarui produk",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "shop_id": {
+                    "type": "string"
+                  },
+                  "category_id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "sku": {
+                    "type": "string"
+                  },
+                  "price": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "url_name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "stock": {
+                    "type": "integer"
+                  },
+                  "weight": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "minimum_order": {
+                    "type": "integer"
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  },
+                  "length": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "width": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "height": {
+                    "type": "number",
+                    "format": "float"
+                  }
+                },
+                "required": [
+                  "shop_id",
+                  "category_id",
+                  "name",
+                  "sku",
+                  "price",
+                  "stock",
+                  "is_active"
+                ]
+              }
+            }
+          }
         },
         "responses": {
           "201": {
@@ -487,18 +993,23 @@
                   "type": "object",
                   "properties": {
                     "error": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": "true"
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "Wrong email or password"
                     },
                     "data": {
                       "type": "array",
                       "items": {
                         "type": "object",
                         "properties": {
-                          "name": {
-                            "type": "string"
+                          "products": {
+                            "type": "array",
+                            "items": {
+                              "type": "object"
+                            }
                           }
                         }
                       }
@@ -513,6 +1024,18 @@
       "delete": {
         "summary": "Delete multiple products",
         "tags": ["Products"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "204": {
             "description": "Products deleted",
@@ -522,21 +1045,16 @@
                   "type": "object",
                   "properties": {
                     "error": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": false
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "Products deleted successfully"
                     },
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "name": {
-                            "type": "string"
-                          }
-                        }
-                      }
+                      "type": "null",
+                      "default": null
                     }
                   }
                 }
@@ -569,22 +1087,55 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "error": {
-                      "type": "boolean"
-                    },
-                    "message": {
+                    "id": {
                       "type": "string"
                     },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "name": {
-                            "type": "string"
-                          }
-                        }
-                      }
+                    "shop_id": {
+                      "type": "string"
+                    },
+                    "category_id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "sku": {
+                      "type": "string"
+                    },
+                    "price": {
+                      "type": "number",
+                      "format": "float"
+                    },
+                    "url_name": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "stock": {
+                      "type": "integer"
+                    },
+                    "weight": {
+                      "type": "number",
+                      "format": "float"
+                    },
+                    "minimum_order": {
+                      "type": "integer"
+                    },
+                    "is_active": {
+                      "type": "boolean"
+                    },
+                    "length": {
+                      "type": "number",
+                      "format": "float"
+                    },
+                    "width": {
+                      "type": "number",
+                      "format": "float"
+                    },
+                    "height": {
+                      "type": "number",
+                      "format": "float"
                     }
                   }
                 }
@@ -608,18 +1159,67 @@
                   "type": "object",
                   "properties": {
                     "error": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": "false"
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "product retrieved successfully"
                     },
                     "data": {
                       "type": "array",
                       "items": {
                         "type": "object",
                         "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "shop_id": {
+                            "type": "string"
+                          },
+                          "category_id": {
+                            "type": "string"
+                          },
                           "name": {
                             "type": "string"
+                          },
+                          "sku": {
+                            "type": "string"
+                          },
+                          "price": {
+                            "type": "number",
+                            "format": "float"
+                          },
+                          "url_name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "stock": {
+                            "type": "integer"
+                          },
+                          "weight": {
+                            "type": "number",
+                            "format": "float"
+                          },
+                          "minimum_order": {
+                            "type": "integer"
+                          },
+                          "is_active": {
+                            "type": "boolean"
+                          },
+                          "length": {
+                            "type": "number",
+                            "format": "float"
+                          },
+                          "width": {
+                            "type": "number",
+                            "format": "float"
+                          },
+                          "height": {
+                            "type": "number",
+                            "format": "float"
                           }
                         }
                       }
@@ -637,12 +1237,15 @@
                   "type": "object",
                   "properties": {
                     "error": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": "false"
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "product not found"
                     },
                     "data": {
+                      "default": "null",
                       "type": "array",
                       "items": {
                         "type": "object",
@@ -667,7 +1270,59 @@
         "requestBody": {
           "description": "",
           "required": false,
-          "content": {}
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "category_id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "sku": {
+                    "type": "string"
+                  },
+                  "price": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "url_name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "stock": {
+                    "type": "integer"
+                  },
+                  "weight": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "minimum_order": {
+                    "type": "integer"
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  },
+                  "length": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "width": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "height": {
+                    "type": "number",
+                    "format": "float"
+                  }
+                }
+              }
+            }
+          }
         },
         "responses": {
           "200": {
@@ -678,12 +1333,15 @@
                   "type": "object",
                   "properties": {
                     "error": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": "false"
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "product updated successfully"
                     },
                     "data": {
+                      "default": "null",
                       "type": "array",
                       "items": {
                         "type": "object",
@@ -707,77 +1365,15 @@
                   "type": "object",
                   "properties": {
                     "error": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": "true"
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "product not found"
                     },
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "name": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "parameters": [{ "$ref": "#/components/parameters/productId" }],
-        "summary": "Delete product by ID",
-        "tags": ["Products"],
-        "responses": {
-          "204": {
-            "description": "Product deleted",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean"
-                    },
-                    "message": {
-                      "type": "string"
-                    },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "name": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Product not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean"
-                    },
-                    "message": {
-                      "type": "string"
-                    },
-                    "data": {
+                      "default": "null",
                       "type": "array",
                       "items": {
                         "type": "object",
@@ -802,9 +1398,20 @@
         "summary": "Toggle product active status",
         "tags": ["Products"],
         "requestBody": {
-          "description": "",
-          "required": false,
-          "content": {}
+          "content": {
+            "application/json": {
+              "schema": {
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
         },
         "responses": {
           "200": {
@@ -815,12 +1422,15 @@
                   "type": "object",
                   "properties": {
                     "error": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": "true"
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "product toggled successfully"
                     },
                     "data": {
+                      "default": "null",
                       "type": "array",
                       "items": {
                         "type": "object",
@@ -844,12 +1454,15 @@
                   "type": "object",
                   "properties": {
                     "error": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": "true"
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "product no found"
                     },
                     "data": {
+                      "default": "null",
                       "type": "array",
                       "items": {
                         "type": "object",
@@ -881,20 +1494,17 @@
                   "type": "object",
                   "properties": {
                     "error": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": "false"
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "Orders retrieved successfully"
                     },
                     "data": {
                       "type": "array",
                       "items": {
-                        "type": "object",
-                        "properties": {
-                          "name": {
-                            "type": "string"
-                          }
-                        }
+                        "type": "object"
                       }
                     }
                   }
@@ -908,9 +1518,48 @@
         "summary": "Create an order",
         "tags": ["Orders"],
         "requestBody": {
-          "description": "",
-          "required": false,
-          "content": {}
+          "description": "Create a new order",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "recipient_id": {
+                    "type": "string",
+                    "description": "Unique identifier for the recipient"
+                  },
+                  "total_price": {
+                    "type": "number",
+                    "format": "float",
+                    "description": "Total price for the order"
+                  },
+                  "created_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Timestamp of when the order was created"
+                  },
+                  "updated_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Timestamp of when the order was last updated"
+                  },
+                  "OrderItem": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    },
+                    "description": "List of order items"
+                  },
+                  "Payment": {
+                    "type": "object",
+                    "description": "Payment details for the order"
+                  }
+                },
+                "required": ["recipient_id", "total_price"]
+              }
+            }
+          }
         },
         "responses": {
           "201": {
@@ -921,222 +1570,18 @@
                   "type": "object",
                   "properties": {
                     "error": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": "false"
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "Orders retrieved successfully"
                     },
                     "data": {
+                      "default": "null",
                       "type": "array",
                       "items": {
-                        "type": "object",
-                        "properties": {
-                          "name": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/orders/{id}": {
-      "get": {
-        "parameters": [{ "$ref": "#/components/parameters/orderId" }],
-        "summary": "Get order by ID",
-        "tags": ["Orders"],
-        "responses": {
-          "200": {
-            "description": "Order details",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean"
-                    },
-                    "message": {
-                      "type": "string"
-                    },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "name": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Order not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean"
-                    },
-                    "message": {
-                      "type": "string"
-                    },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "name": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "patch": {
-        "parameters": [{ "$ref": "#/components/parameters/orderId" }],
-        "summary": "Update order by ID",
-        "tags": ["Orders"],
-        "requestBody": {
-          "description": "",
-          "required": false,
-          "content": {}
-        },
-        "responses": {
-          "200": {
-            "description": "Order updated",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean"
-                    },
-                    "message": {
-                      "type": "string"
-                    },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "name": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Order not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean"
-                    },
-                    "message": {
-                      "type": "string"
-                    },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "name": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "parameters": [{ "$ref": "#/components/parameters/orderId" }],
-        "summary": "Delete order by ID",
-        "tags": ["Orders"],
-        "responses": {
-          "204": {
-            "description": "Order deleted",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean"
-                    },
-                    "message": {
-                      "type": "string"
-                    },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "name": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Order not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean"
-                    },
-                    "message": {
-                      "type": "string"
-                    },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "name": {
-                            "type": "string"
-                          }
-                        }
+                        "type": "object"
                       }
                     }
                   }
@@ -1171,12 +1616,294 @@
                   "type": "object",
                   "properties": {
                     "error": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": "false"
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "orders retrieved successfully"
                     },
                     "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orders/{id}": {
+      "get": {
+        "parameters": [{ "$ref": "#/components/parameters/orderId" }],
+        "summary": "Get order by ID",
+        "tags": ["Orders"],
+        "responses": {
+          "200": {
+            "description": "Order details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "default": "false"
+                    },
+                    "message": {
+                      "type": "string",
+                      "default": "order retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "id of the order"
+                          },
+                          "recipient_id": {
+                            "type": "string",
+                            "description": "Unique identifier for the recipient"
+                          },
+                          "total_price": {
+                            "type": "number",
+                            "format": "float",
+                            "description": "Total price for the order"
+                          },
+                          "created_at": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "Timestamp of when the order was created"
+                          },
+                          "updated_at": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "Timestamp of when the order was last updated"
+                          },
+                          "OrderItem": {
+                            "type": "array",
+                            "items": {
+                              "type": "object"
+                            },
+                            "description": "List of order items"
+                          },
+                          "Payment": {
+                            "type": "object",
+                            "description": "Payment details for the order"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Order not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "default": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "default": "order not found"
+                    },
+                    "data": {
+                      "default": "null",
+                      "type": "array"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "parameters": [{ "$ref": "#/components/parameters/orderId" }],
+        "summary": "Update order by ID",
+        "tags": ["Orders"],
+        "requestBody": {
+          "description": "",
+          "required": false,
+          "content": {}
+        },
+        "responses": {
+          "200": {
+            "description": "Order updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "default": "false"
+                    },
+                    "message": {
+                      "type": "string",
+                      "default": "order updated successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "id of the order"
+                          },
+                          "recipient_id": {
+                            "type": "string",
+                            "description": "Unique identifier for the recipient"
+                          },
+                          "total_price": {
+                            "type": "number",
+                            "format": "float",
+                            "description": "Total price for the order"
+                          },
+                          "created_at": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "Timestamp of when the order was created"
+                          },
+                          "updated_at": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "Timestamp of when the order was last updated"
+                          },
+                          "OrderItem": {
+                            "type": "array",
+                            "items": {
+                              "type": "object"
+                            },
+                            "description": "List of order items"
+                          },
+                          "Payment": {
+                            "type": "object",
+                            "description": "Payment details for the order"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Order not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "default": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "default": "order not found"
+                    },
+                    "data": {
+                      "default": "null",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "parameters": [{ "$ref": "#/components/parameters/orderId" }],
+        "summary": "Delete order by ID",
+        "tags": ["Orders"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Order deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "default": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "default": "order deleted successfully"
+                    },
+                    "data": {
+                      "default": "null",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Order not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "default": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "default": "order not found"
+                    },
+                    "data": {
+                      "default": "null",
                       "type": "array",
                       "items": {
                         "type": "object",
@@ -1209,12 +1936,15 @@
                   "type": "object",
                   "properties": {
                     "error": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": "true"
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "Wrong email or password"
                     },
                     "data": {
+                      "default": "null",
                       "type": "array",
                       "items": {
                         "type": "object",
@@ -1250,12 +1980,93 @@
                   "type": "object",
                   "properties": {
                     "error": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": "true"
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "Wrong email or password"
                     },
                     "data": {
+                      "default": "null",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orders/{id}/approval": {
+      "patch": {
+        "parameters": [{ "$ref": "#/components/parameters/orderId" }],
+        "summary": "Update order by ID",
+        "tags": ["Orders"],
+        "requestBody": {
+          "description": "",
+          "required": false,
+          "content": {}
+        },
+        "responses": {
+          "200": {
+            "description": "Order updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "default": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "default": "Wrong email or password"
+                    },
+                    "data": {
+                      "default": "null",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Order not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "default": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "default": "Wrong email or password"
+                    },
+                    "data": {
+                      "default": "null",
                       "type": "array",
                       "items": {
                         "type": "object",
@@ -1293,12 +2104,334 @@
                   "type": "object",
                   "properties": {
                     "error": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": "true"
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "Wrong email or password"
                     },
                     "data": {
+                      "default": "null",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/balance": {
+      "get": {
+        "summary": "Get admin balance",
+        "tags": ["Admin"],
+        "responses": {
+          "200": {
+            "description": "List of info",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "default": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "default": "Wrong email or password"
+                    },
+                    "data": {
+                      "default": "null",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/transactions": {
+      "get": {
+        "summary": "Get admin balance",
+        "tags": ["Admin"],
+        "responses": {
+          "200": {
+            "description": "List of info",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "default": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "default": "Wrong email or password"
+                    },
+                    "data": {
+                      "default": "null",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/users": {
+      "get": {
+        "summary": "Get admin balance",
+        "tags": ["Admin"],
+        "responses": {
+          "200": {
+            "description": "List of info",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "default": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "default": "Wrong email or password"
+                    },
+                    "data": {
+                      "default": "null",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/categories": {
+      "get": {
+        "summary": "Get admin balance",
+        "tags": ["Admin"],
+        "responses": {
+          "200": {
+            "description": "List of info",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "default": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "default": "Wrong email or password"
+                    },
+                    "data": {
+                      "default": "null",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/withdraw": {
+      "get": {
+        "summary": "Get admin balance",
+        "tags": ["Admin"],
+        "responses": {
+          "200": {
+            "description": "List of info",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "default": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "default": "Wrong email or password"
+                    },
+                    "data": {
+                      "default": "null",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create an order",
+        "tags": ["Admin"],
+        "requestBody": {
+          "description": "",
+          "required": false,
+          "content": {}
+        },
+        "responses": {
+          "201": {
+            "description": "Order created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "default": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "default": "Wrong email or password"
+                    },
+                    "data": {
+                      "default": "null",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "parameters": [{ "$ref": "#/components/parameters/orderId" }],
+        "summary": "Update order by ID",
+        "tags": ["Admin"],
+        "requestBody": {
+          "description": "",
+          "required": false,
+          "content": {}
+        },
+        "responses": {
+          "200": {
+            "description": "Order updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "default": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "default": "Wrong email or password"
+                    },
+                    "data": {
+                      "default": "null",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Order not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "default": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "default": "Wrong email or password"
+                    },
+                    "data": {
+                      "default": "null",
                       "type": "array",
                       "items": {
                         "type": "object",
