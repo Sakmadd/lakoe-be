@@ -1053,7 +1053,7 @@
                       "default": "Products deleted successfully"
                     },
                     "data": {
-                      "type": "null",
+                      "type": "object",
                       "default": null
                     }
                   }
