@@ -2131,7 +2131,7 @@
         }
       }
     },
-    "/admin/balance": {
+    "/admins/balance": {
       "get": {
         "summary": "Get admin balance",
         "tags": ["Admin"],
@@ -2171,7 +2171,7 @@
         }
       }
     },
-    "/admin/transactions": {
+    "/admins/transactions": {
       "get": {
         "summary": "Get admin balance",
         "tags": ["Admin"],
@@ -2211,7 +2211,7 @@
         }
       }
     },
-    "/admin/users": {
+    "/admins/users": {
       "get": {
         "summary": "Get admin balance",
         "tags": ["Admin"],
@@ -2251,7 +2251,7 @@
         }
       }
     },
-    "/admin/categories": {
+    "/admins/categories": {
       "get": {
         "summary": "Get admin balance",
         "tags": ["Admin"],
@@ -2291,7 +2291,7 @@
         }
       }
     },
-    "/admin/withdraw": {
+    "/admins/withdraw": {
       "get": {
         "summary": "Get admin balance",
         "tags": ["Admin"],
