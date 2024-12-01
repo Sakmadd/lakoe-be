@@ -1525,36 +1525,42 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "recipient_id": {
-                    "type": "string",
-                    "description": "Unique identifier for the recipient"
+                  "Recipient":{
+                    "items":{
+                      "type": "object",
+                      "properties": {
+                        "name":{
+                          "type": "string"
+                        },
+                        "address":{
+                          "type": "string"
+                        },
+                        "phone":{
+                          "type": "string"
+                        },
+                        "email":{
+                          "type": "string"
+                        },
+                        "district":{
+                          "type": "string"
+                        },
+                        "city":{
+                          "type": "string"
+                        },
+                        "longitude":{
+                          "type": "integer"
+                        },
+                        "latitude":{
+                          "type":"integer"
+                        }
+                      }
+                    }
                   },
-                  "total_price": {
-                    "type": "number",
-                    "format": "float",
-                    "description": "Total price for the order"
-                  },
-                  "created_at": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "Timestamp of when the order was created"
-                  },
-                  "updated_at": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "Timestamp of when the order was last updated"
-                  },
-                  "OrderItem": {
-                    "type": "array",
-                    "items": {
-                      "type": "object"
-                    },
-                    "description": "List of order items"
-                  },
-                  "Payment": {
-                    "type": "object",
-                    "description": "Payment details for the order"
-                  }
+                 "product_id":{
+                   "type": "string"
+                 },
+                 "quantity":{
+                   "type": "integer"}
                 },
                 "required": ["recipient_id", "total_price"]
               }
@@ -1660,7 +1666,6 @@
                       "default": "order retrieved successfully"
                     },
                     "data": {
-                      "type": "array",
                       "items": {
                         "type": "object",
                         "properties": {
@@ -1668,9 +1673,11 @@
                             "type": "string",
                             "description": "id of the order"
                           },
-                          "recipient_id": {
-                            "type": "string",
-                            "description": "Unique identifier for the recipient"
+                          "Recipient":{
+                            "type": "object",
+                            "items": {
+                              "type": "object"
+                            }
                           },
                           "total_price": {
                             "type": "number",
@@ -1739,7 +1746,21 @@
         "requestBody": {
           "description": "",
           "required": false,
-          "content": {}
+          "content": {
+            "application/json":{
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "product_id":{
+                    "type": "string"
+                  },
+                  "quantity":{
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
         },
         "responses": {
           "200": {
@@ -1766,9 +1787,11 @@
                             "type": "string",
                             "description": "id of the order"
                           },
-                          "recipient_id": {
-                            "type": "string",
-                            "description": "Unique identifier for the recipient"
+                          "Recipient":{
+                            "type": "object",
+                            "items": {
+                              "type": "object"
+                            }
                           },
                           "total_price": {
                             "type": "number",
@@ -2015,7 +2038,21 @@
         "requestBody": {
           "description": "",
           "required": false,
-          "content": {}
+          "content": {
+            "application/json":{
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "order_id":{
+                    "type": "string"
+                  },
+                  "status":{
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
         },
         "responses": {
           "200": {
@@ -2031,11 +2068,10 @@
                     },
                     "message": {
                       "type": "string",
-                      "default": "Wrong email or password"
+                      "default": "Order [Approved|Rejected] successfully"
                     },
-                    "data": {
-                      "default": "null",
-                      "type": "array",
+                    "invoice": {
+                      "type": "object",
                       "items": {
                         "type": "object",
                         "properties": {
@@ -2063,7 +2099,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "default": "Wrong email or password"
+                      "default": "Order not found"
                     },
                     "data": {
                       "default": "null",
