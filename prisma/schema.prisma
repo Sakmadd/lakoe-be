@@ -195,6 +195,7 @@ model OrderItem {
 model Recipient {
   id        String    @id @default(uuid())
   name      String
+  email     String
   address   String
   phone     String
   district  String
