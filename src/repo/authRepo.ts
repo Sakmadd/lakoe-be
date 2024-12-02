@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
-import RegisterDto from '../dtos/registerDto';
+import RegisterDto from '../dtos/authentication/registerDto';
 import hasher from '../utils/hasher';
+import LoginDTO from '../dtos/authentication/loginDTO';
 
 const prisma = new PrismaClient();
 
@@ -33,4 +34,25 @@ export async function registerRepo(data: RegisterDto) {
   delete user.password;
 
   return user;
+}
+
+export async function loginRepo(data: LoginDTO) {
+  const requestedUser = await prisma.user.findFirst({
+    where: {
+      email: data.email,
+    },
+  });
+
+  if (!requestedUser) {
+    throw new Error('User not found');
+  }
+
+  const compare = hasher.comparePassword(data.password, requestedUser.password);
+
+  if (!compare) {
+    throw new Error('Wrong email or password');
+  }
+  delete requestedUser.password;
+
+  return requestedUser;
 }

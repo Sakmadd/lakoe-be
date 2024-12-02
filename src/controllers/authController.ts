@@ -32,6 +32,38 @@ class AuthControllers {
       }),
     );
   }
+
+  async login(req: Request, res: Response) {
+    const { email, password } = req.body;
+
+    const { error, payload, message }: ServiceResponseDTO<string> =
+      await authService.login({
+        email,
+        password,
+      });
+
+    if (error) {
+      return res.status(401).json(
+        new ResponseDTO<string>({
+          error,
+          message: message,
+          data: payload,
+        }),
+      );
+    }
+
+    return res.status(200).json(
+      new ResponseDTO<string>({
+        error,
+        message: {
+          status: 'Login succesfull',
+        },
+        data: {
+          token: payload,
+        },
+      }),
+    );
+  }
 }
 
 export default new AuthControllers();
