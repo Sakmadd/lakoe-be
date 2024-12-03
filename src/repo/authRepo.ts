@@ -1,9 +1,7 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../libs/prisma';
 import RegisterDto from '../dtos/authentication/registerDto';
 import hasher from '../utils/hasher';
 import LoginDTO from '../dtos/authentication/loginDTO';
-
-const prisma = new PrismaClient();
 
 export async function registerRepo(data: RegisterDto) {
   const existingUser = await prisma.user.findFirst({

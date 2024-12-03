@@ -22,22 +22,24 @@ model User {
   name     String @unique
   email    String
   password String
-  Shop     Shop   @relation(fields: [shop_id], references: [id])
+
+  Shop Shop @relation(fields: [shop_id], references: [id])
 
   @@map("users")
 }
 
 model Shop {
-  id          String     @id @default(uuid())
+  id          String  @id @default(uuid())
   phone       String?
   description String?
   slogan      String?
   logo        String?
-  balance     Float      @default(0)
-  User        User?
-  location    Location[]
-  Product     Product[]
-  Withdraw    Withdraw[]
+  balance     Float   @default(0)
+
+  User     User?
+  location Location[]
+  Product  Product[]
+  Withdraw Withdraw[]
 
   @@map("shops")
 }
