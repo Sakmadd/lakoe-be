@@ -19,13 +19,14 @@ export interface ShopType {
   slogan?: string;
   logo?: string;
   balance: number;
-  location?: LocationType[];
+  Location?: LocationType[];
   product?: ProductType[];
   user?: UserType;
 }
 
 export interface LocationType {
   id: string;
+  shop_id: string;
   name: string;
   address: string;
   city: string;
@@ -33,6 +34,8 @@ export interface LocationType {
   postal_code: string;
   longitude: string;
   latitude: string;
+  is_main: Boolean;
+  Shop?: ShopType;
 }
 
 export interface ProductType {

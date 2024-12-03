@@ -16,10 +16,16 @@ enum OrderStatus {
   CANCELED
 }
 
+enum Role {
+  Seller
+  Admin
+}
+
 model User {
   id       String @id @default(uuid())
   shop_id  String @unique
   name     String @unique
+  role     Role   @default(Seller)
   email    String
   password String
 
@@ -45,7 +51,7 @@ model Shop {
 }
 
 model Location {
-  id          String @id @default(uuid())
+  id          String  @id @default(uuid())
   shop_id     String
   name        String
   address     String
@@ -54,8 +60,8 @@ model Location {
   postal_code String
   longitude   String
   latitude    String
-  is_main     String
-  Shop        Shop?  @relation(fields: [shop_id], references: [id])
+  is_main     Boolean
+  Shop        Shop?   @relation(fields: [shop_id], references: [id])
 
   @@map("locations")
 }
