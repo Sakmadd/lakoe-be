@@ -9,7 +9,7 @@ cloudinary.config({
   api_secret: CONFIGS.CLOUDINARY_API_SECRET,
 });
 
-export const uploadImageMiddleware = async (
+export const uploadImage = async (
   req: Request,
   res: Response,
   next: NextFunction,
