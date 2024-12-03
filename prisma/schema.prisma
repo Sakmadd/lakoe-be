@@ -100,7 +100,8 @@ model Images {
 
 model Category {
   id        String     @id @default(uuid())
-  name      String
+  label     String
+  value     String
   parent_id String?
   Parent    Category?  @relation("CategoryToParent", fields: [parent_id], references: [id])
   Children  Category[] @relation("CategoryToParent")
