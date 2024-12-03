@@ -1,11 +1,15 @@
 import { Router } from 'express';
 import shopController from '../../../controllers/shopController';
+import { uploadImage } from '../../../middlewares/upload-file';
+
 
 const router = Router();
 
 router.get('/shops/:id', shopController.getShop.bind(shopController));
-router.get(
+router.patch(
   '/shops/:id/locations',
+  uploadImage.bind,
+
   shopController.getLocationById.bind(shopController),
 );
 router.post(

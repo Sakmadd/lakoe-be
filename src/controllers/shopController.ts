@@ -26,12 +26,13 @@ class shopController {
     const { id } = req.params;
     const { name, phone, description, slogan, logo } = req.body;
 
+    const updatedLogo = req.body.imageUrl || logo;
+
     const shop = await shopService.updateShop({
       name,
       phone,
       description,
       slogan,
-      logo,
       id,
     });
 
