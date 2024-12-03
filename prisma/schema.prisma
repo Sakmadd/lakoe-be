@@ -16,10 +16,16 @@ enum OrderStatus {
   CANCELED
 }
 
+enum Role {
+  Seller
+  Admin
+}
+
 model User {
   id       String @id @default(uuid())
   shop_id  String @unique
   name     String @unique
+  role     Role   @default(Seller)
   email    String
   password String
 
@@ -45,7 +51,7 @@ model Shop {
 }
 
 model Location {
-  id          String @id @default(uuid())
+  id          String  @id @default(uuid())
   shop_id     String
   name        String
   address     String
@@ -54,14 +60,14 @@ model Location {
   postal_code String
   longitude   String
   latitude    String
-  is_main     String
-  Shop        Shop?  @relation(fields: [shop_id], references: [id])
+  is_main     Boolean
+  Shop        Shop?   @relation(fields: [shop_id], references: [id])
 
   @@map("locations")
 }
 
 model Product {
-  id            String          @id @default(uuid())
+  id            String      @id @default(uuid())
   shop_id       String
   category_id   String
   name          String
@@ -76,28 +82,32 @@ model Product {
   length        Float
   width         Float
   height        Float
-  created_at    DateTime        @default(now())
-  updated_at    DateTime        @default(now())
+  created_at    DateTime    @default(now())
+  updated_at    DateTime    @default(now())
   OrderItem     OrderItem[]
-  Shop          Shop            @relation(fields: [shop_id], references: [id])
-  Category      Category        @relation(fields: [category_id], references: [id])
+  Shop          Shop        @relation(fields: [shop_id], references: [id])
+  Category      Category    @relation(fields: [category_id], references: [id])
   Variant       Variant[]
-  ProductImages ProductImages[]
+  ProductImages Images[]
 
   @@map("products")
 }
 
-model ProductImages {
-  id         String  @id @default(uuid())
-  product_id String
-  alt        String
-  url        String
-  product    Product @relation(fields: [product_id], references: [id])
+model Images {
+  id               String @id @default(uuid())
+  product_id       String
+  variantOption_id String
+
+  alt           String
+  src           String
+  variantOption VariantOption @relation(fields: [variantOption_id], references: [id])
+  product       Product       @relation(fields: [product_id], references: [id])
 }
 
 model Category {
   id        String     @id @default(uuid())
-  name      String
+  label     String
+  value     String
   parent_id String?
   Parent    Category?  @relation("CategoryToParent", fields: [parent_id], references: [id])
   Children  Category[] @relation("CategoryToParent")
@@ -127,6 +137,7 @@ model VariantOption {
   updated_at         DateTime             @default(now())
   Variant            Variant              @relation(fields: [variant_id], references: [id])
   VariantOptionValue VariantOptionValue[]
+  Images             Images[]
 
   @@map("variantOptions")
 }
