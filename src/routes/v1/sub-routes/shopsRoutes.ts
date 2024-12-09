@@ -1,25 +1,35 @@
 import { Router } from 'express';
 import shopController from '../../../controllers/shopController';
-import { uploadImage } from '../../../middlewares/upload-file';
+import upload from '../../../middlewares/upload-file';
+import { authentication } from '../../../middlewares/authentication';
 
 const router = Router();
 
-router.get('/shops/:id', shopController.getShop.bind(shopController));
+router.get('/:id', shopController.getShop.bind(shopController));
+
 router.patch(
-  '/shops/:id/locations',
-  uploadImage.bind,
+  '/:id',
+  upload.single('logo'),
+  shopController.updateShop.bind(shopController),
+);
+
+router.patch(
+  '/:id/locations',
   shopController.getLocationById.bind(shopController),
 );
+
 router.post(
-  '/shops/:id/locations',
+  '/:id/locations',
   shopController.addLocationById.bind(shopController),
 );
+
 router.patch(
-  '/shops/:id/locations/:location_id',
+  '/:id/locations/:location_id',
   shopController.updateLocationByLocationId.bind(shopController),
 );
+
 router.delete(
-  '/shops/:id/locations/:location_id',
+  '/:id/locations/:location_id',
   shopController.deleteLocation.bind(shopController),
 );
 
