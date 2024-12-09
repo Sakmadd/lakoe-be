@@ -13,7 +13,7 @@ router.patch(
   shopController.updateShop.bind(shopController),
 );
 
-router.patch(
+router.get(
   '/:id/locations',
   shopController.getLocationById.bind(shopController),
 );
