@@ -192,10 +192,10 @@ export interface BankAccount {
   name: string;
   account: string;
   bank: string;
-  Withdraw?: WithdrawType[];
+  Withdraw?: Withdraw[];
 }
 
-export interface WithdrawType {
+export interface Withdraw {
   id: string;
   bank_account_id: string;
   shop_id: string;
@@ -207,8 +207,4 @@ export interface WithdrawType {
   created_at: Date;
   BankAccount?: BankAccount;
   Shop?: ShopType;
-}
-
-export interface BalanceType {
-  amount: number;
 }

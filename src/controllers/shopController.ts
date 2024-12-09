@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import shopService from '../services/shopService';
-import uploader from '../libs/cloudinary';
 
 class shopController {
   async getShop(req: Request, res: Response) {
@@ -25,19 +24,16 @@ class shopController {
 
   async updateShop(req: Request, res: Response) {
     const { id } = req.params;
-    const { name, phone, description, slogan } = req.body;
-    let { logo } = req.body;
+    const { name, phone, description, slogan, logo } = req.body;
 
-    if (req.file) {
-      logo = await uploader(req.file as Express.Multer.File);
-    }
+    const updatedLogo = req.body.imageUrl || logo;
 
     const shop = await shopService.updateShop({
       name,
       phone,
       description,
       slogan,
-      logo,
+      logo: updatedLogo,
       id,
     });
 
