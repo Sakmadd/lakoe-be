@@ -6,6 +6,7 @@ import { CreateProductDTO } from '../dtos/products/createProduct';
 import { ProductType } from '../types/types';
 import { SearchDTO } from '../dtos/products/searchProductDTO';
 import { ProductDetailDTO } from '../dtos/products/productDetailDTO';
+import { ToggleProductDTO } from '../dtos/products/toggleProductDTO';
 
 class ProductService {
   async getAllProducts(
@@ -104,6 +105,48 @@ class ProductService {
       });
     } catch (error) {
       return serviceErrorHandler<ProductDetailDTO | null>({
+        error: true,
+        message: error.message,
+        payload: null,
+      });
+    }
+  }
+
+  async updateProductById(
+    id: string,
+    data: CreateProductDTO,
+  ): Promise<ServiceResponseDTO<CreateProductDTO | null>> {
+    try {
+      const product = await productRepo.updateProductById(id, data);
+
+      return new ServiceResponseDTO<CreateProductDTO>({
+        error: false,
+        message: null,
+        payload: product,
+      });
+    } catch (error) {
+      return serviceErrorHandler<CreateProductDTO | null>({
+        error: true,
+        message: error.message,
+        payload: null,
+      });
+    }
+  }
+
+  async toggleProductActive(
+    id: string,
+    isActive: boolean,
+  ): Promise<ServiceResponseDTO<ToggleProductDTO | null>> {
+    try {
+      const product = await productRepo.toggleProductActive(id, isActive);
+
+      return new ServiceResponseDTO<ToggleProductDTO>({
+        error: false,
+        message: null,
+        payload: product,
+      });
+    } catch (error) {
+      return serviceErrorHandler<ToggleProductDTO | null>({
         error: true,
         message: error.message,
         payload: null,
