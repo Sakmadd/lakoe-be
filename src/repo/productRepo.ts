@@ -198,11 +198,14 @@ export async function createProduct(data: CreateProductDTO) {
 }
 
 export async function getProductsByIds(id: string[]) {
-  const products = prisma.product.findMany({
+  const products = await prisma.product.findMany({
     where: {
       id: {
         in: id,
       },
+    },
+    include: {
+      Images: true,
     },
   });
 
@@ -298,7 +301,7 @@ export async function getProductById(
             select: {
               id: true,
               name: true,
-              variantId: true, // Prisma field; will be renamed below
+              variantId: true,
               src: true,
               alt: true,
             },
@@ -360,7 +363,7 @@ export async function getProductById(
       VariantOption: (variant.VariantOption || []).map((option) => ({
         id: option.id,
         name: option.name,
-        variant_id: option.variantId, // Rename to match DTO
+        variant_id: option.variantId,
         src: option.src,
         alt: option.alt,
       })),

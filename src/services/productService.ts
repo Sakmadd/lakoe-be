@@ -5,6 +5,7 @@ import { ProductsDTO } from '../dtos/products/productsDTO';
 import { CreateProductDTO } from '../dtos/products/createProduct';
 import { ProductType } from '../types/types';
 import { SearchDTO } from '../dtos/products/searchProductDTO';
+import { ProductDetailDTO } from '../dtos/products/productDetailDTO';
 
 class ProductService {
   async getAllProducts(
@@ -92,17 +93,17 @@ class ProductService {
 
   async getProductById(
     id: string,
-  ): Promise<ServiceResponseDTO<ProductType | null>> {
+  ): Promise<ServiceResponseDTO<ProductDetailDTO | null>> {
     try {
       const product = await productRepo.getProductById(id);
 
-      return new ServiceResponseDTO<ProductType>({
+      return new ServiceResponseDTO<ProductDetailDTO>({
         error: false,
         message: null,
         payload: product,
       });
     } catch (error) {
-      return serviceErrorHandler<ProductType | null>({
+      return serviceErrorHandler<ProductDetailDTO | null>({
         error: true,
         message: error.message,
         payload: null,
