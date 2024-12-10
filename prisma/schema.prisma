@@ -21,6 +21,11 @@ enum Role {
   admin
 }
 
+enum Role {
+  Seller
+  Admin
+}
+
 model User {
   id       String @id @default(uuid())
   shop_id  String @unique

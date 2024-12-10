@@ -1,5 +1,6 @@
 import { OrderStatus, Role } from '@prisma/client';
 
+
 export interface UserType {
   id: string;
   shop_id: string;
@@ -37,6 +38,7 @@ export interface LocationType {
   longitude: string;
   latitude: string;
   is_main: boolean;
+
   Shop?: ShopType;
 }
 
