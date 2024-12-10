@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import productService from '../services/productService';
 import uploader from '../libs/cloudinary';
+import { boolean } from 'zod';
 
 class productController {
   async getAllProducts(req: Request, res: Response) {
@@ -125,6 +126,47 @@ class productController {
     return res.status(200).json({
       error: false,
       message: 'Product found',
+      data: product,
+    });
+  }
+
+  async updateProductById(req: Request, res: Response) {
+    const { id } = req.params;
+    const data = req.body;
+
+    const product = await productService.updateProductById(id, data);
+
+    if (!product) {
+      return res.status(404).json({
+        error: true,
+        message: 'No product found',
+        data: null,
+      });
+    }
+
+    return res.status(200).json({
+      error: false,
+      message: 'Product updated',
+      data: product,
+    });
+  }
+
+  async toggleProductActive(req: Request, res: Response) {
+    const { id } = req.params;
+    const isActive = req.body;
+
+    const product = await productService.toggleProductActive(id, isActive);
+
+    if (!product) {
+      return res.status(404).json({
+        error: true,
+        message: 'No product found',
+        data: null,
+      });
+    }
+    return res.status(200).json({
+      error: false,
+      message: 'Product updated',
       data: product,
     });
   }

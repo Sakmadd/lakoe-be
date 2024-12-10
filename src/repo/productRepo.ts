@@ -406,3 +406,197 @@ export async function getProductById(
 
   return productFinal;
 }
+
+export async function updateProductById(id: string, data: CreateProductDTO) {
+  const product = await prisma.product.update({
+    where: { id },
+    data: {
+      name: data.name,
+      sku: data.sku,
+      price: data.price,
+      url_name: data.url_name,
+      description: data.description,
+      stock: data.stock,
+      weight: data.weight,
+      minimum_order: data.minimum_order,
+      is_active: data.is_active,
+      length: data.length,
+      width: data.width,
+      height: data.height,
+      Category: {
+        connect: { id: data.Category.id },
+      },
+      Shop: {
+        connect: { id: data.Shop.id },
+      },
+      Variant: {
+        upsert: data.Variant.map((variant) => ({
+          where: { id: variant.id },
+          update: {
+            name: variant.name,
+            is_active: variant.is_active,
+            VariantOption: {
+              upsert: variant.VariantOption.map((option) => ({
+                where: { id: option.id },
+                update: {
+                  name: option.name,
+                  src: option.src,
+                  alt: option.alt,
+                },
+                create: {
+                  id: option.id,
+                  name: option.name,
+                  src: option.src,
+                  alt: option.alt,
+                  variant_id: variant.id,
+                },
+              })),
+            },
+          },
+          create: {
+            id: variant.id,
+            product_id: id,
+            name: variant.name,
+            is_active: variant.is_active,
+            VariantOption: {
+              create: variant.VariantOption.map((option) => ({
+                id: option.id,
+                name: option.name,
+                src: option.src,
+                alt: option.alt,
+              })),
+            },
+          },
+        })),
+      },
+      VariantOptionCombination: {
+        upsert: data.VariantOptionCombination.map((combination) => ({
+          where: { id: combination.id },
+          update: {
+            name: combination.name,
+            is_active: combination.is_active,
+            price: combination.price,
+            stock: combination.stock,
+            weight: combination.weight,
+            sku: combination.sku,
+          },
+          create: {
+            id: combination.id,
+            product_id: id,
+            name: combination.name,
+            is_active: combination.is_active,
+            price: combination.price,
+            stock: combination.stock,
+            weight: combination.weight,
+            sku: combination.sku,
+          },
+        })),
+      },
+      Images: {
+        upsert: data.Images.map((image) => ({
+          where: { id: image.id },
+          update: {
+            alt: image.alt,
+            src: image.src,
+          },
+          create: {
+            id: image.id,
+            product_id: id,
+            alt: image.alt,
+            src: image.src,
+          },
+        })),
+      },
+    },
+    include: {
+      Category: true,
+      Shop: {
+        select: {
+          id: true,
+          User: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
+      Variant: {
+        include: {
+          VariantOption: true,
+        },
+      },
+      VariantOptionCombination: true,
+      Images: true,
+    },
+  });
+
+  return {
+    id: product.id,
+    name: product.name,
+    sku: product.sku,
+    price: product.price,
+    url_name: product.url_name,
+    description: product.description,
+    stock: product.stock,
+    weight: product.weight,
+    minimum_order: product.minimum_order,
+    is_active: product.is_active,
+    length: product.length,
+    width: product.width,
+    height: product.height,
+    Shop: {
+      id: product.Shop.id,
+      name: product.Shop.User.name,
+    },
+    Category: {
+      id: product.Category.id,
+      parent_id: product.Category.parent_id || null,
+      label: product.Category.label,
+      value: product.Category.value,
+    },
+    Images: product.Images.map((image) => ({
+      id: image.id,
+      product_id: product.id,
+      src: image.src,
+      alt: image.alt,
+    })),
+    Variant: product.Variant.map((variant) => ({
+      id: variant.id,
+      name: variant.name,
+      is_active: variant.is_active,
+      product_id: product.id,
+      VariantOption: variant.VariantOption.map((option) => ({
+        id: option.id,
+        variant_id: variant.id,
+        name: option.name,
+        src: option.src,
+        alt: option.alt,
+      })),
+    })),
+    VariantOptionCombination: product.VariantOptionCombination.map(
+      (combination) => ({
+        id: combination.id,
+        product_id: product.id,
+        name: combination.name,
+        is_active: combination.is_active,
+        price: combination.price,
+        weight: combination.weight,
+        sku: combination.sku,
+        stock: combination.stock,
+      }),
+    ),
+  };
+}
+
+export async function toggleProductActive(id: string, isActive: boolean) {
+  const product = await prisma.product.update({
+    where: { id },
+    data: {
+      is_active: isActive,
+    },
+  });
+  return {
+    id: product.id,
+    isActive: product.is_active,
+  };
+}
