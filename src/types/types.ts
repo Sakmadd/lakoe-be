@@ -1,6 +1,5 @@
 import { OrderStatus, Role } from '@prisma/client';
 
-
 export interface UserType {
   id: string;
   shop_id: string;
@@ -219,4 +218,8 @@ export interface WithdrawType {
   created_at: Date;
   BankAccount?: BankAccountType;
   Shop?: ShopType;
+}
+
+export interface BalanceType {
+  amount: number;
 }
