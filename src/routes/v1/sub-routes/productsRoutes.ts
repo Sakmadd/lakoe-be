@@ -24,4 +24,17 @@ router.get('/search', productController.searchProducts.bind(productController));
 
 router.get('/:id', productController.getProductById.bind(productController));
 
+router.patch(
+  '/:id',
+  authentication,
+  upload.array('Images'),
+  productController.updateProductById.bind(productController),
+);
+
+router.patch(
+  '/:id/toggle-active',
+  authentication,
+  productController.toggleProductActive.bind(productController),
+);
+
 export default router;
