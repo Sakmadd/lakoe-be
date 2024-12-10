@@ -15,7 +15,28 @@ export async function getShopDetail(id: string) {
       logo: true,
       balance: true,
       location: true,
-      Product: true,
+      Product: {
+        select: {
+          id: true,
+          shop_id: true,
+          category_id: true,
+          name: true,
+          sku: true,
+          price: true,
+          url_name: true,
+          description: true,
+          stock: true,
+          weight: true,
+          minimum_order: true,
+          is_active: true,
+          length: true,
+          width: true,
+          height: true,
+          created_at: true,
+          updated_at: true,
+          Images: true,
+        },
+      },
       User: true,
     },
   });
@@ -44,7 +65,6 @@ export async function updateShop(data: ShopUpdateDTO) {
     include: {
       User: true,
       location: true,
-      Product: true,
       Withdraw: true,
     },
   });
@@ -64,9 +84,10 @@ export async function updateShop(data: ShopUpdateDTO) {
       id: shop.User.id,
       name: shop.User.name,
       email: shop.User.email,
+      role: shop.User.role,
+      shop_id: shop.User.shop_id,
     },
     location: shop.location,
-    Product: shop.Product,
     Withdraw: shop.Withdraw,
   };
 

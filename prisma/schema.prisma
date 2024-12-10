@@ -8,24 +8,24 @@ datasource db {
 }
 
 enum OrderStatus {
-  UNPAID
-  NEW_ORDER
-  READY_TO_SHIP
-  ON_DELIVERY
-  DONE
-  CANCELED
+  unpaid
+  new_order
+  ready_to_ship
+  on_delivery
+  done
+  canceled
 }
 
 enum Role {
-  Seller
-  Admin
+  seller
+  admin
 }
 
 model User {
   id       String @id @default(uuid())
   shop_id  String @unique
   name     String @unique
-  role     Role   @default(Seller)
+  role     Role   @default(seller)
   email    String
   password String
 
@@ -67,48 +67,49 @@ model Location {
 }
 
 model Product {
-  id            String      @id @default(uuid())
-  shop_id       String
-  category_id   String
-  name          String
-  sku           String
-  price         Float
-  url_name      String
-  description   String
-  stock         Int
-  weight        Float
-  minimum_order Int
-  is_active     Boolean
-  length        Float
-  width         Float
-  height        Float
-  created_at    DateTime    @default(now())
-  updated_at    DateTime    @default(now())
-  OrderItem     OrderItem[]
-  Shop          Shop        @relation(fields: [shop_id], references: [id])
-  Category      Category    @relation(fields: [category_id], references: [id])
-  Variant       Variant[]
-  ProductImages Images[]
+  id                       String                     @id @default(uuid())
+  shop_id                  String
+  category_id              String
+  name                     String
+  sku                      String
+  price                    Float
+  url_name                 String
+  description              String
+  stock                    Int
+  weight                   Float
+  minimum_order            Int
+  is_active                Boolean
+  length                   Float
+  width                    Float
+  height                   Float
+  created_at               DateTime                   @default(now())
+  updated_at               DateTime                   @default(now())
+  OrderItem                OrderItem[]
+  Shop                     Shop                       @relation(fields: [shop_id], references: [id])
+  Category                 Category                   @relation(fields: [category_id], references: [id])
+  Variant                  Variant[]
+  Images                   Image[]
+  VariantOptionCombination VariantOptionCombination[]
 
   @@map("products")
 }
 
-model Images {
-  id               String @id @default(uuid())
-  product_id       String
-  variantOption_id String
+model Image {
+  id         String @id @default(uuid())
+  product_id String
 
-  alt           String
-  src           String
-  variantOption VariantOption @relation(fields: [variantOption_id], references: [id])
-  product       Product       @relation(fields: [product_id], references: [id])
+  alt     String?
+  src     String
+  product Product @relation(fields: [product_id], references: [id])
+
+  @@map("images")
 }
 
 model Category {
   id        String     @id @default(uuid())
+  parent_id String?
   label     String
   value     String
-  parent_id String?
   Parent    Category?  @relation("CategoryToParent", fields: [parent_id], references: [id])
   Children  Category[] @relation("CategoryToParent")
   Product   Product[]
@@ -130,46 +131,52 @@ model Variant {
 }
 
 model VariantOption {
-  id                 String               @id @default(uuid())
-  name               String
-  variant_id         String
-  created_at         DateTime             @default(now())
-  updated_at         DateTime             @default(now())
-  Variant            Variant              @relation(fields: [variant_id], references: [id])
-  VariantOptionValue VariantOptionValue[]
-  Images             Images[]
+  id        String   @id @default(uuid())
+  name      String
+  Variant   Variant? @relation(fields: [variantId], references: [id])
+  variantId String?
+  src       String?
+  alt       String?
 
   @@map("variantOptions")
 }
 
-model VariantOptionValue {
-  id                String        @id @default(uuid())
-  variant_option_id String
-  name              String
-  sku               String
-  weight            String
-  stock             Int
-  price             Float
-  is_active         Boolean       @default(true)
-  created_at        DateTime      @default(now())
-  updated_at        DateTime      @default(now())
-  VariantOption     VariantOption @relation(references: [id], fields: [variant_option_id])
+model VariantOptionCombination {
+  id         String  @id @default(uuid())
+  name       String
+  is_active  Boolean @default(true)
+  price      Float
+  weight     Int
+  sku        String
+  stock      Int
+  product_id String
+  Product    Product @relation(fields: [product_id], references: [id])
 
-  @@map("variantOptionsValues")
+  @@map("variantOptionCombination")
 }
 
 model Invoices {
-  id            String      @id @default(uuid())
-  recipient_id  String      @unique
+  id            String @id @default(uuid())
+  recipient_id  String @unique
   prices        Float
   serviceCharge Float
-  status        OrderStatus
+
   invoiceNumber String
   Courier       Courier?
   Payment       Payment?
-  Recipient     Recipient   @relation(fields: [recipient_id], references: [id])
+  Recipient     Recipient      @relation(fields: [recipient_id], references: [id])
+  OrderHistory  OrderHistory[]
 
   @@map("invoices")
+}
+
+model OrderHistory {
+  id         String      @id @default(uuid())
+  invoice_id String
+  status     OrderStatus
+  timestamp  DateTime    @default(now())
+
+  Invoice Invoices @relation(fields: [invoice_id], references: [id])
 }
 
 model Courier {
@@ -214,8 +221,8 @@ model Recipient {
   phone     String
   district  String
   city      String
-  longitude Decimal
-  latitude  Decimal
+  longitude String
+  latitude  String
   Order     Order?
   Invoices  Invoices?
 
@@ -234,8 +241,8 @@ model Payment {
   account_name   String
   account_number String
   status         String
-  created_at     DateTime
-  updated_at     DateTime
+  created_at     DateTime @default(now())
+  updated_at     DateTime @default(now())
   Order          Order    @relation(fields: [order_id], references: [id])
   Invoice        Invoices @relation(fields: [invoice_id], references: [id])
 

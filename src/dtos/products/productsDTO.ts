@@ -16,7 +16,7 @@ export interface ProductsDTO {
   height: number;
   created_at: Date;
   updated_at: Date;
-  ProductImages: {
+  Images: {
     src: string;
   };
   Shop: {
