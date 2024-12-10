@@ -1,4 +1,5 @@
-import { OrderStatus } from '@prisma/client';
+import { OrderStatus, Role } from '@prisma/client';
+
 
 export interface UserType {
   id: string;
@@ -6,6 +7,7 @@ export interface UserType {
   name: string;
   email: string;
   password?: string;
+  role: Role;
 }
 
 export interface UserDetailType extends UserType {
@@ -20,8 +22,9 @@ export interface ShopType {
   logo?: string;
   balance: number;
   Location?: LocationType[];
-  product?: ProductType[];
-  user?: UserType;
+  Product?: ProductType[];
+  Withdraw?: WithdrawType[];
+  User?: UserType;
 }
 
 export interface LocationType {
@@ -34,7 +37,8 @@ export interface LocationType {
   postal_code: string;
   longitude: string;
   latitude: string;
-  is_main: Boolean;
+  is_main: boolean;
+
   Shop?: ShopType;
 }
 
@@ -60,20 +64,22 @@ export interface ProductType {
   Shop?: ShopType;
   Category?: CategoryType;
   Variant?: VariantType[];
-  ProductImages?: ProductImagesType[];
+  Images: ImageType[];
+  VariantOptionCombination?: VariantOptionCombinationType[];
 }
 
-export interface ProductImagesType {
+export interface ImageType {
   id: string;
   product_id: string;
-  alt: string;
-  url: string;
-  product?: ProductType;
+  alt?: string;
+  src: string;
+  Product?: ProductType;
 }
 
 export interface CategoryType {
   id: string;
-  name: string;
+  label: string;
+  value: string;
   parent_id?: string;
   Parent?: CategoryType;
   Children?: CategoryType[];
@@ -94,25 +100,22 @@ export interface VariantType {
 export interface VariantOptionType {
   id: string;
   name: string;
-  variant_id: string;
-  created_at: Date;
-  updated_at: Date;
+  variantId?: string;
+  src?: string;
+  alt?: string;
   Variant?: VariantType;
-  VariantOptionValue?: VariantOptionValueType[];
 }
 
-export interface VariantOptionValueType {
+export interface VariantOptionCombinationType {
   id: string;
-  variant_option_id: string;
   name: string;
-  sku: string;
-  weight: string;
-  stock: number;
-  price: number;
   is_active: boolean;
-  created_at: Date;
-  updated_at: Date;
-  VariantOption?: VariantOptionType;
+  price: number;
+  weight: number;
+  sku: string;
+  stock: number;
+  product_id: string;
+  Product?: ProductType;
 }
 
 export interface InvoicesType {
@@ -125,6 +128,15 @@ export interface InvoicesType {
   Courier?: CourierType;
   Payment?: PaymentType;
   Recipient?: RecipientType;
+  OrderHistory?: OrderHistoryType[];
+}
+
+export interface OrderHistoryType {
+  id: string;
+  invoice_id: string;
+  status: OrderStatus;
+  timestamp: Date;
+  Invoice?: InvoicesType;
 }
 
 export interface CourierType {
@@ -135,7 +147,7 @@ export interface CourierType {
   Invoices?: InvoicesType;
 }
 
-export interface Order {
+export interface OrderType {
   id: string;
   recipient_id: string;
   total_price: number;
@@ -151,7 +163,7 @@ export interface OrderItemType {
   order_id: string;
   product_id: string;
   quantity: number;
-  Order?: Order;
+  Order?: OrderType;
   Product?: ProductType;
 }
 
@@ -163,9 +175,9 @@ export interface RecipientType {
   phone: string;
   district: string;
   city: string;
-  longitude: number;
-  latitude: number;
-  Order?: Order;
+  longitude: string;
+  latitude: string;
+  Order?: OrderType;
   Invoices?: InvoicesType;
 }
 
@@ -183,19 +195,19 @@ export interface PaymentType {
   status: string;
   created_at: Date;
   updated_at: Date;
-  Order?: Order;
+  Order?: OrderType;
   Invoice?: InvoicesType;
 }
 
-export interface BankAccount {
+export interface BankAccountType {
   id: string;
   name: string;
   account: string;
   bank: string;
-  Withdraw?: Withdraw[];
+  Withdraw?: WithdrawType[];
 }
 
-export interface Withdraw {
+export interface WithdrawType {
   id: string;
   bank_account_id: string;
   shop_id: string;
@@ -205,6 +217,6 @@ export interface Withdraw {
   status: string;
   updated_at: Date;
   created_at: Date;
-  BankAccount?: BankAccount;
+  BankAccount?: BankAccountType;
   Shop?: ShopType;
 }

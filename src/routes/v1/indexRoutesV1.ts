@@ -5,12 +5,13 @@ import orderRoutes from './sub-routes/orderRoutes';
 import productsRoutes from './sub-routes/productsRoutes';
 import shopsRoutes from './sub-routes/shopsRoutes';
 import usersRoutes from './sub-routes/usersRoutes';
+import { authentication } from '../../middlewares/authentication';
 
 const app = express();
 
 app.use('/auth', authRoutes);
 app.use('/users', usersRoutes);
-app.use('/shops', shopsRoutes);
+app.use('/shops', authentication, shopsRoutes);
 app.use('/products', productsRoutes);
 app.use('/orders', orderRoutes);
 app.use('/admins', adminsRoutes);

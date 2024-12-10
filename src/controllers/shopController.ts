@@ -33,6 +33,7 @@ class shopController {
       phone,
       description,
       slogan,
+      logo: updatedLogo,
       id,
     });
 
