@@ -156,11 +156,10 @@ model VariantOptionCombination {
 }
 
 model Invoices {
-  id            String @id @default(uuid())
-  recipient_id  String @unique
+  id            String         @id @default(uuid())
+  recipient_id  String         @unique
   prices        Float
   serviceCharge Float
-
   invoiceNumber String
   Courier       Courier?
   Payment       Payment?
@@ -180,11 +179,14 @@ model OrderHistory {
 }
 
 model Courier {
-  id          String   @id @default(uuid())
-  invoice_id  String   @unique
-  price       Float
+  id         String @id @default(uuid())
+  invoice_id String @unique
+  order_id   String @unique
+  price      Float
   courierCode String
-  Invoices    Invoices @relation(fields: [invoice_id], references: [id])
+
+  order Order @relation(fields: [order_id], references: [id])
+  Invoices Invoices @relation(fields: [invoice_id], references: [id])
 
   @@map("couriers")
 }
@@ -197,6 +199,7 @@ model Order {
   updated_at   DateTime    @default(now())
   OrderItem    OrderItem[]
   Payment      Payment?
+  Courier      Courier?
   Recipient    Recipient   @relation(fields: [recipient_id], references: [id])
 
   @@map("orders")
@@ -233,7 +236,7 @@ model Payment {
   id             String   @id @default(uuid())
   order_id       String   @unique
   invoice_id     String   @unique
-  transaction_id String
+  mt_order_id    String // midtra
   type           String
   url            String
   bank           String?
