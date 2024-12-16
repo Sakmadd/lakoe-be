@@ -1,5 +1,8 @@
 import axios from 'axios';
-import { CreateOrdersDTO, PaymentOrderDTO } from '../dtos/orders/createOrders';
+import {
+  CreateOrdersDTO,
+  ResPaymentOrderDTO,
+} from '../dtos/orders/createOrders';
 import { prisma } from '../libs/prisma';
 class orderRepository {
   async createOrder(data: CreateOrdersDTO) {
@@ -16,24 +19,24 @@ class orderRepository {
       },
     });
 
-    const requestPayment = {
-      payment_type: data.Payment.type,
-      bank_transfer: {
-        bank: data.Payment.bank,
-      },
-      transaction_details: {
-        order_id: data.Payment.mt_order_id,
-        gross_amount: data.Payment.amount,
-      },
-      account_name: data.Payment.account_name,
-      account_number: data.Payment.account_number,
-      url: data.Payment.url,
-      status: data.Payment.status,
-    };
+    // const requestPayment = {
+    //   payment_type: data.Payment.type,
+    //   bank_transfer: {
+    //     bank: data.Payment.bank,
+    //   },
+    //   transaction_details: {
+    //     order_id: data.Payment.mt_order_id,
+    //     gross_amount: data.Payment.amount,
+    //   },
+    //   account_name: data.Payment.account_name,
+    //   account_number: data.Payment.account_number,
+    //   url: data.Payment.url,
+    //   status: data.Payment.status,
+    // };
 
     const responseCharge = await axios.post(
       'https://api.sandbox.midtrans.com/v2/charge',
-      requestPayment,
+      // requestPayment,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -50,7 +53,7 @@ class orderRepository {
       },
     );
 
-    const responseMidtrans: PaymentOrderDTO = {
+    const responseMidtrans: ResPaymentOrderDTO = {
       mt_order_id: responseCharge.data.order_id, // Optional, depends on the payment type
       type: responseCharge.data.payment_type,
       url: responseSnap.data.redirect_url || '',

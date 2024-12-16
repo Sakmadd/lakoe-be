@@ -156,17 +156,30 @@ model VariantOptionCombination {
 }
 
 model Invoices {
-  id            String         @id @default(uuid())
-  recipient_id  String         @unique
+  id            String           @id @default(uuid())
+  recipient_id  String           @unique
   prices        Float
   serviceCharge Float
   invoiceNumber String
   Courier       Courier?
   Payment       Payment?
-  Recipient     Recipient      @relation(fields: [recipient_id], references: [id])
+  Recipient     Recipient        @relation(fields: [recipient_id], references: [id])
   OrderHistory  OrderHistory[]
 
   @@map("invoices")
+}
+
+model templateMassage {
+  id              String @id @default(uuid())
+  title           String
+  contain_massage String
+  
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime @updatedAt
+
+
+  @@map("templateMassages")
 }
 
 model OrderHistory {
@@ -179,35 +192,35 @@ model OrderHistory {
 }
 
 model Courier {
-  id         String @id @default(uuid())
-  invoice_id String @unique
-  order_id   String @unique
-  price      Float
+  id          String @id @default(uuid())
+  invoice_id  String @unique
+  order_id    String @unique
+  price       Float
   courierCode String
 
-  order Order @relation(fields: [order_id], references: [id])
+  order    Order    @relation(fields: [order_id], references: [id])
   Invoices Invoices @relation(fields: [invoice_id], references: [id])
 
   @@map("couriers")
 }
 
 model Order {
-  id           String      @id @default(uuid())
-  recipient_id String      @unique
+  id           String     @id @default(uuid())
+  recipient_id String     @unique
   total_price  Float
-  created_at   DateTime    @default(now())
-  updated_at   DateTime    @default(now())
-  OrderItem    OrderItem[]
+  created_at   DateTime   @default(now())
+  updated_at   DateTime   @default(now())
+  OrderItem    OrderItem?
   Payment      Payment?
   Courier      Courier?
-  Recipient    Recipient   @relation(fields: [recipient_id], references: [id])
+  Recipient    Recipient  @relation(fields: [recipient_id], references: [id])
 
   @@map("orders")
 }
 
 model OrderItem {
   id         String  @id @default(uuid())
-  order_id   String
+  order_id   String  @unique
   product_id String
   quantity   Int
   Order      Order   @relation(fields: [order_id], references: [id])
@@ -236,7 +249,7 @@ model Payment {
   id             String   @id @default(uuid())
   order_id       String   @unique
   invoice_id     String   @unique
-  mt_order_id    String // midtra
+  mt_order_id    String
   type           String
   url            String
   bank           String?

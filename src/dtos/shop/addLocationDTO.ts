@@ -1,5 +1,5 @@
 export interface addLocationDTO {
-  id: string;
+  // id: string;
   name: string;
   address: string;
   city: string;
