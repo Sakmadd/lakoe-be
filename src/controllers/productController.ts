@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import productService from '../services/productService';
 import uploader from '../libs/cloudinary';
-import { boolean } from 'zod';
 
 class productController {
   async getAllProducts(req: Request, res: Response) {

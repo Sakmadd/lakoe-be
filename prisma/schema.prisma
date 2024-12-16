@@ -179,13 +179,13 @@ model OrderHistory {
 }
 
 model Courier {
-  id         String @id @default(uuid())
-  invoice_id String @unique
-  order_id   String @unique
-  price      Float
+  id          String @id @default(uuid())
+  invoice_id  String @unique
+  order_id    String @unique
+  price       Float
   courierCode String
 
-  order Order @relation(fields: [order_id], references: [id])
+  order    Order    @relation(fields: [order_id], references: [id])
   Invoices Invoices @relation(fields: [invoice_id], references: [id])
 
   @@map("couriers")
