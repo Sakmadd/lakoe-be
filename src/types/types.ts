@@ -25,7 +25,13 @@ export interface ShopType {
   Withdraw?: WithdrawType[];
   User?: UserType;
 }
-
+export interface TemplateType {
+  id: string;
+  title: string;
+  contain_message: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
 export interface LocationType {
   id: string;
   shop_id: string;

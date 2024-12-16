@@ -156,28 +156,26 @@ model VariantOptionCombination {
 }
 
 model Invoices {
-  id            String           @id @default(uuid())
-  recipient_id  String           @unique
+  id            String         @id @default(uuid())
+  recipient_id  String         @unique
   prices        Float
   serviceCharge Float
   invoiceNumber String
   Courier       Courier?
   Payment       Payment?
-  Recipient     Recipient        @relation(fields: [recipient_id], references: [id])
+  Recipient     Recipient      @relation(fields: [recipient_id], references: [id])
   OrderHistory  OrderHistory[]
 
   @@map("invoices")
 }
 
-model templateMassage {
+model TemplateMassage {
   id              String @id @default(uuid())
   title           String
-  contain_massage String
-  
+  contain_message String
 
-  createdAt DateTime  @default(now())
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
 
   @@map("templateMassages")
 }
