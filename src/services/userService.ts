@@ -60,6 +60,26 @@ class userServices {
       });
     }
   }
+
+  async getLoggedUser(
+    loggedUser: UserType,
+  ): Promise<ServiceResponseDTO<UserDetailType>> {
+    try {
+      const user = await userRepo.getLoggedUser(loggedUser);
+
+      return new ServiceResponseDTO<UserDetailType>({
+        error: false,
+        message: null,
+        payload: user,
+      });
+    } catch (error) {
+      return serviceErrorHandler<UserDetailType | null>({
+        error: true,
+        message: error.message,
+        payload: null,
+      });
+    }
+  }
 }
 
 export default new userServices();

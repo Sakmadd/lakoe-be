@@ -1,8 +1,11 @@
 import express from 'express';
 import { CONFIGS } from './config/config';
 import { API_V1 } from './routes/v1/indexRoutesV1';
+import cors from 'cors';
 const app = express();
 const port = CONFIGS.PORT;
+
+app.use(cors());
 
 app.get('/', (req, res) => {
   res.send('Welcome to the API!');

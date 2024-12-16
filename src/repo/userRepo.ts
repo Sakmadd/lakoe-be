@@ -1,5 +1,6 @@
 import { UpdateUserDTO } from '../dtos/user/updateUser';
 import { prisma } from '../libs/prisma';
+import { UserDetailType, UserType } from '../types/types';
 
 export async function getAllUser() {
   const users = await prisma.user.findMany({
@@ -54,4 +55,18 @@ export async function updateUser(data: UpdateUserDTO) {
   }
 
   return user;
+}
+
+export async function getLoggedUser(loggedUser: UserType) {
+  const rawUser: UserDetailType = await prisma.user.findUnique({
+    where: {
+      id: loggedUser.id,
+    },
+    include: {
+      Shop: true,
+    },
+  });
+
+  delete rawUser.password;
+  return rawUser;
 }
