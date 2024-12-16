@@ -20,23 +20,23 @@ class adminController {
     });
   }
 
-  async getAllTransaction(req: Request, res: Response) {
-    const transaction = await adminService.getAllTransaction();
+  // async getAllTransaction(req: Request, res: Response) {
+  //   const transaction = await adminService.getAllTransaction();
 
-    if (!transaction) {
-      return res.status(404).json({
-        error: true,
-        message: 'No transaction found',
-        data: null,
-      });
-    }
+  //   if (!transaction) {
+  //     return res.status(404).json({
+  //       error: true,
+  //       message: 'No transaction found',
+  //       data: null,
+  //     });
+  //   }
 
-    return res.status(200).json({
-      error: false,
-      message: 'Transactions found',
-      data: transaction,
-    });
-  }
+  //   return res.status(200).json({
+  //     error: false,
+  //     message: 'Transactions found',
+  //     data: transaction,
+  //   });
+  // }
 
   async getAllUser(req: Request, res: Response) {
     const user = await adminService.getAllUsers();
