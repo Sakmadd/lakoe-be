@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import shopService from '../services/shopService';
+import { number } from 'zod';
+import { ShopUpdateDTO } from '../dtos/shop/shopUpdateDTO';
 
 class shopController {
   async getShop(req: Request, res: Response) {
@@ -24,23 +26,27 @@ class shopController {
 
   async updateShop(req: Request, res: Response) {
     const { id } = req.params;
-    const { name, phone, description, slogan, logo } = req.body;
+    const id_shop = res.locals.user.shop_id;
+    const body: ShopUpdateDTO = req.body;
 
-    const updatedLogo = req.body.imageUrl || logo;
-
-    const shop = await shopService.updateShop({
-      name,
-      phone,
-      description,
-      slogan,
-      logo: updatedLogo,
-      id,
-    });
+    if (req.files) {
+      const files = req.files as { [key: string]: Express.Multer.File[] };
+      Object.keys(files).map((key) => {
+        body[key] = files[key];
+      });
+    }
+    const shop = await shopService.updateShop(body, id);
 
     if (!shop) {
       return res.status(404).json({
         error: true,
         message: 'No shop found in the database',
+        data: null,
+      });
+    } else if (id_shop !== id) {
+      return res.status(404).json({
+        error: true,
+        message: 'you cannot access this shop',
         data: null,
       });
     }
@@ -84,9 +90,7 @@ class shopController {
       is_main,
     } = req.body;
 
-    const { id } = req.params;
-
-    const location = await shopService.addLocationById({
+    const newLocation = {
       name,
       address,
       city,
@@ -95,8 +99,13 @@ class shopController {
       longitude,
       latitude,
       is_main,
-      id,
-    });
+    };
+
+    req.body = newLocation;
+
+    const { id } = req.params;
+
+    const location = await shopService.addLocationById(newLocation, id);
 
     if (!location) {
       return res.status(404).json({
@@ -114,7 +123,8 @@ class shopController {
   }
 
   async updateLocationByLocationId(req: Request, res: Response) {
-    const { id, location_id } = req.params;
+    const { id } = req.params;
+
     const {
       name,
       address,
@@ -126,7 +136,7 @@ class shopController {
       is_main,
     } = req.body;
 
-    const location = await shopService.updateLocationByLocationId({
+    const updateLocation = {
       name,
       address,
       city,
@@ -135,9 +145,14 @@ class shopController {
       longitude,
       latitude,
       is_main,
+    };
+
+    req.body = updateLocation;
+
+    const location = await shopService.updateLocationByLocationId(
+      updateLocation,
       id,
-      location_id,
-    });
+    );
 
     if (!location) {
       return res.status(404).json({
@@ -155,12 +170,9 @@ class shopController {
   }
 
   async deleteLocation(req: Request, res: Response) {
-    const { id, location_id } = req.params;
+    const { id } = req.params;
 
-    const location = await shopService.deleteLocation({
-      id,
-      location_id,
-    });
+    const location = await shopService.deleteLocation(id);
 
     if (!location) {
       return res.status(404).json({
