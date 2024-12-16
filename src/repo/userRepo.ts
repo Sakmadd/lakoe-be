@@ -63,7 +63,40 @@ export async function getLoggedUser(loggedUser: UserType) {
       id: loggedUser.id,
     },
     include: {
-      Shop: true,
+      Shop: {
+        select: {
+          id: true,
+          balance: true,
+          description: true,
+          location: true,
+          logo: true,
+          phone: true,
+          slogan: true,
+          Withdraw: true,
+          Product: {
+            select: {
+              id: true,
+              shop_id: true,
+              name: true,
+              description: true,
+              category_id: true,
+              sku: true,
+              price: true,
+              url_name: true,
+              stock: true,
+              weight: true,
+              minimum_order: true,
+              is_active: true,
+              length: true,
+              width: true,
+              height: true,
+              created_at: true,
+              updated_at: true,
+              Images: true,
+            },
+          },
+        },
+      },
     },
   });
 
