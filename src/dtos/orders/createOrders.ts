@@ -6,6 +6,7 @@ export type CreateOrdersDTO = {
   total_price: number;
   OrderItem: OrderItemType;
   Payment: ResPaymentOrderDTO;
+
 };
 interface RecipientDTO {
   name: string;
@@ -42,6 +43,7 @@ export interface Product {
 }
 
 export interface ResPaymentOrderDTO {
+
   invoice_id?: string;
   mt_order_id?: string;
   type: string;
