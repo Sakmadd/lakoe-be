@@ -1,4 +1,3 @@
-import { PrismaClient } from '@prisma/client';
 import RegisterDto from '../dtos/authentication/registerDto';
 import ServiceResponseDTO from '../dtos/serviceResponseDto';
 import jwt from 'jsonwebtoken';
@@ -6,12 +5,9 @@ import { UserType } from '../types/types';
 import { serviceErrorHandler } from '../utils/serviceErrorHandler';
 import { validationErrorHandler } from '../utils/validationErrorHandler';
 import { loginSchema, registerSchema } from '../validator/dataSchema';
-import hasher from '../utils/hasher';
 import { loginRepo, registerRepo } from '../repo/authRepo';
 import LoginDTO from '../dtos/authentication/loginDTO';
 import { CONFIGS } from '../config/config';
-
-const prisma = new PrismaClient();
 
 class AuthServices {
   async register(

@@ -19,21 +19,6 @@ class orderRepository {
       },
     });
 
-    // const requestPayment = {
-    //   payment_type: data.Payment.type,
-    //   bank_transfer: {
-    //     bank: data.Payment.bank,
-    //   },
-    //   transaction_details: {
-    //     order_id: data.Payment.mt_order_id,
-    //     gross_amount: data.Payment.amount,
-    //   },
-    //   account_name: data.Payment.account_name,
-    //   account_number: data.Payment.account_number,
-    //   url: data.Payment.url,
-    //   status: data.Payment.status,
-    // };
-
     const responseCharge = await axios.post(
       'https://api.sandbox.midtrans.com/v2/charge',
       // requestPayment,
@@ -64,6 +49,8 @@ class orderRepository {
       status: responseCharge.data.transaction_status,
       invoice_id: '',
     };
+
+    console.log(responseMidtrans);
 
     const OrderItem = data.OrderItem;
     const order = await prisma.order.create({
