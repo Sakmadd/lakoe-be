@@ -8,7 +8,7 @@ class OrderServices {
     data: CreateOrdersDTO,
   ): Promise<ServiceResponseDTO<CreateOrdersDTO | null>> {
     try {
-      const order = await orderRepo.createOrder(data);
+      await orderRepo.createOrder(data);
       return new ServiceResponseDTO<CreateOrdersDTO>({
         error: false,
         message: null,

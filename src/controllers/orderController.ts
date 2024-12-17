@@ -16,7 +16,7 @@ class OrderController {
         massage: 'Orders retrieved successfully',
         data: order,
       });
-    } catch (error) {
+    } catch {
       res.status(400).send({
         error: true,
         massage: 'Error retrieving orders',

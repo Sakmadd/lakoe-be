@@ -3,7 +3,6 @@ import { ProductDetailDTO } from '../dtos/products/productDetailDTO';
 import { ProductsDTO } from '../dtos/products/productsDTO';
 import { SearchDTO } from '../dtos/products/searchProductDTO';
 import { prisma } from '../libs/prisma';
-import { ProductType } from '../types/types';
 
 export async function getAllProducts(take: number, skip: number) {
   const products = await prisma.product.findMany({

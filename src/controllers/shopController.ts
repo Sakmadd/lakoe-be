@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import shopService from '../services/shopService';
-import { number } from 'zod';
 import { ShopUpdateDTO } from '../dtos/shop/shopUpdateDTO';
 
 class shopController {

@@ -127,7 +127,7 @@ class shopService {
     id: string,
   ): Promise<ServiceResponseDTO<LocationType | null>> {
     try {
-      const location = await shopRepo.deleteLocation(id);
+      await shopRepo.deleteLocation(id);
 
       return new ServiceResponseDTO<LocationType>({
         error: false,

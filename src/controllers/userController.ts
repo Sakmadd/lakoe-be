@@ -47,11 +47,11 @@ class userController {
     );
   }
 
-  async updateUser(req: Request, res: Response) {
+  async updateUser(req: Request) {
     const { id } = req.params;
     const { name, email } = req.body;
 
-    const user = await userService.updateUser({
+    await userService.updateUser({
       id,
       name,
       email,
