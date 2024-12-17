@@ -7,7 +7,7 @@ const router = Router();
 router.get('/:id', shopController.getShop.bind(shopController));
 
 router.patch(
-  '/shop/:id',
+  '/:id',
   upload.fields([{ name: 'logo', maxCount: 1 }]),
   shopController.updateShop.bind(shopController),
 );
