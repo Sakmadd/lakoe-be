@@ -16,5 +16,5 @@ app.use('/shops', authentication, shopsRoutes);
 app.use('/products', productsRoutes);
 app.use('/orders', orderRoutes);
 app.use('/admins', adminsRoutes);
-app.use('/template-massage', templateRouter);
+app.use('/template-message', templateRouter);
 export const API_V1 = app;
