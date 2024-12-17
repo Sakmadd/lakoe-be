@@ -1,12 +1,8 @@
-import { PaymentType } from '../../types/types';
-import { PaymentDTO } from '../admin/transactionDTO';
-
 export type CreateOrdersDTO = {
   Recipient?: RecipientDTO;
   total_price: number;
   OrderItem: OrderItemType;
   Payment: ResPaymentOrderDTO;
-
 };
 interface RecipientDTO {
   name: string;
@@ -43,7 +39,6 @@ export interface Product {
 }
 
 export interface ResPaymentOrderDTO {
-
   invoice_id?: string;
   mt_order_id?: string;
   type: string;
