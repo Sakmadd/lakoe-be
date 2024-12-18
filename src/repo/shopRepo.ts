@@ -3,6 +3,7 @@ import { ShopUpdateDTO } from '../dtos/shop/shopUpdateDTO';
 import { UpdateLocationDTO } from '../dtos/shop/updateLocationDTO';
 import { prisma } from '../libs/prisma';
 import { LocationType } from '../types/types';
+import { serviceErrorHandler } from '../utils/serviceErrorHandler';
 
 export async function getShopDetail(id: string) {
   const shop = await prisma.shop.findUnique({
@@ -85,11 +86,6 @@ export async function getLocationById(id: string) {
     },
   });
 
-  console.log(
-    'Checking is_main output before mapping : ',
-    locations.map((loc) => loc.is_main),
-  );
-
   if (!locations) {
     throw new Error('Shop not found');
   }
@@ -108,11 +104,6 @@ export async function getLocationById(id: string) {
     latitude: loc.latitude,
     is_main: loc.is_main,
   }));
-
-  console.log(
-    'Checking is_main output after mapping : ',
-    locationsFinal.map((loc) => loc.is_main),
-  );
 
   return locationsFinal;
 }
@@ -153,7 +144,7 @@ export async function addLocationById(data: addLocationDTO, id: string) {
 
     return locations;
   } catch (error) {
-    console.log(error);
+    serviceErrorHandler(error);
   }
 }
 

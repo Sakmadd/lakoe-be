@@ -67,8 +67,6 @@ class userServices {
     loggedUser: UserType,
   ): Promise<ServiceResponseDTO<UserDetailType>> {
     try {
-      console.log('Logged user service request : ', loggedUser);
-
       const user = await userRepo.getLoggedUser(loggedUser);
 
       return new ServiceResponseDTO<UserDetailType>({

@@ -33,14 +33,10 @@ class shopController {
     const id_shop = res.locals.user.shop_id;
     const body: ShopUpdateDTO = req.body;
 
-    console.log('Files before Cloudinary:', req.files);
-
     if (req.files && req.files['logo']) {
       const logoFile = (req.files['logo'] as Express.Multer.File[])[0];
       body.logo = await uploader(logoFile);
     }
-
-    console.log('Logo after Cloudinary:', body.logo);
 
     const shop = await shopService.updateShop(body, id);
 
@@ -113,8 +109,6 @@ class shopController {
     };
 
     req.body = newLocation;
-
-    console.log(newLocation);
 
     const { id } = req.params;
 

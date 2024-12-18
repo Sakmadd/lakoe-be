@@ -203,8 +203,7 @@ export async function createProduct(data: CreateProductDTO, user_id: string) {
         }),
       ),
     };
-  } catch (error) {
-    console.log('Error occurred:', error);
+  } catch {
     throw new Error('Error creating product');
   }
 }

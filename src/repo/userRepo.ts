@@ -1,6 +1,7 @@
 import { UpdateUserDTO } from '../dtos/user/updateUser';
 import { prisma } from '../libs/prisma';
-import { UserDetailType, UserType } from '../types/types';
+import { UserType } from '../types/types';
+import { serviceErrorHandler } from '../utils/serviceErrorHandler';
 
 export async function getAllUser() {
   const users = await prisma.user.findMany({
@@ -71,6 +72,6 @@ export async function getLoggedUser(loggedUser: UserType) {
     delete rawUser.password;
     return rawUser;
   } catch (error) {
-    console.log(error);
+    serviceErrorHandler(error);
   }
 }

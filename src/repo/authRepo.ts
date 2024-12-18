@@ -2,6 +2,7 @@ import { prisma } from '../libs/prisma';
 import RegisterDto from '../dtos/authentication/registerDto';
 import hasher from '../utils/hasher';
 import LoginDTO from '../dtos/authentication/loginDTO';
+import { serviceErrorHandler } from '../utils/serviceErrorHandler';
 
 export async function registerRepo(data: RegisterDto) {
   try {
@@ -34,7 +35,7 @@ export async function registerRepo(data: RegisterDto) {
 
     return user;
   } catch (error) {
-    console.log(error);
+    serviceErrorHandler(error);
   }
 }
 

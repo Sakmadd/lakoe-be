@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import userService from '../services/userService';
-import ServiceResponseDTO from '../dtos/serviceResponseDto';
 import { UserDetailType } from '../types/types';
 import ResponseDTO from '../dtos/responseDto';
 
@@ -84,8 +83,6 @@ class userController {
 
   async checkUser(req: Request, res: Response) {
     const { id } = res.locals.user.id;
-
-    console.log(id);
 
     const user = await userService.getUserById(id);
 

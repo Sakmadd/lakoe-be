@@ -65,8 +65,6 @@ class orderRepository {
       invoice_id: '',
     };
 
-    console.log(responseMidtrans);
-
     const OrderItem = data.OrderItem;
     const order = await prisma.order.create({
       data: {

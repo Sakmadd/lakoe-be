@@ -32,8 +32,7 @@ export const authentication = (
     res.locals.user = decoded;
 
     next();
-  } catch (error) {
-    console.log(error);
+  } catch {
     res.status(401).json({ message: 'Unauthorized catch' });
   }
 };

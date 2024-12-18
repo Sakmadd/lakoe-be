@@ -5,12 +5,7 @@ class OrderController {
   async postOrder(req: Request, res: Response) {
     try {
       const data: CreateOrdersDTO = req.body;
-      console.log(data);
-
       const order = await orderService.createOrder(data);
-
-      console.log(order);
-
       res.status(200).json({
         error: false,
         massage: 'Orders retrieved successfully',
