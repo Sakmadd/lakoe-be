@@ -1,4 +1,3 @@
-import { error } from 'console';
 import { CreateProductDTO } from '../dtos/products/createProduct';
 import { ProductDetailDTO } from '../dtos/products/productDetailDTO';
 import { ProductsDTO } from '../dtos/products/productsDTO';
@@ -108,33 +107,35 @@ export async function createProduct(data: CreateProductDTO, user_id: string) {
             alt: `${data.name} - ${index + 1}`,
           })),
         },
-        Variant: Array.isArray(data.Variant)
+        Variant: data.Variant
           ? {
               create: data.Variant.map((variant) => ({
                 name: variant.name,
-                is_active: variant.is_active,
-                VariantOption: {
-                  create: (variant.VariantOption || []).map((option) => ({
-                    name: option.name,
-                    src: option.src || '',
-                    alt: option.alt || '',
-                  })),
-                },
+                is_active: true,
+                VariantOption: variant.VariantOption
+                  ? {
+                      create: variant.VariantOption.map((option) => ({
+                        name: option.name,
+                        src: option.src || '',
+                        alt: option.alt || '',
+                      })),
+                    }
+                  : undefined,
               })),
             }
-          : {},
-        VariantOptionCombination: Array.isArray(data.VariantOptionCombination)
+          : undefined,
+        VariantOptionCombination: data.VariantOptionCombination
           ? {
               create: data.VariantOptionCombination.map((combination) => ({
                 name: combination.name,
-                is_active: combination.is_active,
                 price: combination.price,
-                weight: combination.weight,
                 sku: combination.sku,
                 stock: combination.stock,
+                weight: combination.weight,
+                is_active: combination.is_active,
               })),
             }
-          : {},
+          : undefined,
       },
       include: {
         Shop: true,
