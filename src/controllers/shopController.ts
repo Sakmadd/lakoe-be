@@ -1,6 +1,9 @@
 import { Request, Response } from 'express';
 import shopService from '../services/shopService';
 import { ShopUpdateDTO } from '../dtos/shop/shopUpdateDTO';
+import ResponseDTO from '../dtos/responseDto';
+import uploader from '../libs/cloudinary';
+import { LocationType } from '../types/types';
 
 class shopController {
   async getShop(req: Request, res: Response) {
@@ -9,11 +12,13 @@ class shopController {
     const shop = await shopService.getShopDetail(id);
 
     if (!shop) {
-      return res.status(404).json({
-        error: true,
-        message: 'No shop found in the database',
-        data: null,
-      });
+      return res.status(404).json(
+        new ResponseDTO<string>({
+          error: true,
+          message: 'No shop found in the database',
+          data: null,
+        }),
+      );
     }
 
     return res.status(200).json({
@@ -28,12 +33,15 @@ class shopController {
     const id_shop = res.locals.user.shop_id;
     const body: ShopUpdateDTO = req.body;
 
-    if (req.files) {
-      const files = req.files as { [key: string]: Express.Multer.File[] };
-      Object.keys(files).map((key) => {
-        body[key] = files[key];
-      });
+    console.log('Files before Cloudinary:', req.files);
+
+    if (req.files && req.files['logo']) {
+      const logoFile = (req.files['logo'] as Express.Multer.File[])[0];
+      body.logo = await uploader(logoFile);
     }
+
+    console.log('Logo after Cloudinary:', body.logo);
+
     const shop = await shopService.updateShop(body, id);
 
     if (!shop) {
@@ -80,9 +88,11 @@ class shopController {
   async addLocationById(req: Request, res: Response) {
     const {
       name,
-      address,
+      province,
       city,
       district,
+      subdistrict,
+      address,
       postal_code,
       longitude,
       latitude,
@@ -91,9 +101,11 @@ class shopController {
 
     const newLocation = {
       name,
-      address,
+      province,
       city,
       district,
+      subdistrict,
+      address,
       postal_code,
       longitude,
       latitude,
@@ -101,6 +113,8 @@ class shopController {
     };
 
     req.body = newLocation;
+
+    console.log(newLocation);
 
     const { id } = req.params;
 
@@ -114,11 +128,13 @@ class shopController {
       });
     }
 
-    return res.status(200).json({
-      error: false,
-      message: 'Location Found',
-      data: location,
-    });
+    return res.status(200).json(
+      new ResponseDTO<LocationType>({
+        error: false,
+        message: 'Location Created',
+        data: location,
+      }),
+    );
   }
 
   async updateLocationByLocationId(req: Request, res: Response) {

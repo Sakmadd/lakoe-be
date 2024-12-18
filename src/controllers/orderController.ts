@@ -11,7 +11,7 @@ class OrderController {
 
       console.log(order);
 
-      res.status(200).send({
+      res.status(200).json({
         error: false,
         massage: 'Orders retrieved successfully',
         data: order,
