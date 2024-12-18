@@ -33,7 +33,7 @@ export async function getAllTransaction() {
       Payment: {
         select: {
           id: true,
-          transaction_id: true,
+          mt_order_id: true,
           type: true,
           url: true,
           bank: true,
@@ -82,13 +82,13 @@ export async function getAllTransaction() {
       },
       payment: {
         id: inv.Payment.id,
-        transactionId: inv.Payment.transaction_id,
+        transaction_id: inv.Payment.mt_order_id,
         type: inv.Payment.type,
         url: inv.Payment.url,
         bank: inv.Payment.bank,
         amount: inv.Payment.amount,
-        accountName: inv.Payment.account_name,
-        accountNumber: inv.Payment.account_number,
+        account_name: inv.Payment.account_name,
+        account_number: inv.Payment.account_number,
         status: inv.Payment.status,
         createdAt: inv.Payment.created_at,
         updatedAt: inv.Payment.updated_at,

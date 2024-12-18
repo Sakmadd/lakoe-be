@@ -9,6 +9,14 @@ export interface UserType {
   role: Role;
 }
 
+export interface TemplateType {
+  id: string;
+  title: string;
+  contain_message: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface UserDetailType extends UserType {
   Shop: ShopType;
 }

@@ -25,23 +25,24 @@ class AdminService {
       });
     }
   }
-  async getAllTransaction(): Promise<ServiceResponseDTO<InvoiceDTO[] | null>> {
-    try {
-      const transaction = await adminRepo.getAllTransaction();
 
-      return new ServiceResponseDTO<InvoiceDTO[]>({
-        error: false,
-        message: null,
-        payload: transaction,
-      });
-    } catch (error) {
-      return serviceErrorHandler<InvoiceDTO[] | null>({
-        error: true,
-        message: error.message,
-        payload: null,
-      });
-    }
-  }
+  // async getAllTransaction(): Promise<ServiceResponseDTO<InvoiceDTO[] | null>> {
+  //   try {
+  //     const transaction = await adminRepo.getAllTransaction();
+
+  //     return new ServiceResponseDTO<InvoiceDTO[]>({
+  //       error: false,
+  //       message: null,
+  //       payload: transaction,
+  //     });
+  //   } catch (error) {
+  //     return serviceErrorHandler<InvoiceDTO[] | null>({
+  //       error: true,
+  //       message: error.message,
+  //       payload: null,
+  //     });
+  //   }
+  // }
 
   async getAllUsers(): Promise<ServiceResponseDTO<UserDTO[] | null>> {
     try {

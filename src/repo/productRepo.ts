@@ -3,7 +3,6 @@ import { ProductDetailDTO } from '../dtos/products/productDetailDTO';
 import { ProductsDTO } from '../dtos/products/productsDTO';
 import { SearchDTO } from '../dtos/products/searchProductDTO';
 import { prisma } from '../libs/prisma';
-import { ProductType } from '../types/types';
 
 export async function getAllProducts(take: number, skip: number) {
   const products = await prisma.product.findMany({
@@ -60,141 +59,154 @@ export async function getAllProducts(take: number, skip: number) {
   return productsFinal;
 }
 
-export async function createProduct(data: CreateProductDTO) {
-  const product = await prisma.product.create({
-    data: {
-      name: data.name,
-      sku: data.sku,
-      price: data.price,
-      url_name: data.url_name,
-      description: data.description,
-      stock: data.stock,
-      weight: data.weight,
-      minimum_order: data.minimum_order,
-      is_active: data.is_active,
-      length: data.length,
-      width: data.width,
-      height: data.height,
-      Shop: {
-        connectOrCreate: {
-          where: { id: data.Shop.id },
-          create: {
-            id: data.Shop.id,
+export async function createProduct(data: CreateProductDTO, user_id: string) {
+  try {
+    const shopId = await prisma.user.findUnique({
+      where: { id: user_id },
+      select: {
+        Shop: {
+          select: {
+            id: true,
+            User: {
+              select: {
+                name: true,
+              },
+            },
           },
         },
       },
+    });
+
+    if (!data.Category?.id) {
+      throw new Error('Category ID is required');
+    }
+
+    const product = await prisma.product.create({
+      data: {
+        name: data.name,
+        sku: data.sku,
+        price: data.price,
+        url_name: data.url_name,
+        description: data.description,
+        stock: data.stock,
+        weight: data.weight,
+        minimum_order: data.minimum_order,
+        is_active: data.is_active,
+        length: data.length,
+        width: data.width,
+        height: data.height,
+        Shop: { connect: { id: shopId?.Shop.id } },
+        Category: {
+          connectOrCreate: {
+            where: { id: data.Category.id },
+            create: {
+              id: data.Category.id,
+              value: data.Category.value,
+              label: data.Category.label,
+            },
+          },
+        },
+        Images: {
+          create: data.Images.map((image, index) => ({
+            src: image.src,
+            alt: `${data.name} - ${index + 1}`,
+          })),
+        },
+        Variant: Array.isArray(data.Variant)
+          ? {
+              create: data.Variant.map((variant) => ({
+                name: variant.name,
+                is_active: variant.is_active,
+                VariantOption: {
+                  create: (variant.VariantOption || []).map((option) => ({
+                    name: option.name,
+                    src: option.src || '',
+                    alt: option.alt || '',
+                  })),
+                },
+              })),
+            }
+          : {},
+        VariantOptionCombination: Array.isArray(data.VariantOptionCombination)
+          ? {
+              create: data.VariantOptionCombination.map((combination) => ({
+                name: combination.name,
+                is_active: combination.is_active,
+                price: combination.price,
+                weight: combination.weight,
+                sku: combination.sku,
+                stock: combination.stock,
+              })),
+            }
+          : {},
+      },
+      include: {
+        Shop: true,
+        Category: true,
+        Images: true,
+        Variant: {
+          include: { VariantOption: true },
+        },
+        VariantOptionCombination: true,
+      },
+    });
+
+    return {
+      id: product.id,
+      name: product.name,
+      sku: product.sku,
+      price: product.price,
+      url_name: product.url_name,
+      description: product.description,
+      stock: product.stock,
+      weight: product.weight,
+      minimum_order: product.minimum_order,
+      is_active: product.is_active,
+      length: product.length,
+      width: product.width,
+      height: product.height,
+      Shop: { id: product.Shop.id, name: shopId.Shop.User.name },
       Category: {
-        connectOrCreate: {
-          where: { id: data.Category.id },
-          create: {
-            id: data.Category.id,
-            value: data.Category.value,
-            label: data.Category.label,
-          },
-        },
+        id: product.Category.id,
+        label: product.Category.label,
+        value: product.Category.value,
       },
-      Images: {
-        create: data.Images.map((image) => ({
-          src: image.src,
-          alt: image.alt,
+      Images: product.Images.map((image) => ({
+        id: image.id,
+        product_id: product.id,
+        src: image.src,
+        alt: image.alt,
+      })),
+      Variant: (product.Variant || []).map((variant) => ({
+        id: variant.id,
+        name: variant.name,
+        is_active: variant.is_active,
+        product_id: product.id,
+        VariantOption: (variant.VariantOption || []).map((option) => ({
+          id: option.id,
+          variant_id: variant.id,
+          name: option.name,
+          src: option.src,
+          alt: option.alt,
         })),
-      },
-      Variant: {
-        create: (data.Variant || []).map((variant) => ({
-          name: variant.name,
-          is_active: variant.is_active,
-          VariantOption: {
-            create: (variant.VariantOption || []).map((option) => ({
-              name: option.name,
-              src: option.src,
-              alt: option.alt,
-            })),
-          },
-        })),
-      },
-      VariantOptionCombination: {
-        create: (data.VariantOptionCombination || []).map((combination) => ({
+      })),
+      VariantOptionCombination: (product.VariantOptionCombination || []).map(
+        (combination) => ({
+          id: combination.id,
+          product_id: product.id,
           name: combination.name,
           is_active: combination.is_active,
           price: combination.price,
           weight: combination.weight,
           sku: combination.sku,
           stock: combination.stock,
-        })),
-      },
-    },
-    include: {
-      Shop: true,
-      Category: true,
-      Images: true,
-      Variant: {
-        include: {
-          VariantOption: true,
-        },
-      },
-      VariantOptionCombination: true,
-    },
-  });
-
-  if (!product) {
-    throw new Error('Product not created');
+        }),
+      ),
+    };
+  } catch (error) {
+    console.log('Error occurred:', error);
+    throw new Error('Error creating product');
   }
-
-  return {
-    id: product.id,
-    name: product.name,
-    sku: product.sku,
-    price: product.price,
-    url_name: product.url_name,
-    description: product.description,
-    stock: product.stock,
-    weight: product.weight,
-    minimum_order: product.minimum_order,
-    is_active: product.is_active,
-    length: product.length,
-    width: product.width,
-    height: product.height,
-    Shop: {
-      id: product.Shop.id,
-      name: data.Shop.name,
-    },
-    Category: {
-      id: product.Category.id,
-      label: product.Category.label,
-      value: product.Category.value,
-    },
-    Images: product.Images.map((image) => ({
-      id: image.id,
-      product_id: product.id,
-      src: image.src,
-      alt: image.alt,
-    })),
-    Variant: (product.Variant || []).map((variant) => ({
-      id: variant.id,
-      name: variant.name,
-      is_active: variant.is_active,
-      product_id: product.id,
-      VariantOption: (variant.VariantOption || []).map((option) => ({
-        id: option.id,
-        variant_id: variant.id,
-        name: option.name,
-        src: option.src,
-        alt: option.alt,
-      })),
-    })),
-    VariantOptionCombination: (product.VariantOptionCombination || []).map(
-      (combination) => ({
-        id: combination.id,
-        product_id: product.id,
-        name: combination.name,
-        is_active: combination.is_active,
-        price: combination.price,
-        weight: combination.weight,
-        sku: combination.sku,
-        stock: combination.stock,
-      }),
-    ),
-  };
 }
 
 export async function getProductsByIds(id: string[]) {

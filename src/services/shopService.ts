@@ -5,6 +5,7 @@ import { serviceErrorHandler } from '../utils/serviceErrorHandler';
 import { ShopUpdateDTO } from '../dtos/shop/shopUpdateDTO';
 import { addLocationDTO } from '../dtos/shop/addLocationDTO';
 import { UpdateLocationDTO } from '../dtos/shop/updateLocationDTO';
+import uploader from '../libs/clodudinary2.0';
 
 class shopService {
   async getShopDetail(
@@ -28,10 +29,20 @@ class shopService {
   }
 
   async updateShop(
-    data: ShopUpdateDTO,
+    body: ShopUpdateDTO,
+    id: string,
   ): Promise<ServiceResponseDTO<ShopType | null>> {
     try {
-      const shop = await shopRepo.updateShop(data);
+      await Promise.all(
+        Object.entries(body).map(async ([key, value]) => {
+          if (typeof value !== 'string') {
+            const src = (await uploader(value))[0].src;
+
+            body[key] = src;
+          }
+        }),
+      );
+      const shop = await shopRepo.updateShop(body, id);
 
       return new ServiceResponseDTO<ShopType>({
         error: false,
@@ -69,13 +80,14 @@ class shopService {
 
   async addLocationById(
     data: addLocationDTO,
+    id: string,
   ): Promise<ServiceResponseDTO<LocationType | null>> {
     try {
-      const location = await shopRepo.addLocationById(data);
+      const location = await shopRepo.addLocationById(data, id);
 
       return new ServiceResponseDTO<LocationType>({
         error: false,
-        message: null,
+        message: 'location has already been added',
         payload: location,
       });
     } catch (error) {
@@ -88,14 +100,18 @@ class shopService {
   }
 
   async updateLocationByLocationId(
-    data: UpdateLocationDTO,
+    updateLocation: UpdateLocationDTO,
+    id: string,
   ): Promise<ServiceResponseDTO<LocationType | null>> {
     try {
-      const location = await shopRepo.updateLocationByLocationId(data);
+      const location = await shopRepo.updateLocationByLocationId(
+        updateLocation,
+        id,
+      );
 
       return new ServiceResponseDTO<LocationType>({
         error: false,
-        message: null,
+        message: 'location update',
         payload: location,
       });
     } catch (error) {
@@ -107,17 +123,16 @@ class shopService {
     }
   }
 
-  async deleteLocation(data: {
-    id: string;
-    location_id: string;
-  }): Promise<ServiceResponseDTO<LocationType | null>> {
+  async deleteLocation(
+    id: string,
+  ): Promise<ServiceResponseDTO<LocationType | null>> {
     try {
-      const location = await shopRepo.deleteLocation(data);
+      await shopRepo.deleteLocation(id);
 
       return new ServiceResponseDTO<LocationType>({
         error: false,
-        message: null,
-        payload: location,
+        message: 'location has already been deleted',
+        payload: null,
       });
     } catch (error) {
       return serviceErrorHandler<LocationType | null>({
