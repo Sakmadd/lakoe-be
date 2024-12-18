@@ -58,8 +58,8 @@ interface VariantOptionCombinationDTO {
 }
 
 interface ImagesDTO {
-  id: string;
-  product_id: string;
+  id?: string;
+  product_id?: string;
   alt?: string;
   src?: string;
 }

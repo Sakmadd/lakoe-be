@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import productService from '../services/productService';
 import uploader from '../libs/cloudinary';
 import ResponseDTO from '../dtos/responseDto';
+import { CreateProductDTO } from '../dtos/products/createProduct';
 
 class productController {
   async getAllProducts(req: Request, res: Response) {
@@ -30,6 +31,7 @@ class productController {
   async createProduct(req: Request, res: Response) {
     try {
       const data = req.body;
+
       const fetchImages = req.files as Express.Multer.File[];
       const user_id = res.locals.user.id;
 
@@ -51,12 +53,30 @@ class productController {
         );
       }
 
-      if (typeof data.Category === 'string') {
-        data.Category = JSON.parse(data.Category);
-      }
-
       if (typeof data.Variant === 'string') {
         data.Variant = JSON.parse(data.Variant);
+      }
+
+      if (Array.isArray(data.Variant)) {
+        data.Variant = data.Variant.map((variant: any) => {
+          if (Array.isArray(variant.options)) {
+            variant.options = variant.options.map((option: any) => {
+              if (typeof option === 'string') {
+                return JSON.parse(option);
+              }
+              return option;
+            });
+          } else {
+            variant.options = [];
+          }
+          return variant;
+        });
+      }
+
+      if (typeof data.VariantOptionCombination === 'string') {
+        data.VariantOptionCombination = JSON.parse(
+          data.VariantOptionCombination,
+        );
       }
 
       if (typeof data.is_active === 'string') {
