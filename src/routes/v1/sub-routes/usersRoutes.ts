@@ -11,6 +11,7 @@ router.get(
   authentication,
   userController.getLoggedUser.bind(userController),
 );
+
 router.patch('/users/:id', userController.updateUser.bind(userController));
 
 export default router;
