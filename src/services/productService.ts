@@ -22,11 +22,7 @@ class ProductService {
         payload: products,
       });
     } catch (error) {
-      return serviceErrorHandler({
-        error: true,
-        message: error.message,
-        payload: null,
-      });
+      return serviceErrorHandler<null>(error);
     }
   }
 
@@ -43,11 +39,7 @@ class ProductService {
         payload: product,
       });
     } catch (error) {
-      return serviceErrorHandler<CreateProductDTO | null>({
-        error: true,
-        message: 'Service failed',
-        payload: null,
-      });
+      return serviceErrorHandler<null>(error);
     }
   }
 
@@ -65,11 +57,7 @@ class ProductService {
         payload: product,
       });
     } catch (error) {
-      return serviceErrorHandler<ProductType[] | null>({
-        error: true,
-        message: error.message,
-        payload: null,
-      });
+      return serviceErrorHandler<null>(error);
     }
   }
 
@@ -85,11 +73,7 @@ class ProductService {
         payload: products,
       });
     } catch (error) {
-      return serviceErrorHandler<ProductsDTO[] | null>({
-        error: true,
-        message: error.message,
-        payload: null,
-      });
+      return serviceErrorHandler<null>(error);
     }
   }
 
@@ -105,11 +89,7 @@ class ProductService {
         payload: product,
       });
     } catch (error) {
-      return serviceErrorHandler<ProductDetailDTO | null>({
-        error: true,
-        message: error.message,
-        payload: null,
-      });
+      return serviceErrorHandler<null>(error);
     }
   }
 
@@ -126,11 +106,7 @@ class ProductService {
         payload: product,
       });
     } catch (error) {
-      return serviceErrorHandler<CreateProductDTO | null>({
-        error: true,
-        message: error.message,
-        payload: null,
-      });
+      return serviceErrorHandler<null>(error);
     }
   }
 
@@ -147,11 +123,7 @@ class ProductService {
         payload: product,
       });
     } catch (error) {
-      return serviceErrorHandler<ToggleProductDTO | null>({
-        error: true,
-        message: error.message,
-        payload: null,
-      });
+      return serviceErrorHandler<null>(error);
     }
   }
 }

@@ -11,14 +11,17 @@ router.patch(
   upload.fields([{ name: 'logo', maxCount: 1 }]),
   shopController.updateShop.bind(shopController),
 );
+
 router.post(
   '/locations/:id',
   shopController.addLocationById.bind(shopController),
 );
+
 router.patch(
   '/locations/:id',
   shopController.updateLocationByLocationId.bind(shopController),
 );
+
 router.delete(
   '/locations/:id',
   shopController.deleteLocation.bind(shopController),

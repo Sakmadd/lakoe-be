@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import productService from '../services/productService';
 import uploader from '../libs/cloudinary';
+import ResponseDTO from '../dtos/responseDto';
 
 class productController {
   async getAllProducts(req: Request, res: Response) {
@@ -9,17 +10,21 @@ class productController {
 
     const products = await productService.getAllProducts(take, skip);
     if (!products) {
-      return res.status(404).json({
-        error: true,
-        message: 'No products found in the database',
-        data: null,
-      });
+      return res.status(404).json(
+        new ResponseDTO({
+          error: true,
+          message: 'No products found in the database',
+          data: null,
+        }),
+      );
     }
-    return res.status(200).json({
-      error: false,
-      message: 'Products found',
-      data: products,
-    });
+    return res.status(200).json(
+      new ResponseDTO({
+        error: false,
+        message: 'Products found',
+        data: products,
+      }),
+    );
   }
 
   async createProduct(req: Request, res: Response) {
@@ -37,11 +42,13 @@ class productController {
       data.minimum_order = +data.minimum_order;
 
       if (!data) {
-        return res.status(400).json({
-          error: true,
-          message: 'Please provide a valid product data',
-          data: null,
-        });
+        return res.status(400).json(
+          new ResponseDTO({
+            error: true,
+            message: 'Please provide a valid product data',
+            data: null,
+          }),
+        );
       }
 
       if (typeof data.Category === 'string') {
@@ -66,17 +73,22 @@ class productController {
         data.Images = imageUrls;
       }
 
-      const product = await productService.createProduct(data, user_id);
+      const { error, message, payload } = await productService.createProduct(
+        data,
+        user_id,
+      );
 
-      return res.status(201).json({
-        error: false,
-        message: 'Product created successfully',
-        data: product,
-      });
+      return res.status(201).json(
+        new ResponseDTO({
+          error: error,
+          message: message,
+          data: payload,
+        }),
+      );
     } catch (error) {
       console.error('Error creating product:', error);
       return res.status(500).json({
-        error: true,
+        error: error,
         message: 'Error creating product controller',
         data: null,
       });
@@ -89,27 +101,26 @@ class productController {
     const ids = Array.isArray(id) ? id : [id];
 
     if (!ids.every((id) => typeof id === 'string') || ids.length === 0) {
-      return res.status(400).json({
-        error: true,
-        message:
-          'Please provide a valid product ID or an array of product IDs to delete.',
-        data: null,
-      });
+      return res.status(400).json(
+        new ResponseDTO({
+          error: true,
+          message:
+            'Please provide a valid product ID or an array of product IDs to delete.',
+          data: null,
+        }),
+      );
     }
 
-    const product = await productService.deleteProducts(ids);
-    if (!product) {
-      return res.status(404).json({
-        error: true,
-        message: 'No product found in the database',
-        data: null,
-      });
-    }
-    return res.status(200).json({
-      error: false,
-      message: 'Product deleted',
-      data: product,
-    });
+    const { error, message, payload } =
+      await productService.deleteProducts(ids);
+
+    return res.status(200).json(
+      new ResponseDTO({
+        error: error,
+        message: message,
+        data: payload,
+      }),
+    );
   }
 
   async searchProducts(req: Request, res: Response) {
@@ -118,64 +129,123 @@ class productController {
     const take = req.query.take ? +req.query.take : 20;
     const skip = req.query.skip ? +req.query.skip : 0;
 
-    const products = await productService.searchProducts({
+    const { error, message, payload } = await productService.searchProducts({
       search,
       take,
       skip,
     });
 
-    if (!products) {
-      return res.status(404).json({
-        error: true,
-        message: 'No products found',
-        data: null,
-      });
+    if (error) {
+      res.status(404).json(
+        new ResponseDTO({
+          error: true,
+          message: message,
+          data: null,
+        }),
+      );
     }
-    return res.status(200).json({
-      error: false,
-      message: 'Products found',
-      data: products,
-    });
+
+    return res.status(200).json(
+      new ResponseDTO({
+        error: error,
+        message: message,
+        data: payload,
+      }),
+    );
   }
 
   async getProductById(req: Request, res: Response) {
     const { id } = req.params;
 
-    const product = await productService.getProductById(id);
+    const { error, message, payload } = await productService.getProductById(id);
 
-    if (!product) {
-      return res.status(404).json({
-        error: true,
-        message: 'No product found',
-        data: null,
-      });
+    if (error) {
+      res.status(404).json(
+        new ResponseDTO({
+          error: true,
+          message: message,
+          data: null,
+        }),
+      );
     }
-    return res.status(200).json({
-      error: false,
-      message: 'Product found',
-      data: product,
-    });
+
+    return res.status(200).json(
+      new ResponseDTO({
+        error: error,
+        message: message,
+        data: payload,
+      }),
+    );
   }
 
   async updateProductById(req: Request, res: Response) {
     const { id } = req.params;
     const data = req.body;
+    const fetchImages = req.files as Express.Multer.File[];
+    const user_id = res.locals.user.id;
 
-    const product = await productService.updateProductById(id, data);
+    data.price = +data.price;
+    data.length = +data.length;
+    data.width = +data.width;
+    data.height = +data.height;
+    data.stock = +data.stock;
+    data.weight = +data.weight;
+    data.minimum_order = +data.minimum_order;
 
-    if (!product) {
-      return res.status(404).json({
-        error: true,
-        message: 'No product found',
-        data: null,
-      });
+    if (!data) {
+      return res.status(400).json(
+        new ResponseDTO({
+          error: true,
+          message: 'Please provide a valid product data',
+          data: null,
+        }),
+      );
     }
 
-    return res.status(200).json({
-      error: false,
-      message: 'Product updated',
-      data: product,
-    });
+    if (typeof data.Category === 'string') {
+      data.Category = JSON.parse(data.Category);
+    }
+
+    if (typeof data.Variant === 'string') {
+      data.Variant = JSON.parse(data.Variant);
+    }
+
+    if (typeof data.is_active === 'string') {
+      data.is_active = data.is_active === 'true';
+    }
+
+    if (fetchImages.length > 0) {
+      const imageUrls = await Promise.all(
+        fetchImages.map(async (file) => {
+          const url = await uploader(file);
+          return { src: url };
+        }),
+      );
+      data.Images = imageUrls;
+    }
+
+    const { error, message, payload } = await productService.updateProductById(
+      id,
+      data,
+    );
+
+    if (error) {
+      res.status(404).json(
+        new ResponseDTO({
+          error: true,
+          message: message,
+          data: null,
+        }),
+      );
+    }
+
+    return res.status(200).json(
+      new ResponseDTO({
+        error: error,
+        message: message,
+        data: payload,
+      }),
+    );
   }
 
   async toggleProductActive(req: Request, res: Response) {
