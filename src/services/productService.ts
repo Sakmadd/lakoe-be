@@ -32,9 +32,10 @@ class ProductService {
 
   async createProduct(
     data: CreateProductDTO,
+    user_id: string,
   ): Promise<ServiceResponseDTO<CreateProductDTO | null>> {
     try {
-      const product = await productRepo.createProduct(data);
+      const product = await productRepo.createProduct(data, user_id);
 
       return new ServiceResponseDTO<CreateProductDTO>({
         error: false,
@@ -44,7 +45,7 @@ class ProductService {
     } catch (error) {
       return serviceErrorHandler<CreateProductDTO | null>({
         error: true,
-        message: error.message,
+        message: 'Service failed',
         payload: null,
       });
     }

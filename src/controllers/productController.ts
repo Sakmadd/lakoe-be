@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import productService from '../services/productService';
 import uploader from '../libs/cloudinary';
-import { boolean } from 'zod';
+import { CreateProductDTO } from '../dtos/products/createProduct';
 
 class productController {
   async getAllProducts(req: Request, res: Response) {
@@ -26,31 +26,59 @@ class productController {
   async createProduct(req: Request, res: Response) {
     try {
       const data = req.body;
+      const fetchImages = req.files as Express.Multer.File[];
+      const user_id = res.locals.user.id;
 
-      const fetchFiles = req.files as Express.Multer.File[];
+      data.price = +data.price;
+      data.length = +data.length;
+      data.width = +data.width;
+      data.height = +data.height;
+      data.stock = +data.stock;
+      data.weight = +data.weight;
+      data.minimum_order = +data.minimum_order;
 
-      if (fetchFiles && fetchFiles.length > 0) {
-        const urls = await Promise.all(
-          fetchFiles.map(async (file) => {
-            const url = await uploader(file);
-            console.log('Uploaded image URL:', url);
-            return { url };
-          }),
-        );
-        data.productImages = urls;
+      if (!data) {
+        return res.status(400).json({
+          error: true,
+          message: 'Please provide a valid product data',
+          data: null,
+        });
       }
 
-      const productWithoutVariant = await productService.createProduct(data);
+      if (typeof data.Category === 'string') {
+        data.Category = JSON.parse(data.Category);
+      }
 
-      return res.status(200).json({
+      if (typeof data.Variant === 'string') {
+        data.Variant = JSON.parse(data.Variant);
+      }
+
+      if (typeof data.is_active === 'string') {
+        data.is_active = data.is_active === 'true';
+      }
+
+      if (fetchImages.length > 0) {
+        const imageUrls = await Promise.all(
+          fetchImages.map(async (file) => {
+            const url = await uploader(file);
+            return { src: url };
+          }),
+        );
+        data.Images = imageUrls;
+      }
+
+      const product = await productService.createProduct(data, user_id);
+
+      return res.status(201).json({
         error: false,
-        message: 'Product created',
-        data: productWithoutVariant,
+        message: 'Product created successfully',
+        data: product,
       });
     } catch (error) {
+      console.error('Error creating product:', error);
       return res.status(500).json({
         error: true,
-        message: error.message,
+        message: 'Error creating product controller',
         data: null,
       });
     }
