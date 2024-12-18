@@ -1,3 +1,4 @@
+import { error } from 'console';
 import { CreateProductDTO } from '../dtos/products/createProduct';
 import { ProductDetailDTO } from '../dtos/products/productDetailDTO';
 import { ProductsDTO } from '../dtos/products/productsDTO';
