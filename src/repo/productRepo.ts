@@ -1,4 +1,3 @@
-import { error } from 'console';
 import { CreateProductDTO } from '../dtos/products/createProduct';
 import { ProductDetailDTO } from '../dtos/products/productDetailDTO';
 import { ProductsDTO } from '../dtos/products/productsDTO';
@@ -202,8 +201,8 @@ export async function createProduct(data: CreateProductDTO, user_id: string) {
         }),
       ),
     };
-  } catch {
-    throw new Error('Error creating product');
+  } catch (error) {
+    throw error;
   }
 }
 
@@ -290,6 +289,131 @@ export async function searchProducts(data: SearchDTO) {
   }));
 
   return productsFinal;
+}
+
+export async function getProductByUrl(
+  url: string,
+): Promise<ProductDetailDTO | null> {
+  const product = await prisma.product.findUnique({
+    where: { url_name: url },
+    include: {
+      Images: true,
+      Variant: {
+        select: {
+          id: true,
+          name: true,
+          is_active: true,
+          product_id: true,
+          created_at: true,
+          updated_at: true,
+          VariantOption: {
+            select: {
+              id: true,
+              name: true,
+              variantId: true,
+              src: true,
+              alt: true,
+            },
+          },
+        },
+      },
+      VariantOptionCombination: true,
+      Shop: {
+        include: {
+          User: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
+      Category: {
+        include: {
+          Parent: true,
+          Children: true,
+        },
+      },
+    },
+  });
+
+  if (!product) {
+    return null;
+  }
+
+  const productFinal: ProductDetailDTO = {
+    id: product.id,
+    shop_id: product.shop_id,
+    category_id: product.category_id,
+    name: product.name,
+    sku: product.sku,
+    price: product.price,
+    url_name: product.url_name,
+    description: product.description,
+    stock: product.stock,
+    weight: product.weight,
+    minimum_order: product.minimum_order,
+    is_active: product.is_active,
+    length: product.length,
+    width: product.width,
+    height: product.height,
+    created_at: product.created_at,
+    updated_at: product.updated_at,
+    Images: product.Images.map((image) => ({
+      id: image.id,
+      product_id: product.id,
+      src: image.src,
+      alt: image.alt,
+    })),
+    Variant: (product.Variant || []).map((variant) => ({
+      id: variant.id,
+      name: variant.name,
+      is_active: variant.is_active,
+      product_id: product.id,
+      VariantOption: (variant.VariantOption || []).map((option) => ({
+        id: option.id,
+        name: option.name,
+        variant_id: option.variantId,
+        src: option.src,
+        alt: option.alt,
+      })),
+    })),
+    VariantOptionCombinations: (product.VariantOptionCombination || []).map(
+      (combination) => ({
+        id: combination.id,
+        name: combination.name,
+        is_active: combination.is_active,
+        price: combination.price,
+        weight: combination.weight,
+        sku: combination.sku,
+        stock: combination.stock,
+        product_id: product.id,
+      }),
+    ),
+    Shop: product.Shop
+      ? {
+          id: product.Shop.id,
+          description: product.Shop.description,
+          slogan: product.Shop.slogan,
+          logo: product.Shop.logo,
+          phone: product.Shop.phone,
+          User: product.Shop.User
+            ? {
+                name: product.Shop.User.name,
+              }
+            : undefined,
+        }
+      : undefined,
+    Category: product.Category
+      ? {
+          id: product.Category.id,
+          label: product.Category.label,
+          value: product.Category.value,
+          parent_id: product.Category.parent_id || null,
+        }
+      : undefined,
+  };
+
+  return productFinal;
 }
 
 export async function getProductById(

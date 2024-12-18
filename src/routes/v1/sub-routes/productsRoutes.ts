@@ -23,6 +23,10 @@ router.delete(
 router.get('/search', productController.searchProducts.bind(productController));
 
 router.get('/:id', productController.getProductById.bind(productController));
+router.get(
+  '/url/:url',
+  productController.getProductByUrl.bind(productController),
+);
 
 router.patch(
   '/:id',

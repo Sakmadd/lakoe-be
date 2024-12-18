@@ -1,8 +1,7 @@
 import { Request, Response } from 'express';
-import productService from '../services/productService';
-import uploader from '../libs/cloudinary';
 import ResponseDTO from '../dtos/responseDto';
-import { CreateProductDTO } from '../dtos/products/createProduct';
+import uploader from '../libs/cloudinary';
+import productService from '../services/productService';
 
 class productController {
   async getAllProducts(req: Request, res: Response) {
@@ -174,6 +173,30 @@ class productController {
     );
   }
 
+  async getProductByUrl(req: Request, res: Response) {
+    const { url } = req.params;
+
+    const { error, message, payload } =
+      await productService.getProductByUrl(url);
+
+    if (error) {
+      res.status(404).json(
+        new ResponseDTO({
+          error: true,
+          message: message,
+          data: null,
+        }),
+      );
+    }
+
+    return res.status(200).json(
+      new ResponseDTO({
+        error: error,
+        message: message,
+        data: payload,
+      }),
+    );
+  }
   async getProductById(req: Request, res: Response) {
     const { id } = req.params;
 

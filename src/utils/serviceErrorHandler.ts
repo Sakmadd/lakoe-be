@@ -19,7 +19,7 @@ export function serviceErrorHandler<T>(
     return new ServiceResponseDTO<T>({
       error: true,
       payload: null,
-      message: 'Validation error with database query',
+      message: `Validation error with database query : ${error.message}`,
     });
   } else if (error instanceof PrismaClientInitializationError) {
     return new ServiceResponseDTO<T>({

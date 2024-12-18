@@ -77,6 +77,22 @@ class ProductService {
     }
   }
 
+  async getProductByUrl(
+    id: string,
+  ): Promise<ServiceResponseDTO<ProductDetailDTO | null>> {
+    try {
+      const product = await productRepo.getProductByUrl(id);
+
+      return new ServiceResponseDTO<ProductDetailDTO>({
+        error: false,
+        message: null,
+        payload: product,
+      });
+    } catch (error) {
+      return serviceErrorHandler<null>(error);
+    }
+  }
+
   async getProductById(
     id: string,
   ): Promise<ServiceResponseDTO<ProductDetailDTO | null>> {
