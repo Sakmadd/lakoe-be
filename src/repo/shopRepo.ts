@@ -99,8 +99,10 @@ export async function getLocationById(id: string) {
     shop_id: loc.shop_id,
     name: loc.name,
     address: loc.address,
+    province: loc.province,
     city: loc.city,
     district: loc.district,
+    subdistrict: loc.subdistrict,
     postal_code: loc.postal_code,
     longitude: loc.longitude,
     latitude: loc.latitude,
@@ -116,36 +118,43 @@ export async function getLocationById(id: string) {
 }
 
 export async function addLocationById(data: addLocationDTO, id: string) {
-  const cariId = await prisma.shop.findUnique({
-    where: { id },
-  });
-  const existingID = await prisma.location.count({
-    where: {
-      shop_id: id,
-    },
-  });
+  try {
+    const cariId = await prisma.shop.findUnique({
+      where: { id },
+    });
 
-  const isMain = existingID === 0;
+    const existingID = await prisma.location.count({
+      where: {
+        shop_id: id,
+      },
+    });
 
-  const locations = await prisma.location.create({
-    data: {
-      name: data.name,
-      address: data.address,
-      city: data.city,
-      district: data.district,
-      postal_code: data.postal_code,
-      longitude: data.longitude,
-      latitude: data.latitude,
-      is_main: isMain ?? false,
-      shop_id: cariId.id,
-    },
-  });
+    const isMain = existingID === 0;
 
-  if (!locations) {
-    throw new Error('Shop not found');
+    const locations = await prisma.location.create({
+      data: {
+        name: data.name,
+        province: data.province,
+        city: data.city,
+        district: data.district,
+        subdistrict: data.subdistrict,
+        address: data.address,
+        postal_code: data.postal_code,
+        longitude: data.longitude,
+        latitude: data.latitude,
+        is_main: isMain ?? false,
+        shop_id: cariId.id,
+      },
+    });
+
+    if (!locations) {
+      throw new Error('Shop not found');
+    }
+
+    return locations;
+  } catch (error) {
+    console.log(error);
   }
-
-  return locations;
 }
 
 export async function updateLocationByLocationId(

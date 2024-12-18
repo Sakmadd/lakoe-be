@@ -55,9 +55,11 @@ model Location {
   id          String  @id @default(uuid())
   shop_id     String
   name        String
-  address     String
+  province    String
   city        String
   district    String
+  subdistrict String
+  address     String
   postal_code String
   longitude   String
   latitude    String

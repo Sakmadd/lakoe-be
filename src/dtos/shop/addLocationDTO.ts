@@ -1,9 +1,10 @@
 export interface addLocationDTO {
-  // id: string;
   name: string;
-  address: string;
+  province: string;
   city: string;
   district: string;
+  subdistrict: string;
+  address: string;
   postal_code: string;
   longitude: string;
   latitude: string;

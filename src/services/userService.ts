@@ -23,7 +23,9 @@ class userServices {
     }
   }
 
-  async getUserById(id): Promise<ServiceResponseDTO<UserDetailType | null>> {
+  async getUserById(
+    id: string,
+  ): Promise<ServiceResponseDTO<UserDetailType | null>> {
     try {
       const user = await userRepo.getUserById(id);
 
@@ -65,6 +67,8 @@ class userServices {
     loggedUser: UserType,
   ): Promise<ServiceResponseDTO<UserDetailType>> {
     try {
+      console.log('Logged user service request : ', loggedUser);
+
       const user = await userRepo.getLoggedUser(loggedUser);
 
       return new ServiceResponseDTO<UserDetailType>({
