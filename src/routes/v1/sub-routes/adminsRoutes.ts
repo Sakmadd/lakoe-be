@@ -5,10 +5,10 @@ const router = Router();
 
 router.get('/balance', adminController.getAllBalance.bind(adminController));
 
-router.get(
-  '/transactions',
-  adminController.getAllTransaction.bind(adminController),
-);
+// router.get(
+//   '/transactions',
+//   adminController.getAllTransaction.bind(adminController),
+// );
 
 router.get('/users', adminController.getAllUser.bind(adminController));
 

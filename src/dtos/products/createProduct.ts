@@ -12,9 +12,9 @@ export interface CreateProductDTO {
   width: number;
   height: number;
   Category: CategoryDTO;
-  Variant: VariantDTO[];
-  VariantOptionCombination: VariantOptionCombinationDTO[];
-  Images: ImagesDTO[];
+  Variant?: VariantDTO[];
+  VariantOptionCombination?: VariantOptionCombinationDTO[];
+  Images?: ImagesDTO[];
   Shop: ShopDTO;
 }
 
@@ -60,6 +60,6 @@ interface VariantOptionCombinationDTO {
 interface ImagesDTO {
   id: string;
   product_id: string;
-  alt: string;
-  src: string;
+  alt?: string;
+  src?: string;
 }
