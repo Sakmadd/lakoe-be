@@ -1,3 +1,4 @@
+import { error } from 'console';
 import { CreateProductDTO } from '../dtos/products/createProduct';
 import { ProductDetailDTO } from '../dtos/products/productDetailDTO';
 import { ProductsDTO } from '../dtos/products/productsDTO';
@@ -77,7 +78,7 @@ export async function createProduct(data: CreateProductDTO, user_id: string) {
       },
     });
 
-    if (!data.Category?.id) {
+    if (!data.category_id) {
       throw new Error('Category ID is required');
     }
 
@@ -97,13 +98,8 @@ export async function createProduct(data: CreateProductDTO, user_id: string) {
         height: data.height,
         Shop: { connect: { id: shopId?.Shop.id } },
         Category: {
-          connectOrCreate: {
-            where: { id: data.Category.id },
-            create: {
-              id: data.Category.id,
-              value: data.Category.value,
-              label: data.Category.label,
-            },
+          connect: {
+            id: data.category_id,
           },
         },
         Images: {
@@ -153,6 +149,7 @@ export async function createProduct(data: CreateProductDTO, user_id: string) {
 
     return {
       id: product.id,
+      category_id: product.category_id,
       name: product.name,
       sku: product.sku,
       price: product.price,
@@ -167,7 +164,7 @@ export async function createProduct(data: CreateProductDTO, user_id: string) {
       height: product.height,
       Shop: { id: product.Shop.id, name: shopId.Shop.User.name },
       Category: {
-        id: product.Category.id,
+        id: product.category_id,
         label: product.Category.label,
         value: product.Category.value,
       },
@@ -435,7 +432,7 @@ export async function updateProductById(id: string, data: CreateProductDTO) {
       width: data.width,
       height: data.height,
       Category: {
-        connect: { id: data.Category.id },
+        connect: { id: data.category_id },
       },
       Shop: {
         connect: { id: data.Shop.id },
@@ -543,6 +540,7 @@ export async function updateProductById(id: string, data: CreateProductDTO) {
 
   return {
     id: product.id,
+    category_id: product.category_id,
     name: product.name,
     sku: product.sku,
     price: product.price,
