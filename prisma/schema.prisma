@@ -171,8 +171,10 @@ model Invoices {
 
 model TemplateMessage {
   id              String @id @default(uuid())
-  title           String @unique
-  contain_message String
+  title           String
+  contain_massage String
+  
+
   createdAt DateTime  @default(now())
   updatedAt DateTime @updatedAt
 
