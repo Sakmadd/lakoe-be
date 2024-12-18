@@ -9,6 +9,7 @@ export async function getShopDetail(id: string) {
     where: { id },
     select: {
       id: true,
+      name: true,
       phone: true,
       description: true,
       slogan: true,
@@ -38,15 +39,11 @@ export async function updateShop(body: ShopUpdateDTO, id: string) {
   const shop = await prisma.shop.update({
     where: { id },
     data: {
+      name: body.name,
       phone: body.phone,
       description: body.description,
       slogan: body.slogan,
       logo: body.logo,
-      User: {
-        update: {
-          name: body.name,
-        },
-      },
     },
     include: {
       User: true,
@@ -61,6 +58,7 @@ export async function updateShop(body: ShopUpdateDTO, id: string) {
 
   const finalData = {
     id: shop.id,
+    name: shop.name ?? '',
     description: shop.description ?? '',
     slogan: shop.slogan ?? '',
     phone: shop.phone ?? '',

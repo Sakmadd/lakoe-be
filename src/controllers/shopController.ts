@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import shopService from '../services/shopService';
 import { ShopUpdateDTO } from '../dtos/shop/shopUpdateDTO';
+import ResponseDTO from '../dtos/responseDto';
 
 class shopController {
   async getShop(req: Request, res: Response) {
@@ -9,11 +10,13 @@ class shopController {
     const shop = await shopService.getShopDetail(id);
 
     if (!shop) {
-      return res.status(404).json({
-        error: true,
-        message: 'No shop found in the database',
-        data: null,
-      });
+      return res.status(404).json(
+        new ResponseDTO<string>({
+          error: true,
+          message: 'No shop found in the database',
+          data: null,
+        }),
+      );
     }
 
     return res.status(200).json({
