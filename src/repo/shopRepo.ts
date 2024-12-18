@@ -15,29 +15,15 @@ export async function getShopDetail(id: string) {
       logo: true,
       balance: true,
       location: true,
-      Product: {
+      User: {
         select: {
           id: true,
           shop_id: true,
-          category_id: true,
           name: true,
-          sku: true,
-          price: true,
-          url_name: true,
-          description: true,
-          stock: true,
-          weight: true,
-          minimum_order: true,
-          is_active: true,
-          length: true,
-          width: true,
-          height: true,
-          created_at: true,
-          updated_at: true,
-          Images: true,
+          role: true,
+          email: true,
         },
       },
-      User: true,
     },
   });
 
@@ -48,17 +34,17 @@ export async function getShopDetail(id: string) {
   return shop;
 }
 
-export async function updateShop(data: ShopUpdateDTO) {
+export async function updateShop(body: ShopUpdateDTO, id: string) {
   const shop = await prisma.shop.update({
-    where: { id: data.id },
+    where: { id },
     data: {
-      phone: data.phone,
-      description: data.description,
-      slogan: data.slogan,
-      logo: data.logo,
+      phone: body.phone,
+      description: body.description,
+      slogan: body.slogan,
+      logo: body.logo,
       User: {
         update: {
-          name: data.name,
+          name: body.name,
         },
       },
     },
@@ -131,7 +117,18 @@ export async function getLocationById(id: string) {
   return locationsFinal;
 }
 
-export async function addLocationById(data: addLocationDTO) {
+export async function addLocationById(data: addLocationDTO, id: string) {
+  const cariId = await prisma.shop.findUnique({
+    where: { id },
+  });
+  const existingID = await prisma.location.count({
+    where: {
+      shop_id: id,
+    },
+  });
+
+  const isMain = existingID === 0;
+
   const locations = await prisma.location.create({
     data: {
       name: data.name,
@@ -141,8 +138,8 @@ export async function addLocationById(data: addLocationDTO) {
       postal_code: data.postal_code,
       longitude: data.longitude,
       latitude: data.latitude,
-      shop_id: data.id,
-      is_main: data.is_main,
+      is_main: isMain ?? false,
+      shop_id: cariId.id,
     },
   });
 
@@ -153,10 +150,13 @@ export async function addLocationById(data: addLocationDTO) {
   return locations;
 }
 
-export async function updateLocationByLocationId(data: UpdateLocationDTO) {
+export async function updateLocationByLocationId(
+  data: UpdateLocationDTO,
+  id: string,
+) {
   const locations = await prisma.location.update({
     where: {
-      id: data.location_id,
+      id: id,
     },
     data: {
       name: data.name,
@@ -177,13 +177,10 @@ export async function updateLocationByLocationId(data: UpdateLocationDTO) {
   return locations;
 }
 
-export async function deleteLocation(data: {
-  id: string;
-  location_id: string;
-}) {
+export async function deleteLocation(id: string) {
   const locations = await prisma.location.delete({
     where: {
-      id: data.location_id,
+      id,
     },
   });
 

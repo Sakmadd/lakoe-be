@@ -4,23 +4,23 @@ import upload from '../../../middlewares/upload-file';
 
 const router = Router();
 
-router.get('/shops/:id', shopController.getShop.bind(shopController));
+router.get('/:id', shopController.getShop.bind(shopController));
 
 router.patch(
-  '/shops/:id/locations',
-  upload.single('logo').bind,
-  shopController.getLocationById.bind(shopController),
+  '/:id',
+  upload.fields([{ name: 'logo', maxCount: 1 }]),
+  shopController.updateShop.bind(shopController),
 );
 router.post(
-  '/shops/:id/locations',
+  '/locations/:id',
   shopController.addLocationById.bind(shopController),
 );
 router.patch(
-  '/shops/:id/locations/:location_id',
+  '/locations/:id',
   shopController.updateLocationByLocationId.bind(shopController),
 );
 router.delete(
-  '/shops/:id/locations/:location_id',
+  '/locations/:id',
   shopController.deleteLocation.bind(shopController),
 );
 

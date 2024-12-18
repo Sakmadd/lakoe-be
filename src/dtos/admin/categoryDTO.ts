@@ -1,6 +1,5 @@
 export interface ImageDTO {
-  id: string;
-  alt: string | null;
+  alt?: string | null;
   src: string;
 }
 
@@ -12,7 +11,7 @@ export interface ProductDTO {
   price: number;
   stock: number;
   sku: string;
-  productImages: ImageDTO[];
+  productImages?: ImageDTO[];
 }
 
 export interface CategoryDTO {

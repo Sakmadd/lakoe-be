@@ -18,13 +18,15 @@ export interface CourierDTO {
 
 export interface PaymentDTO {
   id: string;
-  transactionId: string;
+  transaction_id: string;
+  invoice_id?: string;
+  mt_order_id?: string;
   type: string;
   url: string;
   bank?: string;
   amount: number;
-  accountName: string;
-  accountNumber: string;
+  account_name: string;
+  account_number: string;
   status: string;
   createdAt: Date;
   updatedAt: Date;
