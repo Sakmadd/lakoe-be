@@ -13,7 +13,6 @@ import { BatchDeleteDTO } from '../dtos/products/batchDeleteDTO';
 import { UpdatePriceDTO } from '../dtos/products/UpdateProductPriceDTO';
 import { UpdateStockDTO } from '../dtos/products/updateProductStockDTO';
 
-
 class ProductService {
   async getAllProducts(
     take: number,
@@ -81,15 +80,15 @@ class ProductService {
     }
   }
 
-  async deleteProducts(
-    id: string[],
-  ): Promise<ServiceResponseDTO<ProductType[] | null>> {
+  async deleteProduct(
+    id: string,
+  ): Promise<ServiceResponseDTO<ProductType | null>> {
     try {
-      const product = await productRepo.getProductsByIds(id);
+      const product = await productRepo.getProductsById(id);
 
-      await productRepo.deleteProducts(id);
+      await productRepo.deleteProduct(id);
 
-      return new ServiceResponseDTO<ProductType[]>({
+      return new ServiceResponseDTO<ProductType>({
         error: false,
         message: null,
         payload: product,
