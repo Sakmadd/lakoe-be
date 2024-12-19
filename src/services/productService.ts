@@ -9,6 +9,10 @@ import { ProductDetailDTO } from '../dtos/products/productDetailDTO';
 import { ToggleProductDTO } from '../dtos/products/toggleProductDTO';
 import { CategoriesDTO } from '../dtos/products/categoriesDTO';
 import { ProductByShopDTO } from '../dtos/products/ProductByShopDTO';
+import { BatchDeleteDTO } from '../dtos/products/batchDeleteDTO';
+import { UpdatePriceDTO } from '../dtos/products/UpdateProductPriceDTO';
+import { UpdateStockDTO } from '../dtos/products/updateProductStockDTO';
+
 
 class ProductService {
   async getAllProducts(
@@ -95,6 +99,22 @@ class ProductService {
     }
   }
 
+  async batchDelete(
+    ids: string[],
+  ): Promise<ServiceResponseDTO<BatchDeleteDTO | null>> {
+    try {
+      const product = await productRepo.batchDelete(ids);
+
+      return new ServiceResponseDTO<BatchDeleteDTO>({
+        error: false,
+        message: null,
+        payload: product,
+      });
+    } catch (error) {
+      return serviceErrorHandler<null>(error);
+    }
+  }
+
   async searchProducts(
     data: SearchDTO,
   ): Promise<ServiceResponseDTO<ProductsDTO[] | null>> {
@@ -160,17 +180,64 @@ class ProductService {
     }
   }
 
+  async updateProductPrice(
+    data: UpdatePriceDTO,
+  ): Promise<ServiceResponseDTO<UpdatePriceDTO | null>> {
+    try {
+      const product = await productRepo.updateProductPrice(data);
+
+      return new ServiceResponseDTO<UpdatePriceDTO>({
+        error: false,
+        message: null,
+        payload: product,
+      });
+    } catch (error) {
+      return serviceErrorHandler<null>(error);
+    }
+  }
+
+  async updateProductStock(
+    data: UpdateStockDTO,
+  ): Promise<ServiceResponseDTO<UpdateStockDTO | null>> {
+    try {
+      const product = await productRepo.updateProductStock(data);
+
+      return new ServiceResponseDTO<UpdateStockDTO>({
+        error: false,
+        message: null,
+        payload: product,
+      });
+    } catch (error) {
+      return serviceErrorHandler<null>(error);
+    }
+  }
+
   async toggleProductActive(
     id: string,
-    isActive: boolean,
   ): Promise<ServiceResponseDTO<ToggleProductDTO | null>> {
     try {
-      const product = await productRepo.toggleProductActive(id, isActive);
+      const product = await productRepo.toggleProductActive(id);
 
       return new ServiceResponseDTO<ToggleProductDTO>({
         error: false,
         message: null,
         payload: product,
+      });
+    } catch (error) {
+      return serviceErrorHandler<null>(error);
+    }
+  }
+
+  async toggleProductsActive(
+    ids: string[],
+  ): Promise<ServiceResponseDTO<ToggleProductDTO[] | null>> {
+    try {
+      const products = await productRepo.toggleProductsActive(ids);
+
+      return new ServiceResponseDTO<ToggleProductDTO[]>({
+        error: false,
+        message: null,
+        payload: products,
       });
     } catch (error) {
       return serviceErrorHandler<null>(error);

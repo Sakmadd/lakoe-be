@@ -33,6 +33,30 @@ router.get(
   productController.getAllCategories.bind(productController),
 );
 
+router.patch(
+  '/batch-toggle',
+  authentication,
+  productController.toggleProductsActive.bind(productController),
+);
+
+router.patch(
+  '/price/:id',
+  authentication,
+  productController.updateProductPrice.bind(productController),
+);
+
+router.patch(
+  '/stock/:id',
+  authentication,
+  productController.updateProductStock.bind(productController),
+);
+
+router.delete(
+  '/batch-delete',
+  authentication,
+  productController.batchDelete.bind(productController),
+);
+
 router.get('/:id', productController.getProductById.bind(productController));
 
 router.get(
@@ -48,7 +72,7 @@ router.patch(
 );
 
 router.patch(
-  '/:id/toggle-active',
+  '/:id/toggle',
   authentication,
   productController.toggleProductActive.bind(productController),
 );

@@ -245,6 +245,7 @@ class productController {
       }),
     );
   }
+
   async getProductById(req: Request, res: Response) {
     const { id } = req.params;
 
@@ -273,7 +274,6 @@ class productController {
     const { id } = req.params;
     const data = req.body;
     const fetchImages = req.files as Express.Multer.File[];
-    const user_id = res.locals.user.id;
 
     data.price = +data.price;
     data.length = +data.length;
@@ -293,12 +293,28 @@ class productController {
       );
     }
 
-    if (typeof data.Category === 'string') {
-      data.Category = JSON.parse(data.Category);
-    }
-
     if (typeof data.Variant === 'string') {
       data.Variant = JSON.parse(data.Variant);
+    }
+
+    if (Array.isArray(data.Variant)) {
+      data.Variant = data.Variant.map((variant: any) => {
+        if (Array.isArray(variant.options)) {
+          variant.options = variant.options.map((option: any) => {
+            if (typeof option === 'string') {
+              return JSON.parse(option);
+            }
+            return option;
+          });
+        } else {
+          variant.options = [];
+        }
+        return variant;
+      });
+    }
+
+    if (typeof data.VariantOptionCombination === 'string') {
+      data.VariantOptionCombination = JSON.parse(data.VariantOptionCombination);
     }
 
     if (typeof data.is_active === 'string') {
@@ -321,7 +337,90 @@ class productController {
     );
 
     if (error) {
-      res.status(404).json(
+      return res.status(404).json(
+        new ResponseDTO({
+          error: true,
+          message: message,
+          data: null,
+        }),
+      );
+    }
+
+    return res.status(200).json(
+      new ResponseDTO({
+        error: error,
+        message: message,
+        data: payload,
+      }),
+    );
+  }
+
+  async batchDelete(req: Request, res: Response) {
+    const id = req.body;
+
+    if (!Array.isArray(id) || id.length === 0) {
+      return res.status(400).json({
+        error: true,
+        message: 'Please provide an array of product id',
+        data: null,
+      });
+    }
+
+    const { error, message, payload } = await productService.batchDelete(id);
+
+    if (error) {
+      return res.status(404).json({
+        error: error,
+        message: message,
+        data: null,
+      });
+    }
+    return res.status(200).json(
+      new ResponseDTO({
+        error: error,
+        message: 'Product deleted',
+        data: payload,
+      }),
+    );
+  }
+
+  async updateProductPrice(req: Request, res: Response) {
+    const price = req.body;
+    const { id } = req.params;
+
+    const { error, message, payload } = await productService.updateProductPrice(
+      { id, price },
+    );
+
+    if (error) {
+      return res.status(404).json(
+        new ResponseDTO({
+          error: true,
+          message: message,
+          data: null,
+        }),
+      );
+    }
+
+    return res.status(200).json(
+      new ResponseDTO({
+        error: error,
+        message: message,
+        data: payload,
+      }),
+    );
+  }
+
+  async updateProductStock(req: Request, res: Response) {
+    const stock = req.body;
+    const { id } = req.params;
+
+    const { error, message, payload } = await productService.updateProductStock(
+      { id, stock },
+    );
+
+    if (error) {
+      return res.status(404).json(
         new ResponseDTO({
           error: true,
           message: message,
@@ -341,22 +440,53 @@ class productController {
 
   async toggleProductActive(req: Request, res: Response) {
     const { id } = req.params;
-    const isActive = req.body;
+    const { error, message, payload } =
+      await productService.toggleProductActive(id);
 
-    const product = await productService.toggleProductActive(id, isActive);
-
-    if (!product) {
+    if (error) {
       return res.status(404).json({
-        error: true,
-        message: 'No product found',
+        error: error,
+        message: message,
         data: null,
       });
     }
-    return res.status(200).json({
-      error: false,
-      message: 'Product updated',
-      data: product,
-    });
+    return res.status(200).json(
+      new ResponseDTO({
+        error: error,
+        message: 'Product updated',
+        data: payload,
+      }),
+    );
+  }
+
+  async toggleProductsActive(req: Request, res: Response) {
+    const id = req.body;
+    
+    if (!Array.isArray(id) || id.length === 0) {
+      return res.status(400).json({
+        error: true,
+        message: 'Please provide an array of product id',
+        data: null,
+      });
+    }
+
+    const { error, message, payload } =
+      await productService.toggleProductsActive(id);
+
+    if (error) {
+      return res.status(404).json({
+        error: error,
+        message: message,
+        data: null,
+      });
+    }
+    return res.status(200).json(
+      new ResponseDTO({
+        error: error,
+        message: message,
+        data: payload,
+      }),
+    );
   }
 }
 
