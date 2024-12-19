@@ -794,15 +794,27 @@ export async function updateProductById(id: string, data: CreateProductDTO) {
   };
 }
 
-export async function toggleProductActive(id: string, isActive: boolean) {
-  const product = await prisma.product.update({
+export async function toggleProductActive(id: string) {
+  const currentProduct = await prisma.product.findUnique({
+    where: { id },
+    select: { is_active: true },
+  });
+
+  if (!currentProduct) {
+    throw new Error(`Product with id ${id} not found`);
+  }
+
+  const newIsActive = !currentProduct.is_active;
+
+  const updatedProduct = await prisma.product.update({
     where: { id },
     data: {
-      is_active: isActive,
+      is_active: newIsActive,
     },
   });
+
   return {
-    id: product.id,
-    isActive: product.is_active,
+    id: updatedProduct.id,
+    isActive: updatedProduct.is_active,
   };
 }

@@ -341,22 +341,23 @@ class productController {
 
   async toggleProductActive(req: Request, res: Response) {
     const { id } = req.params;
-    const isActive = req.body;
+    const { error, message, payload } =
+      await productService.toggleProductActive(id);
 
-    const product = await productService.toggleProductActive(id, isActive);
-
-    if (!product) {
+    if (error) {
       return res.status(404).json({
-        error: true,
-        message: 'No product found',
+        error: error,
+        message: message,
         data: null,
       });
     }
-    return res.status(200).json({
-      error: false,
-      message: 'Product updated',
-      data: product,
-    });
+    return res.status(200).json(
+      new ResponseDTO({
+        error: error,
+        message: 'Product updated',
+        data: payload,
+      }),
+    );
   }
 }
 

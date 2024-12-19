@@ -48,7 +48,7 @@ router.patch(
 );
 
 router.patch(
-  '/:id/toggle-active',
+  '/:id/toggle',
   authentication,
   productController.toggleProductActive.bind(productController),
 );
