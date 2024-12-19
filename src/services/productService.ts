@@ -7,6 +7,7 @@ import { ProductType } from '../types/types';
 import { SearchDTO } from '../dtos/products/searchProductDTO';
 import { ProductDetailDTO } from '../dtos/products/productDetailDTO';
 import { ToggleProductDTO } from '../dtos/products/toggleProductDTO';
+import { CategoriesDTO } from '../dtos/products/categoriesDTO';
 
 class ProductService {
   async getAllProducts(
@@ -20,6 +21,22 @@ class ProductService {
         error: false,
         message: null,
         payload: products,
+      });
+    } catch (error) {
+      return serviceErrorHandler<null>(error);
+    }
+  }
+
+  async getAllCategories(): Promise<
+    ServiceResponseDTO<CategoriesDTO[] | null>
+  > {
+    try {
+      const categories = await productRepo.getAllCategories();
+
+      return new ServiceResponseDTO<CategoriesDTO[]>({
+        error: false,
+        message: 'Categories found',
+        payload: categories,
       });
     } catch (error) {
       return serviceErrorHandler<null>(error);
