@@ -461,7 +461,7 @@ class productController {
 
   async toggleProductsActive(req: Request, res: Response) {
     const id = req.body;
-
+    
     if (!Array.isArray(id) || id.length === 0) {
       return res.status(400).json({
         error: true,

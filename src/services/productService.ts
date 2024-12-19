@@ -13,6 +13,7 @@ import { BatchDeleteDTO } from '../dtos/products/batchDeleteDTO';
 import { UpdatePriceDTO } from '../dtos/products/UpdateProductPriceDTO';
 import { UpdateStockDTO } from '../dtos/products/updateProductStockDTO';
 
+
 class ProductService {
   async getAllProducts(
     take: number,
