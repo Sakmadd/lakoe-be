@@ -24,4 +24,9 @@ interface ProductDTO {
   length: string;
 }
 
-export interface RatesResponseDTO {}
+export interface RatesResponseDTO {
+  price: number;
+  company: string;
+  courrier_name: string;
+  courrier_code: string;
+}

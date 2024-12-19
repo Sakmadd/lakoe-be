@@ -28,6 +28,7 @@ router.get(
 );
 
 router.get('/:id', productController.getProductById.bind(productController));
+
 router.get(
   '/url/:url',
   productController.getProductByUrl.bind(productController),

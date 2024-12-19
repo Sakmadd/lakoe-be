@@ -77,7 +77,7 @@ model Product {
   name                     String
   sku                      String
   price                    Float
-  url_name                 String                     @unique
+  url_name                 String
   description              String
   stock                    Int
   minimum_order            Int
