@@ -6,6 +6,7 @@ class OrderController {
   async postOrder(req: Request, res: Response) {
     try {
       const data: CreateOrdersDTO = req.body;
+
       const order = await orderService.createOrder(data);
       res.status(200).json({
         error: false,

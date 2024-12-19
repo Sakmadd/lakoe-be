@@ -5,6 +5,7 @@ import {
 } from '../dtos/orders/createOrders';
 import { prisma } from '../libs/prisma';
 import { RatesRequestDTO, RatesResponseDTO } from '../dtos/orders/ratesOrder';
+import { CONFIGS } from '../config/config';
 
 export async function createOrder(data: CreateOrdersDTO) {
   const recipient = await prisma.recipient.create({
@@ -122,7 +123,7 @@ export async function createOrder(data: CreateOrdersDTO) {
 
 export async function shipmentLocation(city: string, postal_code: string) {
   try {
-    const token = process.env.BITESHIP_API_KEY;
+    const token = CONFIGS.BITESHIP_API_KEY;
 
     const formatInputLocation = city.replace(/ /g, '+');
 
@@ -155,7 +156,7 @@ export async function shipmentLocation(city: string, postal_code: string) {
 
 export async function shipmentRates(data: RatesRequestDTO) {
   try {
-    const token = process.env.BITESHIP_API_KEY;
+    const token = CONFIGS.BITESHIP_API_KEY;
 
     if (!token) {
       throw new Error('Token not found.');
