@@ -27,6 +27,8 @@ interface ProductDTO {
 export interface RatesResponseDTO {
   price: number;
   company: string;
-  courrier_name: string;
-  courrier_code: string;
+  courier_name: string;
+  courier_code: string;
+  courier_type: string;
+  courier_image: string;
 }

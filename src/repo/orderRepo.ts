@@ -4,7 +4,7 @@ import {
   ResPaymentOrderDTO,
 } from '../dtos/orders/createOrders';
 import { prisma } from '../libs/prisma';
-import { RatesRequestDTO } from '../dtos/orders/ratesOrder';
+import { RatesRequestDTO, RatesResponseDTO } from '../dtos/orders/ratesOrder';
 
 export async function createOrder(data: CreateOrdersDTO) {
   const recipient = await prisma.recipient.create({
@@ -120,4 +120,146 @@ export async function createOrder(data: CreateOrdersDTO) {
   return order;
 }
 
-export async function shipmentRates(data: RatesRequestDTO) {}
+export async function shipmentLocation(city: string, postal_code: string) {
+  try {
+    const token = process.env.BITESHIP_API_KEY;
+
+    const formatInputLocation = city.replace(/ /g, '+');
+
+    const hitLocation = await axios.get(
+      `https://api.biteship.com/v1/maps/areas?countries=ID&input=${formatInputLocation}&type=single`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    if (hitLocation.data?.success && hitLocation.data?.areas?.length > 0) {
+      const areas = hitLocation.data.areas;
+
+      const matchingArea = areas.find(
+        (area: any) => area.postal_code === postal_code,
+      );
+
+      return matchingArea ? matchingArea.id : areas[0].id;
+    } else {
+      throw new Error('Invalid API response or no areas found');
+    }
+  } catch (error) {
+    throw new Error(
+      `Error fetching shipment location: ${error instanceof Error ? error.message : error}`,
+    );
+  }
+}
+
+export async function shipmentRates(data: RatesRequestDTO) {
+  try {
+    const token = process.env.BITESHIP_API_KEY;
+
+    if (!token) {
+      throw new Error('Token not found.');
+    }
+
+    const findShopIdByProduct = await prisma.product.findFirst({
+      where: {
+        id: data.items.id,
+      },
+      select: {
+        shop_id: true,
+      },
+    });
+
+    if (!findShopIdByProduct) {
+      throw new Error('Shop not found for the provided product.');
+    }
+
+    const findShopById = await prisma.shop.findFirst({
+      where: {
+        id: findShopIdByProduct.shop_id,
+      },
+      select: {
+        location: true,
+      },
+    });
+
+    if (
+      !findShopById ||
+      !findShopById.location ||
+      !Array.isArray(findShopById.location)
+    ) {
+      throw new Error('Shop location not found.');
+    }
+
+    const mainLocation = findShopById.location.find((loc: any) => loc.is_main);
+
+    if (!mainLocation) {
+      throw new Error('Main location not found.');
+    }
+
+    const shopCity = mainLocation.city;
+    const shopPostalCode = mainLocation.postal_code;
+
+    const originId = await shipmentLocation(shopCity, shopPostalCode);
+    const destinationId = await shipmentLocation(data.city, data.postal_code);
+
+    const requestPayload = {
+      origin_area_id: originId,
+      destination_area_id: destinationId,
+      origin_postal_code: shopPostalCode,
+      destination_postal_code: data.postal_code,
+      origin_longitude: mainLocation.longitude,
+      origin_latitude: mainLocation.latitude,
+      destination_longitude: data.longitude,
+      destination_latitude: data.latitude,
+      couriers: 'paxel,jne,sicepat,jnt',
+      items: [
+        {
+          name: data.items.name,
+          value: data.items.price,
+          length: data.items.length,
+          width: data.items.width,
+          height: data.items.height,
+          weight: data.items.weight,
+          quantity: data.quantity,
+        },
+      ],
+    };
+
+    const response = await axios.post(
+      'https://api.biteship.com/v1/rates/couriers',
+      requestPayload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    const courierImages: Record<string, string> = {
+      paxel:
+        'https://static.wixstatic.com/media/ea5b1d_aab4e6818d9f432e9c7e31a21f133ef0~mv2.png/v1/fill/w_600,h_300,al_c/portfolio_paxel.png',
+      jne: 'https://w7.pngwing.com/pngs/853/492/png-transparent-jalur-nugraha-ekakurir-logo-mail-business-jne-logistic-semarang-business-cdr-text-people-thumbnail.png',
+      sicepat:
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTAdNW-mh6qNAWRzXjFTL2jwqBZy2a0q8W3Lw&s',
+      jnt: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhfD1sqgqqcl5iuI2m4zXMLXxBgP9CIOi1RID-mFoww1XacwfU-qOD-WJyWgPscIyFB-14qS-z13gJPx_eZzYyptYnG7TUSznlU7gOR9_BmqyhpwPbnECFBpDg0ymGq-rwj99ZTkyyTfXo/s320/J%2526T+Express+Logo+-+Free+Vector+Download+PNG.webp',
+    };
+
+    const finalResponse: RatesResponseDTO[] = response.data.pricing.map(
+      (item: any) => ({
+        price: item.price,
+        company: item.company,
+        courier_name: item.courier_name,
+        courier_code: item.courier_code,
+        courier_type: item.type,
+        courier_image: courierImages[item.courier_code] || '',
+      }),
+    );
+
+    return finalResponse;
+  } catch (error) {
+    throw new Error(
+      `Error calculating shipment rates: ${error instanceof Error ? error.message : error}`,
+    );
+  }
+}

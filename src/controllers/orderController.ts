@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { CreateOrdersDTO } from '../dtos/orders/createOrders';
 import orderService from '../services/orderService';
+import ResponseDTO from '../dtos/responseDto';
 class OrderController {
   async postOrder(req: Request, res: Response) {
     try {
@@ -23,7 +24,25 @@ class OrderController {
   async shipmentRates(req: Request, res: Response) {
     const data = req.body;
 
-    const rates = await orderService.shipmentRates(data);
+    const { error, message, payload } = await orderService.shipmentRates(data);
+
+    if (error) {
+      return res.status(400).json(
+        new ResponseDTO({
+          error: error,
+          message: message,
+          data: payload,
+        }),
+      );
+    }
+
+    return res.status(200).json(
+      new ResponseDTO({
+        error: error,
+        message: message,
+        data: payload,
+      }),
+    );
   }
 }
 

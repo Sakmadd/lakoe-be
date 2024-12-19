@@ -195,14 +195,17 @@ model OrderHistory {
 }
 
 model Courier {
-  id                  String @id @default(uuid())
-  invoice_id          String @unique
-  order_id            String @unique
+  id                  String  @id @default(uuid())
+  invoice_id          String  @unique
+  order_id            String  @unique
   origin_area_id      String
   destination_area_id String
   price               Float
-  courierCode         String
-  waybill_id          String
+  courrier_company    String
+  courier_code        String
+  courrier_type       String
+  tracking_id         String?
+  waybill_id          String?
 
   order    Order    @relation(fields: [order_id], references: [id])
   Invoices Invoices @relation(fields: [invoice_id], references: [id])

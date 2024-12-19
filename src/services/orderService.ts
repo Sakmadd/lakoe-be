@@ -22,16 +22,16 @@ class OrderServices {
 
   async shipmentRates(
     data: RatesRequestDTO,
-  ): Promise<ServiceResponseDTO<RatesResponseDTO | null>> {
+  ): Promise<ServiceResponseDTO<RatesResponseDTO[] | null>> {
     try {
-      // const rates = await orderRepo.shipmentRates(data);
-      // return new ServiceResponseDTO<RatesResponseDTO>({
-      //   error: false,
-      //   message: null,
-      //   payload: rates,
-      // });
+      const rates = await orderRepo.shipmentRates(data);
+      return new ServiceResponseDTO<RatesResponseDTO[]>({
+        error: false,
+        message: null,
+        payload: rates,
+      });
     } catch (error) {
-      return serviceErrorHandler<RatesResponseDTO | null>(error);
+      return serviceErrorHandler<null>(error);
     }
   }
 }
