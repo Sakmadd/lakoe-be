@@ -4,6 +4,7 @@ import { ProductsDTO } from '../dtos/products/productsDTO';
 import { SearchDTO } from '../dtos/products/searchProductDTO';
 import { prisma } from '../libs/prisma';
 import { CategoriesDTO } from '../dtos/products/categoriesDTO';
+import { ProductByShopDTO } from '../dtos/products/ProductByShopDTO';
 
 export async function getAllProducts(take: number, skip: number) {
   const products = await prisma.product.findMany({
@@ -32,6 +33,69 @@ export async function getAllProducts(take: number, skip: number) {
     updated_at: product.updated_at,
     Images: {
       src: product.Images[0].src,
+    },
+  }));
+
+  return productsFinal;
+}
+
+export async function getProductsByShopId(id: string) {
+  const products = await prisma.product.findMany({
+    where: {
+      shop_id: id,
+    },
+    select: {
+      id: true,
+      name: true,
+      is_active: true,
+      price: true,
+      stock: true,
+      sku: true,
+      url_name: true,
+      created_at: true,
+      updated_at: true,
+      Images: {
+        select: {
+          id: true,
+          src: true,
+          alt: true,
+        },
+      },
+      Category: {
+        select: {
+          id: true,
+          parent_id: true,
+          label: true,
+          value: true,
+        },
+      },
+    },
+  });
+
+  if (!products) {
+    throw new Error('Products not found');
+  }
+
+  const productsFinal: ProductByShopDTO[] = (products ?? []).map((product) => ({
+    id: product.id,
+    name: product.name,
+    is_active: product.is_active,
+    price: product.price,
+    stock: product.stock,
+    sku: product.sku,
+    url_name: product.url_name,
+    created_at: product.created_at,
+    updated_at: product.updated_at,
+    Images: product.Images.map((image) => ({
+      id: image.id,
+      src: image.src,
+      alt: image.alt,
+    })),
+    Category: {
+      id: product.Category.id,
+      parent_id: product.Category.parent_id ? product.Category.parent_id : null,
+      label: product.Category.label,
+      value: product.Category.value,
     },
   }));
 

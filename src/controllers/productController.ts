@@ -30,6 +30,31 @@ class productController {
     );
   }
 
+  async getProductsByShopId(req: Request, res: Response) {
+    const id = res.locals.user.shop_id;
+
+    const { error, message, payload } =
+      await productService.getProductsByShopId(id);
+
+    if (error) {
+      return res.status(404).json(
+        new ResponseDTO({
+          error: error,
+          message: 'No products found in the database',
+          data: null,
+        }),
+      );
+    }
+
+    return res.status(200).json(
+      new ResponseDTO({
+        error: error,
+        message: message,
+        data: payload,
+      }),
+    );
+  }
+
   async getAllCategories(req: Request, res: Response) {
     const { error, message, payload } = await productService.getAllCategories();
     if (error) {
