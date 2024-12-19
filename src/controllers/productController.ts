@@ -245,6 +245,7 @@ class productController {
       }),
     );
   }
+
   async getProductById(req: Request, res: Response) {
     const { id } = req.params;
 
@@ -384,7 +385,7 @@ class productController {
   }
 
   async updateProductPrice(req: Request, res: Response) {
-    const { price } = req.body;
+    const price = req.body;
     const { id } = req.params;
 
     const { error, message, payload } = await productService.updateProductPrice(
@@ -411,7 +412,7 @@ class productController {
   }
 
   async updateProductStock(req: Request, res: Response) {
-    const { stock } = req.body;
+    const stock = req.body;
     const { id } = req.params;
 
     const { error, message, payload } = await productService.updateProductStock(

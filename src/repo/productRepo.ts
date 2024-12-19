@@ -7,6 +7,7 @@ import { CategoriesDTO } from '../dtos/products/categoriesDTO';
 import { ProductByShopDTO } from '../dtos/products/ProductByShopDTO';
 import { UpdateStockDTO } from '../dtos/products/updateProductStockDTO';
 import { UpdatePriceDTO } from '../dtos/products/UpdateProductPriceDTO';
+import { BatchDeleteDTO } from '../dtos/products/batchDeleteDTO';
 
 export async function getAllProducts(take: number, skip: number) {
   const products = await prisma.product.findMany({
@@ -306,30 +307,49 @@ export async function deleteProducts(id: string[]) {
   return product;
 }
 
-export async function batchDelete(ids: string[]) {
-  await prisma.image.deleteMany({
-    where: { product_id: { in: ids } },
-  });
+export async function batchDelete(ids: string[]): Promise<BatchDeleteDTO> {
+  try {
+    const existingProducts = await prisma.product.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+      select: { id: true },
+    });
 
-  await prisma.variant.deleteMany({
-    where: { product_id: { in: ids } },
-  });
+    const existingIds = existingProducts.map((product) => product.id);
 
-  await prisma.variantOptionCombination.deleteMany({
-    where: { product_id: { in: ids } },
-  });
+    const missingIds = ids.filter((id) => !existingIds.includes(id));
+    if (missingIds.length > 0) {
+      throw new Error(
+        `The following product IDs do not exist: ${missingIds.join(', ')}`,
+      );
+    }
 
-  const deleteResult = await prisma.product.deleteMany({
-    where: { id: { in: ids } },
-  });
+    await prisma.image.deleteMany({
+      where: { product_id: { in: ids } },
+    });
 
-  console.log(`Deleted ${deleteResult.count} products.`);
+    await prisma.variant.deleteMany({
+      where: { product_id: { in: ids } },
+    });
 
-  return {
-    success: true,
-    deletedIds: ids,
-    message: `Deleted ${deleteResult.count} products successfully.`,
-  };
+    await prisma.variantOptionCombination.deleteMany({
+      where: { product_id: { in: ids } },
+    });
+
+    const deleteResult = await prisma.product.deleteMany({
+      where: { id: { in: ids } },
+    });
+
+    return {
+      success: true,
+      deletedIds: ids,
+    };
+  } catch (error) {
+    throw error;
+  }
 }
 
 export async function updateProductStock(data: UpdateStockDTO) {
