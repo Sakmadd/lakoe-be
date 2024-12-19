@@ -3,6 +3,7 @@ import { ProductDetailDTO } from '../dtos/products/productDetailDTO';
 import { ProductsDTO } from '../dtos/products/productsDTO';
 import { SearchDTO } from '../dtos/products/searchProductDTO';
 import { prisma } from '../libs/prisma';
+import { CategoriesDTO } from '../dtos/products/categoriesDTO';
 
 export async function getAllProducts(take: number, skip: number) {
   const products = await prisma.product.findMany({
@@ -10,15 +11,6 @@ export async function getAllProducts(take: number, skip: number) {
       Images: {
         select: {
           src: true,
-        },
-      },
-      Shop: {
-        select: {
-          User: {
-            select: {
-              name: true,
-            },
-          },
         },
       },
     },
@@ -32,31 +24,46 @@ export async function getAllProducts(take: number, skip: number) {
 
   const productsFinal: ProductsDTO[] = (products ?? []).map((product) => ({
     id: product.id,
-    shop_id: product.shop_id,
-    category_id: product.category_id,
     name: product.name,
-    sku: product.sku,
     price: product.price,
     url_name: product.url_name,
     description: product.description,
-    stock: product.stock,
-    weight: product.weight,
-    minimum_order: product.minimum_order,
-    is_active: product.is_active,
-    length: product.length,
-    width: product.width,
-    height: product.height,
     created_at: product.created_at,
     updated_at: product.updated_at,
     Images: {
       src: product.Images[0].src,
     },
-    Shop: {
-      name: product.Shop.User.name,
-    },
   }));
 
   return productsFinal;
+}
+
+export async function getAllCategories() {
+  const categories = await prisma.category.findMany({
+    select: {
+      id: true,
+      parent_id: true,
+      label: true,
+      value: true,
+      Children: true,
+    },
+  });
+
+  const finalCategories: CategoriesDTO[] = (categories ?? []).map(
+    (category) => ({
+      id: category.id,
+      label: category.label,
+      value: category.value,
+      children: category.Children.map((child) => ({
+        id: child.id,
+        parent_id: child.parent_id,
+        label: child.label,
+        value: child.value,
+      })),
+    }),
+  );
+
+  return finalCategories;
 }
 
 export async function createProduct(data: CreateProductDTO, user_id: string) {

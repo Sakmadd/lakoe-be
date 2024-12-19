@@ -8,11 +8,14 @@ class productController {
     const take = req.query.take ? +req.query.take : 20;
     const skip = req.query.skip ? +req.query.skip : 0;
 
-    const products = await productService.getAllProducts(take, skip);
-    if (!products) {
+    const { error, message, payload } = await productService.getAllProducts(
+      take,
+      skip,
+    );
+    if (error) {
       return res.status(404).json(
         new ResponseDTO({
-          error: true,
+          error: error,
           message: 'No products found in the database',
           data: null,
         }),
@@ -20,9 +23,29 @@ class productController {
     }
     return res.status(200).json(
       new ResponseDTO({
-        error: false,
-        message: 'Products found',
-        data: products,
+        error: error,
+        message: message,
+        data: payload,
+      }),
+    );
+  }
+
+  async getAllCategories(req: Request, res: Response) {
+    const { error, message, payload } = await productService.getAllCategories();
+    if (error) {
+      return res.status(404).json(
+        new ResponseDTO({
+          error: error,
+          message: 'No categories found in the database',
+          data: null,
+        }),
+      );
+    }
+    return res.status(200).json(
+      new ResponseDTO({
+        error: error,
+        message: message,
+        data: payload,
       }),
     );
   }
