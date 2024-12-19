@@ -794,15 +794,54 @@ export async function updateProductById(id: string, data: CreateProductDTO) {
   };
 }
 
-export async function toggleProductActive(id: string, isActive: boolean) {
-  const product = await prisma.product.update({
+export async function toggleProductActive(id: string) {
+  const currentProduct = await prisma.product.findUnique({
+    where: { id },
+    select: { is_active: true },
+  });
+
+  if (!currentProduct) {
+    throw new Error(`Product with id ${id} not found`);
+  }
+
+  const newIsActive = !currentProduct.is_active;
+
+  const updatedProduct = await prisma.product.update({
     where: { id },
     data: {
-      is_active: isActive,
+      is_active: newIsActive,
     },
   });
+
   return {
+    id: updatedProduct.id,
+    isActive: updatedProduct.is_active,
+  };
+}
+
+export async function toggleProductsActive(ids: string[]) {
+  const products = await prisma.product.findMany({
+    where: { id: { in: ids } },
+    select: { id: true, is_active: true },
+  });
+
+  if (products.length !== ids.length) {
+    throw new Error('Some products were not found');
+  }
+
+  const updatePromises = products.map((product) =>
+    prisma.product.update({
+      where: { id: product.id },
+      data: { is_active: !product.is_active },
+    }),
+  );
+
+  const updatedProducts = await Promise.all(updatePromises);
+
+  const finalProducts = updatedProducts.map((product) => ({
     id: product.id,
     isActive: product.is_active,
-  };
+  }));
+
+  return finalProducts;
 }

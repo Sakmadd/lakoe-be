@@ -162,15 +162,30 @@ class ProductService {
 
   async toggleProductActive(
     id: string,
-    isActive: boolean,
   ): Promise<ServiceResponseDTO<ToggleProductDTO | null>> {
     try {
-      const product = await productRepo.toggleProductActive(id, isActive);
+      const product = await productRepo.toggleProductActive(id);
 
       return new ServiceResponseDTO<ToggleProductDTO>({
         error: false,
         message: null,
         payload: product,
+      });
+    } catch (error) {
+      return serviceErrorHandler<null>(error);
+    }
+  }
+
+  async toggleProductsActive(
+    ids: string[],
+  ): Promise<ServiceResponseDTO<ToggleProductDTO[] | null>> {
+    try {
+      const products = await productRepo.toggleProductsActive(ids);
+
+      return new ServiceResponseDTO<ToggleProductDTO[]>({
+        error: false,
+        message: null,
+        payload: products,
       });
     } catch (error) {
       return serviceErrorHandler<null>(error);
