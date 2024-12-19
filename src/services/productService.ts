@@ -8,6 +8,7 @@ import { SearchDTO } from '../dtos/products/searchProductDTO';
 import { ProductDetailDTO } from '../dtos/products/productDetailDTO';
 import { ToggleProductDTO } from '../dtos/products/toggleProductDTO';
 import { CategoriesDTO } from '../dtos/products/categoriesDTO';
+import { ProductByShopDTO } from '../dtos/products/ProductByShopDTO';
 
 class ProductService {
   async getAllProducts(
@@ -20,6 +21,22 @@ class ProductService {
       return new ServiceResponseDTO<ProductsDTO[]>({
         error: false,
         message: null,
+        payload: products,
+      });
+    } catch (error) {
+      return serviceErrorHandler<null>(error);
+    }
+  }
+
+  async getProductsByShopId(
+    id: string,
+  ): Promise<ServiceResponseDTO<ProductByShopDTO[] | null>> {
+    try {
+      const products = await productRepo.getProductsByShopId(id);
+
+      return new ServiceResponseDTO<ProductByShopDTO[]>({
+        error: false,
+        message: 'Products found',
         payload: products,
       });
     } catch (error) {

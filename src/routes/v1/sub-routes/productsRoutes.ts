@@ -20,6 +20,12 @@ router.delete(
   productController.deleteProducts.bind(productController),
 );
 
+router.get(
+  '/shop',
+  authentication,
+  productController.getProductsByShopId.bind(productController),
+);
+
 router.get('/search', productController.searchProducts.bind(productController));
 
 router.get(
@@ -28,6 +34,7 @@ router.get(
 );
 
 router.get('/:id', productController.getProductById.bind(productController));
+
 router.get(
   '/url/:url',
   productController.getProductByUrl.bind(productController),
