@@ -359,6 +359,38 @@ class productController {
       }),
     );
   }
+
+  async toggleProductsActive(req: Request, res: Response) {
+    const id = req.body;
+
+    console.log(id);
+
+    if (!Array.isArray(id) || id.length === 0) {
+      return res.status(400).json({
+        error: true,
+        message: 'Please provide an array of product id',
+        data: null,
+      });
+    }
+
+    const { error, message, payload } =
+      await productService.toggleProductsActive(id);
+
+    if (error) {
+      return res.status(404).json({
+        error: error,
+        message: message,
+        data: null,
+      });
+    }
+    return res.status(200).json(
+      new ResponseDTO({
+        error: error,
+        message: message,
+        data: payload,
+      }),
+    );
+  }
 }
 
 export default new productController();

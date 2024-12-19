@@ -175,6 +175,22 @@ class ProductService {
       return serviceErrorHandler<null>(error);
     }
   }
+
+  async toggleProductsActive(
+    ids: string[],
+  ): Promise<ServiceResponseDTO<ToggleProductDTO[] | null>> {
+    try {
+      const products = await productRepo.toggleProductsActive(ids);
+
+      return new ServiceResponseDTO<ToggleProductDTO[]>({
+        error: false,
+        message: null,
+        payload: products,
+      });
+    } catch (error) {
+      return serviceErrorHandler<null>(error);
+    }
+  }
 }
 
 export default new ProductService();
