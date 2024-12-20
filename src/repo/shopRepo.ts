@@ -1,6 +1,9 @@
 import { addLocationDTO } from '../dtos/shop/addLocationDTO';
 import { ShopUpdateDTO } from '../dtos/shop/shopUpdateDTO';
-import { UpdateLocationDTO } from '../dtos/shop/updateLocationDTO';
+import {
+  UpdateLocationDTO,
+  updateMainLocation,
+} from '../dtos/shop/updateLocationDTO';
 import { prisma } from '../libs/prisma';
 import { LocationType } from '../types/types';
 import { serviceErrorHandler } from '../utils/serviceErrorHandler';
@@ -36,6 +39,41 @@ export async function getShopDetail(id: string) {
   return shop;
 }
 
+export async function getAllLocations(id: string) {
+  const locations = await prisma.location.findMany({
+    where: {
+      shop_id: id,
+    },
+  });
+
+  if (!locations) {
+    throw new Error('Locations not found');
+  }
+
+  return locations;
+}
+export async function updateMainLocation(body: updateMainLocation, id: string) {
+  let mainLocation: any;
+  if (id) {
+    await prisma.location.updateMany({
+      where: {
+        id: {
+          not: id,
+        },
+      },
+      data: {
+        is_main: false,
+      },
+    });
+    mainLocation = await prisma.location.update({
+      where: { id },
+      data: {
+        is_main: true,
+      },
+    });
+  }
+  return mainLocation;
+}
 export async function updateShop(body: ShopUpdateDTO, id: string) {
   const shop = await prisma.shop.update({
     where: { id },
@@ -161,6 +199,8 @@ export async function updateLocationByLocationId(
       address: data.address,
       city: data.city,
       district: data.district,
+      province: data.province,
+      subdistrict: data.subdistrict,
       postal_code: data.postal_code,
       longitude: data.longitude,
       latitude: data.latitude,

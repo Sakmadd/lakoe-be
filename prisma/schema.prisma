@@ -64,7 +64,7 @@ model Location {
   postal_code String
   longitude   String
   latitude    String
-  is_main     Boolean
+  is_main     Boolean @default(false)
   Shop        Shop?   @relation(fields: [shop_id], references: [id])
 
   @@map("locations")
