@@ -64,7 +64,7 @@ model Location {
   postal_code String
   longitude   String
   latitude    String
-  is_main     Boolean
+  is_main     Boolean @default(false)
   Shop        Shop?   @relation(fields: [shop_id], references: [id])
 
   @@map("locations")
@@ -72,8 +72,8 @@ model Location {
 
 model Product {
   id                       String                     @id @default(uuid())
-  shop_id                  String
-  category_id              String
+  shop_id                  String 
+  category_id              String 
   name                     String
   sku                      String
   price                    Float
@@ -89,8 +89,8 @@ model Product {
   created_at               DateTime                   @default(now())
   updated_at               DateTime                   @default(now())
   OrderItem                OrderItem[]
-  Shop                     Shop                       @relation(fields: [shop_id], references: [id])
-  Category                 Category                   @relation(fields: [category_id], references: [id])
+  Shop                     Shop                 @relation(fields: [shop_id], references: [id])
+  Category                 Category               @relation(fields: [category_id], references: [id])
   Variant                  Variant[]
   Images                   Image[]
   VariantOptionCombination VariantOptionCombination[]
@@ -227,7 +227,7 @@ model Order {
 model OrderItem {
   id         String  @id @default(uuid())
   order_id   String  @unique
-  product_id String
+  product_id String 
   quantity   Int
   Order      Order   @relation(fields: [order_id], references: [id])
   Product    Product @relation(fields: [product_id], references: [id])

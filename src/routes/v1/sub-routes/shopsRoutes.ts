@@ -5,7 +5,12 @@ import upload from '../../../middlewares/upload-file';
 const router = Router();
 
 router.get('/:id', shopController.getShop.bind(shopController));
+router.get('/location/:id', shopController.getAllLocation.bind(shopController));
 
+router.patch(
+  '/location/:id',
+  shopController.updateMainLocation.bind(shopController),
+);
 router.patch(
   '/:id',
   upload.fields([{ name: 'logo', maxCount: 1 }]),

@@ -6,12 +6,12 @@ const app = express();
 const port = CONFIGS.PORT;
 
 app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
   res.send('Welcome to the API!');
 });
-
-app.use(express.json());
 
 app.use('/v1', API_V1);
 

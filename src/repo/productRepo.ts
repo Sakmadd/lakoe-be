@@ -9,7 +9,6 @@ import { UpdateStockDTO } from '../dtos/products/updateProductStockDTO';
 import { UpdatePriceDTO } from '../dtos/products/UpdateProductPriceDTO';
 import { BatchDeleteDTO } from '../dtos/products/batchDeleteDTO';
 
-
 export async function getAllProducts(take: number, skip: number) {
   const products = await prisma.product.findMany({
     include: {
