@@ -1,35 +1,8 @@
 import { prisma } from '../libs/prisma';
 
 class sellerRepo {
-  // async getDashboard(shop_id: string){
-
-  //   const product = await prisma.product.findMany(
-  //     {
-  //       where:{
-  //         shop_id
-  //       }
-  //     }
-  //   )
-  //   let products = product.length
-  //   const shop = await prisma.shop.findUnique({
-  //     where:{
-  //       id: shop_id
-  //     },
-  //     select:{
-  //       balance:true,
-
-  //     },
-
-  //   })
-  //   const dashboard = {
-  //     products,
-  //     balance: shop.balance
-  //   }
-
-  //   return dashboard;
-  // }
   async getDashboard(shop_id: string) {
-    const [shopData, productCount] = await Promise.all([
+    const [shopData, productCount, productUnpaid] = await Promise.all([
       prisma.shop.findUnique({
         where: { id: shop_id },
         select: { balance: true },
@@ -37,17 +10,57 @@ class sellerRepo {
       prisma.product.count({
         where: { shop_id },
       }),
+      prisma.orderHistory.count({
+        where: {
+          status: 'unpaid',
+          Invoice: {
+            Payment: {
+              Order: {
+                OrderItem: {
+                  is: {
+                    Product: {
+                      shop_id,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      }),
     ]);
 
     if (!shopData) {
       throw new Error('Shop not found');
     }
 
-    // Strukturkan data hasil
     return {
       products: productCount,
       balance: shopData.balance,
+      porductUnpaid: productUnpaid,
     };
+  }
+
+  async getGraph(shop_id: string) {
+    const graph = await prisma.orderHistory.findMany({
+      where: {
+        status: 'done',
+        Invoice: {
+          Payment: {
+            Order: {
+              OrderItem: {
+                is: {
+                  Product: {
+                    shop_id,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    return graph;
   }
 }
 export default new sellerRepo();

@@ -23,6 +23,7 @@ export interface UserDetailType extends UserType {
 
 export interface ShopType {
   id: string;
+  name?: string;
   phone?: string;
   description?: string;
   slogan?: string;
@@ -38,9 +39,11 @@ export interface LocationType {
   id: string;
   shop_id: string;
   name: string;
-  address: string;
+  province: string;
   city: string;
   district: string;
+  subdistrict: string;
+  address: string;
   postal_code: string;
   longitude: string;
   latitude: string;
@@ -71,7 +74,7 @@ export interface ProductType {
   Shop?: ShopType;
   Category?: CategoryType;
   Variant?: VariantType[];
-  Images: ImageType[];
+  Images?: ImageType[];
   VariantOptionCombination?: VariantOptionCombinationType[];
 }
 

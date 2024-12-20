@@ -1,9 +1,7 @@
 import { Router } from 'express';
-import dashboadController from '../../../controllers/sellerController';
+import sellerController from '../../../controllers/sellerController';
 
 const sellerDasboard = Router();
-sellerDasboard.get(
-  '/',
-  dashboadController.getDashboard.bind(dashboadController),
-);
+sellerDasboard.get('/', sellerController.getDashboard.bind(sellerController));
+sellerDasboard.get('/graphs', sellerController.getGraph.bind(sellerController));
 export default sellerDasboard;

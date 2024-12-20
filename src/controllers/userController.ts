@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import userService from '../services/userService';
-import ServiceResponseDTO from '../dtos/serviceResponseDto';
 import { UserDetailType } from '../types/types';
 import ResponseDTO from '../dtos/responseDto';
 
@@ -61,14 +60,13 @@ class userController {
   async getLoggedUser(req: Request, res: Response) {
     const loggedUser = res.locals.user;
 
-    const { error, payload }: ServiceResponseDTO<UserDetailType> =
-      await userService.getLoggedUser(loggedUser);
+    const user = await userService.getLoggedUser(loggedUser);
 
-    if (error) {
-      return res.status(500).json(
-        new ResponseDTO<null>({
-          error,
-          message: payload,
+    if (!user) {
+      return res.status(404).json(
+        new ResponseDTO<UserDetailType>({
+          error: true,
+          message: 'No user found in the database',
           data: null,
         }),
       );
@@ -76,11 +74,33 @@ class userController {
 
     return res.status(200).json(
       new ResponseDTO<UserDetailType>({
-        error,
-        message: {
-          status: 'User retrieved!',
-        },
-        data: payload,
+        error: false,
+        message: 'user found',
+        data: user,
+      }),
+    );
+  }
+
+  async checkUser(req: Request, res: Response) {
+    const { id } = res.locals.user.id;
+
+    const user = await userService.getUserById(id);
+
+    if (!user) {
+      return res.status(404).json(
+        new ResponseDTO<UserDetailType>({
+          error: true,
+          message: 'No user found in the database',
+          data: null,
+        }),
+      );
+    }
+
+    return res.status(200).json(
+      new ResponseDTO<UserDetailType>({
+        error: false,
+        message: 'user found',
+        data: user,
       }),
     );
   }

@@ -19,6 +19,7 @@ CREATE TABLE "users" (
 -- CreateTable
 CREATE TABLE "shops" (
     "id" TEXT NOT NULL,
+    "name" TEXT,
     "phone" TEXT,
     "description" TEXT,
     "slogan" TEXT,
@@ -136,6 +137,17 @@ CREATE TABLE "invoices" (
 );
 
 -- CreateTable
+CREATE TABLE "templateMessages" (
+    "id" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "contain_message" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "templateMessages_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "OrderHistory" (
     "id" TEXT NOT NULL,
     "invoice_id" TEXT NOT NULL,
@@ -149,6 +161,7 @@ CREATE TABLE "OrderHistory" (
 CREATE TABLE "couriers" (
     "id" TEXT NOT NULL,
     "invoice_id" TEXT NOT NULL,
+    "order_id" TEXT NOT NULL,
     "price" DOUBLE PRECISION NOT NULL,
     "courierCode" TEXT NOT NULL,
 
@@ -196,7 +209,7 @@ CREATE TABLE "payments" (
     "id" TEXT NOT NULL,
     "order_id" TEXT NOT NULL,
     "invoice_id" TEXT NOT NULL,
-    "transaction_id" TEXT NOT NULL,
+    "mt_order_id" TEXT NOT NULL,
     "type" TEXT NOT NULL,
     "url" TEXT NOT NULL,
     "bank" TEXT,
@@ -248,7 +261,13 @@ CREATE UNIQUE INDEX "invoices_recipient_id_key" ON "invoices"("recipient_id");
 CREATE UNIQUE INDEX "couriers_invoice_id_key" ON "couriers"("invoice_id");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "couriers_order_id_key" ON "couriers"("order_id");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "orders_recipient_id_key" ON "orders"("recipient_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "orderItems_order_id_key" ON "orderItems"("order_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "payments_order_id_key" ON "payments"("order_id");
@@ -288,6 +307,9 @@ ALTER TABLE "invoices" ADD CONSTRAINT "invoices_recipient_id_fkey" FOREIGN KEY (
 
 -- AddForeignKey
 ALTER TABLE "OrderHistory" ADD CONSTRAINT "OrderHistory_invoice_id_fkey" FOREIGN KEY ("invoice_id") REFERENCES "invoices"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "couriers" ADD CONSTRAINT "couriers_order_id_fkey" FOREIGN KEY ("order_id") REFERENCES "orders"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "couriers" ADD CONSTRAINT "couriers_invoice_id_fkey" FOREIGN KEY ("invoice_id") REFERENCES "invoices"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

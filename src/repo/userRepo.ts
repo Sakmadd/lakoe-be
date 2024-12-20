@@ -1,6 +1,7 @@
 import { UpdateUserDTO } from '../dtos/user/updateUser';
 import { prisma } from '../libs/prisma';
-import { UserDetailType, UserType } from '../types/types';
+import { UserType } from '../types/types';
+import { serviceErrorHandler } from '../utils/serviceErrorHandler';
 
 export async function getAllUser() {
   const users = await prisma.user.findMany({
@@ -58,48 +59,19 @@ export async function updateUser(data: UpdateUserDTO) {
 }
 
 export async function getLoggedUser(loggedUser: UserType) {
-  const rawUser: UserDetailType = await prisma.user.findUnique({
-    where: {
-      id: loggedUser.id,
-    },
-    include: {
-      Shop: {
-        select: {
-          id: true,
-          balance: true,
-          description: true,
-          location: true,
-          logo: true,
-          phone: true,
-          slogan: true,
-          Withdraw: true,
-          Product: {
-            select: {
-              id: true,
-              shop_id: true,
-              name: true,
-              description: true,
-              category_id: true,
-              sku: true,
-              price: true,
-              url_name: true,
-              stock: true,
-              weight: true,
-              minimum_order: true,
-              is_active: true,
-              length: true,
-              width: true,
-              height: true,
-              created_at: true,
-              updated_at: true,
-              Images: true,
-            },
-          },
-        },
+  try {
+    const rawUser = await prisma.user.findUnique({
+      where: {
+        id: loggedUser.id,
       },
-    },
-  });
+      include: {
+        Shop: true,
+      },
+    });
 
-  delete rawUser.password;
-  return rawUser;
+    delete rawUser.password;
+    return rawUser;
+  } catch (error) {
+    serviceErrorHandler(error);
+  }
 }

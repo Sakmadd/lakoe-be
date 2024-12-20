@@ -36,6 +36,7 @@ model User {
 
 model Shop {
   id          String  @id @default(uuid())
+  name        String?
   phone       String?
   description String?
   slogan      String?
@@ -54,9 +55,11 @@ model Location {
   id          String  @id @default(uuid())
   shop_id     String
   name        String
-  address     String
+  province    String
   city        String
   district    String
+  subdistrict String
+  address     String
   postal_code String
   longitude   String
   latitude    String
@@ -68,8 +71,8 @@ model Location {
 
 model Product {
   id                       String                     @id @default(uuid())
-  shop_id                  String
-  category_id              String
+  shop_id                  String 
+  category_id              String 
   name                     String
   sku                      String
   price                    Float
@@ -85,8 +88,8 @@ model Product {
   created_at               DateTime                   @default(now())
   updated_at               DateTime                   @default(now())
   OrderItem                OrderItem[]
-  Shop                     Shop                       @relation(fields: [shop_id], references: [id])
-  Category                 Category                   @relation(fields: [category_id], references: [id])
+  Shop                     Shop                 @relation(fields: [shop_id], references: [id])
+  Category                 Category               @relation(fields: [category_id], references: [id])
   Variant                  Variant[]
   Images                   Image[]
   VariantOptionCombination VariantOptionCombination[]
@@ -156,28 +159,25 @@ model VariantOptionCombination {
 }
 
 model Invoices {
-  id            String           @id @default(uuid())
-  recipient_id  String           @unique
+  id            String         @id @default(uuid())
+  recipient_id  String         @unique
   prices        Float
   serviceCharge Float
   invoiceNumber String
   Courier       Courier?
   Payment       Payment?
-  Recipient     Recipient        @relation(fields: [recipient_id], references: [id])
+  Recipient     Recipient      @relation(fields: [recipient_id], references: [id])
   OrderHistory  OrderHistory[]
 
   @@map("invoices")
 }
 
 model TemplateMessage {
-  id              String @id @default(uuid())
+  id              String   @id @default(uuid())
   title           String
-  contain_massage String
-  
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime @updatedAt
-
+  contain_message String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   @@map("templateMessages")
 }
@@ -221,7 +221,7 @@ model Order {
 model OrderItem {
   id         String  @id @default(uuid())
   order_id   String  @unique
-  product_id String
+  product_id String 
   quantity   Int
   Order      Order   @relation(fields: [order_id], references: [id])
   Product    Product @relation(fields: [product_id], references: [id])

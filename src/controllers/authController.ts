@@ -67,10 +67,8 @@ class AuthControllers {
   async checkAuth(req: Request, res: Response) {
     try {
       const user = res.locals.user;
-      console.log(user);
       res.status(200).json({ user });
-    } catch (error) {
-      console.log(error);
+    } catch {
       res.status(401).json({ message: 'Unauthorized' });
     }
   }
