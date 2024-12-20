@@ -19,6 +19,12 @@ class OrderController {
       });
     }
   }
+
+  async shipmentRates(req: Request, res: Response) {
+    const data = req.body;
+
+    const rates = await orderService.shipmentRates(data);
+  }
 }
 
 export default new OrderController();

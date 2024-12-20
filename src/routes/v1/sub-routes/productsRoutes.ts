@@ -20,9 +20,49 @@ router.delete(
   productController.deleteProducts.bind(productController),
 );
 
+router.get(
+  '/shop',
+  authentication,
+  productController.getProductsByShopId.bind(productController),
+);
+
 router.get('/search', productController.searchProducts.bind(productController));
 
+router.get(
+  '/categories',
+  productController.getAllCategories.bind(productController),
+);
+
+router.patch(
+  '/batch-toggle',
+  authentication,
+  productController.toggleProductsActive.bind(productController),
+);
+
+router.patch(
+  '/price/:id',
+  authentication,
+  productController.updateProductPrice.bind(productController),
+);
+
+router.patch(
+  '/stock/:id',
+  authentication,
+  productController.updateProductStock.bind(productController),
+);
+
+router.delete(
+  '/batch-delete',
+  authentication,
+  productController.batchDelete.bind(productController),
+);
+
 router.get('/:id', productController.getProductById.bind(productController));
+
+router.get(
+  '/url/:url',
+  productController.getProductByUrl.bind(productController),
+);
 
 router.patch(
   '/:id',
@@ -32,7 +72,7 @@ router.patch(
 );
 
 router.patch(
-  '/:id/toggle-active',
+  '/:id/toggle',
   authentication,
   productController.toggleProductActive.bind(productController),
 );

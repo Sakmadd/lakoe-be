@@ -1,5 +1,6 @@
 export interface CreateProductDTO {
   name: string;
+  category_id: string;
   sku: string;
   price: number;
   url_name: string;
@@ -11,23 +12,22 @@ export interface CreateProductDTO {
   length: number;
   width: number;
   height: number;
-  Category: CategoryDTO;
   Variant?: VariantDTO[];
   VariantOptionCombination?: VariantOptionCombinationDTO[];
   Images?: ImagesDTO[];
+  Category?: CategoryDTO;
   Shop: ShopDTO;
+}
+
+interface CategoryDTO {
+  id: string;
+  label: string;
+  value: string;
 }
 
 interface ShopDTO {
   id: string;
   name: string;
-}
-
-interface CategoryDTO {
-  id: string;
-  parent_id?: string;
-  label: string;
-  value: string;
 }
 
 interface VariantDTO {
@@ -58,8 +58,8 @@ interface VariantOptionCombinationDTO {
 }
 
 interface ImagesDTO {
-  id: string;
-  product_id: string;
+  id?: string;
+  product_id?: string;
   alt?: string;
   src?: string;
 }

@@ -7,6 +7,11 @@ import { ProductType } from '../types/types';
 import { SearchDTO } from '../dtos/products/searchProductDTO';
 import { ProductDetailDTO } from '../dtos/products/productDetailDTO';
 import { ToggleProductDTO } from '../dtos/products/toggleProductDTO';
+import { CategoriesDTO } from '../dtos/products/categoriesDTO';
+import { ProductByShopDTO } from '../dtos/products/ProductByShopDTO';
+import { BatchDeleteDTO } from '../dtos/products/batchDeleteDTO';
+import { UpdatePriceDTO } from '../dtos/products/UpdateProductPriceDTO';
+import { UpdateStockDTO } from '../dtos/products/updateProductStockDTO';
 
 class ProductService {
   async getAllProducts(
@@ -22,11 +27,39 @@ class ProductService {
         payload: products,
       });
     } catch (error) {
-      return serviceErrorHandler({
-        error: true,
-        message: error.message,
-        payload: null,
+      return serviceErrorHandler<null>(error);
+    }
+  }
+
+  async getProductsByShopId(
+    id: string,
+  ): Promise<ServiceResponseDTO<ProductByShopDTO[] | null>> {
+    try {
+      const products = await productRepo.getProductsByShopId(id);
+
+      return new ServiceResponseDTO<ProductByShopDTO[]>({
+        error: false,
+        message: 'Products found',
+        payload: products,
       });
+    } catch (error) {
+      return serviceErrorHandler<null>(error);
+    }
+  }
+
+  async getAllCategories(): Promise<
+    ServiceResponseDTO<CategoriesDTO[] | null>
+  > {
+    try {
+      const categories = await productRepo.getAllCategories();
+
+      return new ServiceResponseDTO<CategoriesDTO[]>({
+        error: false,
+        message: 'Categories found',
+        payload: categories,
+      });
+    } catch (error) {
+      return serviceErrorHandler<null>(error);
     }
   }
 
@@ -43,11 +76,7 @@ class ProductService {
         payload: product,
       });
     } catch (error) {
-      return serviceErrorHandler<CreateProductDTO | null>({
-        error: true,
-        message: 'Service failed',
-        payload: null,
-      });
+      return serviceErrorHandler<null>(error);
     }
   }
 
@@ -65,11 +94,23 @@ class ProductService {
         payload: product,
       });
     } catch (error) {
-      return serviceErrorHandler<ProductType[] | null>({
-        error: true,
-        message: error.message,
-        payload: null,
+      return serviceErrorHandler<null>(error);
+    }
+  }
+
+  async batchDelete(
+    ids: string[],
+  ): Promise<ServiceResponseDTO<BatchDeleteDTO | null>> {
+    try {
+      const product = await productRepo.batchDelete(ids);
+
+      return new ServiceResponseDTO<BatchDeleteDTO>({
+        error: false,
+        message: null,
+        payload: product,
       });
+    } catch (error) {
+      return serviceErrorHandler<null>(error);
     }
   }
 
@@ -85,11 +126,23 @@ class ProductService {
         payload: products,
       });
     } catch (error) {
-      return serviceErrorHandler<ProductsDTO[] | null>({
-        error: true,
-        message: error.message,
-        payload: null,
+      return serviceErrorHandler<null>(error);
+    }
+  }
+
+  async getProductByUrl(
+    id: string,
+  ): Promise<ServiceResponseDTO<ProductDetailDTO | null>> {
+    try {
+      const product = await productRepo.getProductByUrl(id);
+
+      return new ServiceResponseDTO<ProductDetailDTO>({
+        error: false,
+        message: null,
+        payload: product,
       });
+    } catch (error) {
+      return serviceErrorHandler<null>(error);
     }
   }
 
@@ -105,11 +158,7 @@ class ProductService {
         payload: product,
       });
     } catch (error) {
-      return serviceErrorHandler<ProductDetailDTO | null>({
-        error: true,
-        message: error.message,
-        payload: null,
-      });
+      return serviceErrorHandler<null>(error);
     }
   }
 
@@ -126,20 +175,47 @@ class ProductService {
         payload: product,
       });
     } catch (error) {
-      return serviceErrorHandler<CreateProductDTO | null>({
-        error: true,
-        message: error.message,
-        payload: null,
+      return serviceErrorHandler<null>(error);
+    }
+  }
+
+  async updateProductPrice(
+    data: UpdatePriceDTO,
+  ): Promise<ServiceResponseDTO<UpdatePriceDTO | null>> {
+    try {
+      const product = await productRepo.updateProductPrice(data);
+
+      return new ServiceResponseDTO<UpdatePriceDTO>({
+        error: false,
+        message: null,
+        payload: product,
       });
+    } catch (error) {
+      return serviceErrorHandler<null>(error);
+    }
+  }
+
+  async updateProductStock(
+    data: UpdateStockDTO,
+  ): Promise<ServiceResponseDTO<UpdateStockDTO | null>> {
+    try {
+      const product = await productRepo.updateProductStock(data);
+
+      return new ServiceResponseDTO<UpdateStockDTO>({
+        error: false,
+        message: null,
+        payload: product,
+      });
+    } catch (error) {
+      return serviceErrorHandler<null>(error);
     }
   }
 
   async toggleProductActive(
     id: string,
-    isActive: boolean,
   ): Promise<ServiceResponseDTO<ToggleProductDTO | null>> {
     try {
-      const product = await productRepo.toggleProductActive(id, isActive);
+      const product = await productRepo.toggleProductActive(id);
 
       return new ServiceResponseDTO<ToggleProductDTO>({
         error: false,
@@ -147,11 +223,23 @@ class ProductService {
         payload: product,
       });
     } catch (error) {
-      return serviceErrorHandler<ToggleProductDTO | null>({
-        error: true,
-        message: error.message,
-        payload: null,
+      return serviceErrorHandler<null>(error);
+    }
+  }
+
+  async toggleProductsActive(
+    ids: string[],
+  ): Promise<ServiceResponseDTO<ToggleProductDTO[] | null>> {
+    try {
+      const products = await productRepo.toggleProductsActive(ids);
+
+      return new ServiceResponseDTO<ToggleProductDTO[]>({
+        error: false,
+        message: null,
+        payload: products,
       });
+    } catch (error) {
+      return serviceErrorHandler<null>(error);
     }
   }
 }

@@ -34,9 +34,11 @@ CREATE TABLE "locations" (
     "id" TEXT NOT NULL,
     "shop_id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "address" TEXT NOT NULL,
+    "province" TEXT NOT NULL,
     "city" TEXT NOT NULL,
     "district" TEXT NOT NULL,
+    "subdistrict" TEXT NOT NULL,
+    "address" TEXT NOT NULL,
     "postal_code" TEXT NOT NULL,
     "longitude" TEXT NOT NULL,
     "latitude" TEXT NOT NULL,
@@ -56,9 +58,9 @@ CREATE TABLE "products" (
     "url_name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "stock" INTEGER NOT NULL,
-    "weight" DOUBLE PRECISION NOT NULL,
     "minimum_order" INTEGER NOT NULL,
     "is_active" BOOLEAN NOT NULL,
+    "weight" DOUBLE PRECISION NOT NULL,
     "length" DOUBLE PRECISION NOT NULL,
     "width" DOUBLE PRECISION NOT NULL,
     "height" DOUBLE PRECISION NOT NULL,
@@ -129,6 +131,7 @@ CREATE TABLE "variantOptionCombination" (
 CREATE TABLE "invoices" (
     "id" TEXT NOT NULL,
     "recipient_id" TEXT NOT NULL,
+    "shop_id" TEXT NOT NULL,
     "prices" DOUBLE PRECISION NOT NULL,
     "serviceCharge" DOUBLE PRECISION NOT NULL,
     "invoiceNumber" TEXT NOT NULL,
@@ -162,8 +165,11 @@ CREATE TABLE "couriers" (
     "id" TEXT NOT NULL,
     "invoice_id" TEXT NOT NULL,
     "order_id" TEXT NOT NULL,
+    "origin_area_id" TEXT NOT NULL,
+    "destination_area_id" TEXT NOT NULL,
     "price" DOUBLE PRECISION NOT NULL,
     "courierCode" TEXT NOT NULL,
+    "waybill_id" TEXT NOT NULL,
 
     CONSTRAINT "couriers_pkey" PRIMARY KEY ("id")
 );
@@ -255,6 +261,9 @@ CREATE UNIQUE INDEX "users_shop_id_key" ON "users"("shop_id");
 CREATE UNIQUE INDEX "users_name_key" ON "users"("name");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "products_url_name_key" ON "products"("url_name");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "invoices_recipient_id_key" ON "invoices"("recipient_id");
 
 -- CreateIndex
@@ -301,6 +310,9 @@ ALTER TABLE "variantOptions" ADD CONSTRAINT "variantOptions_variantId_fkey" FORE
 
 -- AddForeignKey
 ALTER TABLE "variantOptionCombination" ADD CONSTRAINT "variantOptionCombination_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "invoices" ADD CONSTRAINT "invoices_shop_id_fkey" FOREIGN KEY ("shop_id") REFERENCES "shops"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "invoices" ADD CONSTRAINT "invoices_recipient_id_fkey" FOREIGN KEY ("recipient_id") REFERENCES "recipients"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

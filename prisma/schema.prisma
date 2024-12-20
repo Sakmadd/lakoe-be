@@ -47,6 +47,7 @@ model Shop {
   location Location[]
   Product  Product[]
   Withdraw Withdraw[]
+  Invoices Invoices[]
 
   @@map("shops")
 }
@@ -76,12 +77,12 @@ model Product {
   name                     String
   sku                      String
   price                    Float
-  url_name                 String
+  url_name                 String                     @unique
   description              String
   stock                    Int
-  weight                   Float
   minimum_order            Int
   is_active                Boolean
+  weight                   Float
   length                   Float
   width                    Float
   height                   Float
@@ -161,11 +162,13 @@ model VariantOptionCombination {
 model Invoices {
   id            String         @id @default(uuid())
   recipient_id  String         @unique
+  shop_id       String
   prices        Float
   serviceCharge Float
   invoiceNumber String
   Courier       Courier?
   Payment       Payment?
+  Shop          Shop           @relation(fields: [shop_id], references: [id])
   Recipient     Recipient      @relation(fields: [recipient_id], references: [id])
   OrderHistory  OrderHistory[]
 
@@ -192,11 +195,14 @@ model OrderHistory {
 }
 
 model Courier {
-  id          String @id @default(uuid())
-  invoice_id  String @unique
-  order_id    String @unique
-  price       Float
-  courierCode String
+  id                  String @id @default(uuid())
+  invoice_id          String @unique
+  order_id            String @unique
+  origin_area_id      String
+  destination_area_id String
+  price               Float
+  courierCode         String
+  waybill_id          String
 
   order    Order    @relation(fields: [order_id], references: [id])
   Invoices Invoices @relation(fields: [invoice_id], references: [id])
