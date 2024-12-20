@@ -1,5 +1,13 @@
 import { OrderStatus, Role } from '@prisma/client';
 
+export interface CategoryWithChildren {
+  id: string;
+  label: string;
+  value: string;
+  parent_id?: string;
+  children: CategoryWithChildren[];
+}
+
 export interface UserType {
   id: string;
   shop_id: string;
