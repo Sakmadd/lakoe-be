@@ -150,7 +150,7 @@ function generateInvoiceNumber(): string {
   return `INV-${Date.now()}`;
 }
 
-export async function shipmentLocation(city: string, postal_code: string) {
+async function shipmentLocation(city: string, postal_code: string) {
   try {
     const token = CONFIGS.BITESHIP_API_KEY;
 
