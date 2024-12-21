@@ -4,7 +4,10 @@ import * as shopRepo from '../repo/shopRepo';
 import { serviceErrorHandler } from '../utils/serviceErrorHandler';
 import { ShopUpdateDTO } from '../dtos/shop/shopUpdateDTO';
 import { addLocationDTO } from '../dtos/shop/addLocationDTO';
-import { UpdateLocationDTO } from '../dtos/shop/updateLocationDTO';
+import {
+  UpdateLocationDTO,
+  updateMainLocation,
+} from '../dtos/shop/updateLocationDTO';
 import uploader from '../libs/clodudinary2.0';
 
 class shopService {
@@ -28,6 +31,36 @@ class shopService {
     }
   }
 
+  async getAllLocations(
+    id: string,
+  ): Promise<ServiceResponseDTO<addLocationDTO[] | null>> {
+    try {
+      const locations = await shopRepo.getAllLocations(id);
+      return new ServiceResponseDTO<addLocationDTO[]>({
+        error: false,
+        message: null,
+        payload: locations,
+      });
+    } catch (error) {
+      return serviceErrorHandler<addLocationDTO[] | null>(error);
+    }
+  }
+
+  async updateMainLocation(
+    body: updateMainLocation,
+    id: string,
+  ): Promise<ServiceResponseDTO<updateMainLocation | null>> {
+    try {
+      const updateMainLocation = await shopRepo.updateMainLocation(body, id);
+      return new ServiceResponseDTO<updateMainLocation>({
+        error: false,
+        message: null,
+        payload: updateMainLocation,
+      });
+    } catch (error) {
+      return serviceErrorHandler<updateMainLocation>(error);
+    }
+  }
   async updateShop(
     body: ShopUpdateDTO,
     id: string,
@@ -116,9 +149,7 @@ class shopService {
       });
     } catch (error) {
       return serviceErrorHandler<LocationType | null>({
-        error: true,
-        message: error.message,
-        payload: null,
+        error,
       });
     }
   }
