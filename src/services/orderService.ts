@@ -1,4 +1,8 @@
-import { CreateOrdersDTO } from '../dtos/orders/createOrders';
+// import { CreateOrdersDTO } from '../dtos/orders/createOrders';
+import {
+  CreateOrderRequestDTO,
+  CreateOrderResponseDTO,
+} from '../dtos/orders/createOrderV2';
 import { RatesRequestDTO, RatesResponseDTO } from '../dtos/orders/ratesOrder';
 import ServiceResponseDTO from '../dtos/serviceResponseDto';
 import * as orderRepo from '../repo/orderRepo';
@@ -6,17 +10,17 @@ import { serviceErrorHandler } from '../utils/serviceErrorHandler';
 
 class OrderServices {
   async createOrder(
-    data: CreateOrdersDTO,
-  ): Promise<ServiceResponseDTO<CreateOrdersDTO | null>> {
+    data: CreateOrderRequestDTO,
+  ): Promise<ServiceResponseDTO<CreateOrderResponseDTO | null>> {
     try {
       await orderRepo.createOrder(data);
-      return new ServiceResponseDTO<CreateOrdersDTO>({
+      return new ServiceResponseDTO<CreateOrderResponseDTO>({
         error: false,
         message: null,
         payload: null,
       });
     } catch (error) {
-      return serviceErrorHandler<CreateOrdersDTO | null>(error);
+      return serviceErrorHandler<CreateOrderResponseDTO | null>(error);
     }
   }
 

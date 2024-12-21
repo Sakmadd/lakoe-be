@@ -1,124 +1,153 @@
 import axios from 'axios';
-import {
-  CreateOrdersDTO,
-  ResPaymentOrderDTO,
-} from '../dtos/orders/createOrders';
 import { prisma } from '../libs/prisma';
 import { RatesRequestDTO, RatesResponseDTO } from '../dtos/orders/ratesOrder';
 import { CONFIGS } from '../config/config';
+import { CreateOrderRequestDTO } from '../dtos/orders/createOrderV2';
 
-export async function createOrder(data: CreateOrdersDTO) {
-  const recipient = await prisma.recipient.create({
-    data: {
-      name: data.Recipient?.name || '',
-      email: data.Recipient?.email || '',
-      address: data.Recipient?.address || '',
-      phone: data.Recipient?.phone || '',
-      district: data.Recipient?.district || '',
-      city: data.Recipient?.city || '',
-      longitude: data.Recipient?.longitude || '',
-      latitude: data.Recipient?.latitude || '',
+export async function createOrder(data: CreateOrderRequestDTO) {
+  const findShopId = await prisma.product.findFirst({
+    where: {
+      id: data.items.product_id,
+    },
+    select: {
+      shop_id: true,
     },
   });
 
-  // const requestPayment = {
-  //   payment_type: data.Payment.type,
-  //   bank_transfer: {
-  //     bank: data.Payment.bank,
-  //   },
-  //   transaction_details: {
-  //     order_id: data.Payment.mt_order_id,
-  //     gross_amount: data.Payment.amount,
-  //   },
-  //   account_name: data.Payment.account_name,
-  //   account_number: data.Payment.account_number,
-  //   url: data.Payment.url,
-  //   status: data.Payment.status,
-  // };
-
-  const responseCharge = await axios.post(
-    'https://api.sandbox.midtrans.com/v2/charge',
-    // requestPayment,
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Basic ${Buffer.from(process.env.SERVER_KEY).toString('base64')}`,
+  const findVariantOptionCombination =
+    await prisma.variantOptionCombination.findFirst({
+      where: {
+        id: data.items.variant_combination_id,
       },
-    },
-  );
-  const responseSnap = await axios.post(
-    'https://app.sandbox.midtrans.com/snap/v1/transactions',
-    {
-      headers: {
-        Authorization: `Basic ${Buffer.from(process.env.SERVER_KEY).toString('base64')}`,
+      select: {
+        name: true,
       },
+    });
+
+  const productTotalPrice = data.items.quantity * data.items.price;
+  const totalPrice = productTotalPrice + data.courier_price;
+
+  const initializingRecipient = await prisma.recipient.create({
+    data: {
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      address: data.address,
+      district: data.district,
+      city: data.city,
+      longitude: data.longitude,
+      latitude: data.latitude,
     },
-  );
+  });
 
-  const responseMidtrans: ResPaymentOrderDTO = {
-    mt_order_id: responseCharge.data.order_id, // Optional, depends on the payment type
-    type: responseCharge.data.payment_type,
-    url: responseSnap.data.redirect_url || '',
-    bank: responseCharge.data.bank_transfer?.bank,
-    amount: parseFloat(responseCharge.data.gross_amount),
-    account_name: recipient.name,
-    account_number: responseCharge.data.va_numbers[0].va_number,
-    status: responseCharge.data.transaction_status,
-    invoice_id: '',
-  };
+  const invoice = await prisma.invoices.create({
+    data: {
+      recipient_id: initializingRecipient.id,
+      shop_id: findShopId.shop_id,
+      prices: productTotalPrice,
+      service_charge: data.courier_price,
+      invoice_number: generateInvoiceNumber(),
+    },
+  });
 
-  const OrderItem = data.OrderItem;
   const order = await prisma.order.create({
     data: {
-      recipient_id: recipient.id,
-      total_price: data.total_price,
+      recipient_id: initializingRecipient.id,
+      total_price: totalPrice,
       OrderItem: {
         create: {
-          quantity: OrderItem.quantity,
-          Product: {
-            create: {
-              shop_id: OrderItem.Product?.shop_id || '',
-              category_id: OrderItem.Product?.category_id || '',
-              name: OrderItem.Product?.name || '',
-              sku: OrderItem.Product?.sku || '',
-              price: OrderItem.Product?.price || 0,
-              url_name: OrderItem.Product?.url_name || '',
-              description: OrderItem.Product?.description || '',
-              stock: OrderItem.Product?.stock || 0,
-              weight: OrderItem.Product?.weight || 0,
-              minimum_order: OrderItem.Product?.minimum_order || 1,
-              is_active: OrderItem.Product?.is_active || true,
-              length: OrderItem.Product?.length || 0,
-              width: OrderItem.Product?.width || 0,
-              height: OrderItem.Product?.height || 0,
-            },
-          },
+          product_id: data.items.product_id,
+          variant_combination_id: data.items.variant_combination_id,
+          quantity: data.items.quantity,
         },
       },
       Payment: {
         create: {
-          invoice_id: responseMidtrans.invoice_id,
-          mt_order_id: responseMidtrans.mt_order_id,
-          type: responseMidtrans.type,
-          url: responseMidtrans.url,
-          bank: responseMidtrans.bank,
-          amount: responseMidtrans.amount,
-          account_name: responseMidtrans.account_name,
-          account_number: responseMidtrans.account_number,
-          status: responseMidtrans.status,
+          invoice_id: invoice.id,
+          type: null,
+          url: '',
+          bank: null,
+          amount: totalPrice,
+          account_name: null,
+          account_number: null,
+          status: 'pending',
         },
       },
-    },
-    include: {
-      OrderItem: {
-        include: {
-          Product: true,
+      Courier: {
+        create: {
+          invoice_id: invoice.id,
+          origin_area_id: data.origin_area_id,
+          destination_area_id: data.destination_area_id,
+          price: data.courier_price,
+          courier_company: data.courier_company,
+          courier_code: data.courier_code,
+          courier_type: data.courier_type,
         },
       },
     },
   });
 
-  return order;
+  const midtransRequest = {
+    transaction_details: {
+      order_id: order.id,
+      gross_amount: totalPrice,
+    },
+    customer_details: {
+      first_name: data.name,
+      email: data.email,
+      phone: data.phone,
+    },
+    item_details: [
+      {
+        id: data.items.product_id,
+        price: data.items.price,
+        quantity: data.items.quantity,
+        name: findVariantOptionCombination.name,
+      },
+      {
+        id: 'courier_fee',
+        price: data.courier_price,
+        quantity: 1,
+        name: `Courier: ${data.courier_company} (${data.courier_type})`,
+      },
+    ],
+  };
+
+  try {
+    const midtransResponse = await axios.post(
+      'https://app.sandbox.midtrans.com/snap/v1/transactions',
+      midtransRequest,
+      {
+        headers: {
+          Authorization: `Basic ${Buffer.from('YOUR_SERVER_KEY:').toString('base64')}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    const { token, redirect_url } = midtransResponse.data;
+
+    await prisma.payment.update({
+      where: { invoice_id: invoice.id },
+      data: { url: redirect_url },
+    });
+
+    return {
+      order_id: order.id,
+      token,
+      redirect_url,
+    };
+  } catch (error) {
+    console.error(
+      'Failed to create Midtrans payment:',
+      error.response?.data || error.message,
+    );
+    throw new Error('Failed to process payment.');
+  }
+}
+
+function generateInvoiceNumber(): string {
+  return `INV-${Date.now()}`;
 }
 
 export async function shipmentLocation(city: string, postal_code: string) {
@@ -249,6 +278,8 @@ export async function shipmentRates(data: RatesRequestDTO) {
     const finalResponse: RatesResponseDTO[] = response.data.pricing.map(
       (item: any) => ({
         price: item.price,
+        origin_area_id: originId,
+        destination_area_id: destinationId,
         company: item.company,
         courier_name: item.courier_name,
         courier_code: item.courier_code,
