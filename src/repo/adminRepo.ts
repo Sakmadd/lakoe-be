@@ -15,105 +15,105 @@ export async function getAllBalance() {
   };
 }
 
-// export async function getAllTransaction() {
-//   const transactions = await prisma.invoices.findMany({
-//     select: {
-//       id: true,
-//       recipient_id: true,
-//       prices: true,
-//       serviceCharge: true,
-//       invoiceNumber: true,
-//       Courier: {
-//         select: {
-//           id: true,
-//           price: true,
-//           courierCode: true,
-//         },
-//       },
-//       Payment: {
-//         select: {
-//           id: true,
-//           mt_order_id: true,
-//           type: true,
-//           url: true,
-//           bank: true,
-//           amount: true,
-//           account_name: true,
-//           account_number: true,
-//           status: true,
-//           created_at: true,
-//           updated_at: true,
-//         },
-//       },
-//       Recipient: {
-//         select: {
-//           id: true,
-//           name: true,
-//           email: true,
-//           address: true,
-//           phone: true,
-//           district: true,
-//           city: true,
-//           longitude: true,
-//           latitude: true,
-//         },
-//       },
-//       OrderHistory: {
-//         select: {
-//           id: true,
-//           status: true,
-//           timestamp: true,
-//         },
-//       },
-//     },
-//   });
+export async function getAllTransaction() {
+  const transactions = await prisma.invoices.findMany({
+    select: {
+      id: true,
+      recipient_id: true,
+      prices: true,
+      serviceCharge: true,
+      invoiceNumber: true,
+      Courier: {
+        select: {
+          id: true,
+          price: true,
+          courierCode: true,
+        },
+      },
+      Payment: {
+        select: {
+          id: true,
+          mt_order_id: true,
+          type: true,
+          url: true,
+          bank: true,
+          amount: true,
+          account_name: true,
+          account_number: true,
+          status: true,
+          created_at: true,
+          updated_at: true,
+        },
+      },
+      Recipient: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          address: true,
+          phone: true,
+          district: true,
+          city: true,
+          longitude: true,
+          latitude: true,
+        },
+      },
+      OrderHistory: {
+        select: {
+          id: true,
+          status: true,
+          timestamp: true,
+        },
+      },
+    },
+  });
 
-//   const response = transactions.map(
-//     (inv): InvoiceDTO => ({
-//       id: inv.id,
-//       recipientId: inv.recipient_id,
-//       prices: inv.prices,
-//       serviceCharge: inv.serviceCharge,
-//       invoiceNumber: inv.invoiceNumber,
-//       courier: {
-//         id: inv.Courier.id,
-//         price: inv.Courier.price,
-//         courierCode: inv.Courier.courierCode,
-//       },
-//       payment: {
-//         id: inv.Payment.id,
-//         transaction_id: inv.Payment.mt_order_id,
-//         type: inv.Payment.type,
-//         url: inv.Payment.url,
-//         bank: inv.Payment.bank,
-//         amount: inv.Payment.amount,
-//         account_name: inv.Payment.account_name,
-//         account_number: inv.Payment.account_number,
-//         status: inv.Payment.status,
-//         createdAt: inv.Payment.created_at,
-//         updatedAt: inv.Payment.updated_at,
-//       },
-//       recipient: {
-//         id: inv.Recipient.id,
-//         name: inv.Recipient.name,
-//         email: inv.Recipient.email,
-//         address: inv.Recipient.address,
-//         phone: inv.Recipient.phone,
-//         district: inv.Recipient.district,
-//         city: inv.Recipient.city,
-//         longitude: inv.Recipient.longitude,
-//         latitude: inv.Recipient.latitude,
-//       },
-//       orderHistory: inv.OrderHistory.map((history) => ({
-//         id: history.id,
-//         status: history.status,
-//         timestamp: history.timestamp,
-//       })),
-//     }),
-//   );
+  const response = transactions.map(
+    (inv): InvoiceDTO => ({
+      id: inv.id,
+      recipientId: inv.recipient_id,
+      prices: inv.prices,
+      serviceCharge: inv.serviceCharge,
+      invoiceNumber: inv.invoiceNumber,
+      courier: {
+        id: inv.Courier.id,
+        price: inv.Courier.price,
+        courierCode: inv.Courier.courierCode,
+      },
+      payment: {
+        id: inv.Payment.id,
+        transaction_id: inv.Payment.mt_order_id,
+        type: inv.Payment.type,
+        url: inv.Payment.url,
+        bank: inv.Payment.bank,
+        amount: inv.Payment.amount,
+        account_name: inv.Payment.account_name,
+        account_number: inv.Payment.account_number,
+        status: inv.Payment.status,
+        createdAt: inv.Payment.created_at,
+        updatedAt: inv.Payment.updated_at,
+      },
+      recipient: {
+        id: inv.Recipient.id,
+        name: inv.Recipient.name,
+        email: inv.Recipient.email,
+        address: inv.Recipient.address,
+        phone: inv.Recipient.phone,
+        district: inv.Recipient.district,
+        city: inv.Recipient.city,
+        longitude: inv.Recipient.longitude,
+        latitude: inv.Recipient.latitude,
+      },
+      orderHistory: inv.OrderHistory.map((history) => ({
+        id: history.id,
+        status: history.status,
+        timestamp: history.timestamp,
+      })),
+    }),
+  );
 
-//   return response;
-// }
+  return response;
+}
 
 export async function getAllUsers() {
   const users = await prisma.user.findMany({
