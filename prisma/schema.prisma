@@ -72,8 +72,8 @@ model Location {
 
 model Product {
   id                       String                     @id @default(uuid())
-  shop_id                  String 
-  category_id              String 
+  shop_id                  String
+  category_id              String
   name                     String
   sku                      String
   price                    Float
@@ -89,8 +89,8 @@ model Product {
   created_at               DateTime                   @default(now())
   updated_at               DateTime                   @default(now())
   OrderItem                OrderItem[]
-  Shop                     Shop                 @relation(fields: [shop_id], references: [id])
-  Category                 Category               @relation(fields: [category_id], references: [id])
+  Shop                     Shop                       @relation(fields: [shop_id], references: [id])
+  Category                 Category                   @relation(fields: [category_id], references: [id])
   Variant                  Variant[]
   Images                   Image[]
   VariantOptionCombination VariantOptionCombination[]
@@ -160,17 +160,17 @@ model VariantOptionCombination {
 }
 
 model Invoices {
-  id            String         @id @default(uuid())
-  recipient_id  String         @unique
-  shop_id       String
-  prices        Float
-  serviceCharge Float
-  invoiceNumber String
-  Courier       Courier?
-  Payment       Payment?
-  Shop          Shop           @relation(fields: [shop_id], references: [id])
-  Recipient     Recipient      @relation(fields: [recipient_id], references: [id])
-  OrderHistory  OrderHistory[]
+  id             String         @id @default(uuid())
+  recipient_id   String         @unique
+  shop_id        String
+  prices         Float
+  service_charge Float
+  invoice_number String
+  Courier        Courier?
+  Payment        Payment?
+  Shop           Shop           @relation(fields: [shop_id], references: [id])
+  Recipient      Recipient      @relation(fields: [recipient_id], references: [id])
+  OrderHistory   OrderHistory[]
 
   @@map("invoices")
 }
@@ -195,17 +195,20 @@ model OrderHistory {
 }
 
 model Courier {
-  id                  String @id @default(uuid())
-  invoice_id          String @unique
-  order_id            String @unique
+  id                  String  @id @default(uuid())
+  invoice_id          String  @unique
+  order_id            String  @unique
   origin_area_id      String
   destination_area_id String
   price               Float
-  courierCode         String
-  waybill_id          String
+  courier_company     String
+  courier_code        String
+  courier_type        String
+  tracking_id         String?
+  waybill_id          String?
 
-  order    Order    @relation(fields: [order_id], references: [id])
-  Invoices Invoices @relation(fields: [invoice_id], references: [id])
+  order    Order     @relation(fields: [order_id], references: [id])
+  Invoices Invoices? @relation(fields: [invoice_id], references: [id])
 
   @@map("couriers")
 }
@@ -225,12 +228,13 @@ model Order {
 }
 
 model OrderItem {
-  id         String  @id @default(uuid())
-  order_id   String  @unique
-  product_id String 
-  quantity   Int
-  Order      Order   @relation(fields: [order_id], references: [id])
-  Product    Product @relation(fields: [product_id], references: [id])
+  id                     String  @id @default(uuid())
+  order_id               String  @unique
+  product_id             String
+  variant_combination_id String
+  quantity               Int
+  Order                  Order   @relation(fields: [order_id], references: [id])
+  Product                Product @relation(fields: [product_id], references: [id])
 
   @@map("orderItems")
 }
@@ -255,13 +259,12 @@ model Payment {
   id             String   @id @default(uuid())
   order_id       String   @unique
   invoice_id     String   @unique
-  mt_order_id    String
-  type           String
+  type           String?
   url            String
   bank           String?
   amount         Float
-  account_name   String
-  account_number String
+  account_name   String?
+  account_number String?
   status         String
   created_at     DateTime @default(now())
   updated_at     DateTime @default(now())

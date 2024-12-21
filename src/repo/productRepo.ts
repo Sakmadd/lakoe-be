@@ -304,12 +304,10 @@ export async function createProduct(data: CreateProductDTO, user_id: string) {
   }
 }
 
-export async function getProductsByIds(id: string[]) {
-  const products = await prisma.product.findMany({
+export async function getProductsById(id: string) {
+  const products = await prisma.product.findFirst({
     where: {
-      id: {
-        in: id,
-      },
+      id: id,
     },
     include: {
       Images: true,
@@ -319,12 +317,10 @@ export async function getProductsByIds(id: string[]) {
   return products;
 }
 
-export async function deleteProducts(id: string[]) {
-  const product = await prisma.product.deleteMany({
+export async function deleteProduct(id: string) {
+  const product = await prisma.product.delete({
     where: {
-      id: {
-        in: id,
-      },
+      id: id,
     },
   });
 
