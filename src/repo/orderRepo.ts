@@ -2,147 +2,176 @@ import axios from 'axios';
 import { prisma } from '../libs/prisma';
 import { RatesRequestDTO, RatesResponseDTO } from '../dtos/orders/ratesOrder';
 import { CONFIGS } from '../config/config';
-import { CreateOrderRequestDTO } from '../dtos/orders/createOrderV2';
+import {
+  CreateOrderRequestDTO,
+  CreateOrderResponseDTO,
+} from '../dtos/orders/createOrderV2';
 
 export async function createOrder(data: CreateOrderRequestDTO) {
-  const findShopId = await prisma.product.findFirst({
-    where: {
-      id: data.items.product_id,
-    },
-    select: {
-      shop_id: true,
-    },
-  });
+  try {
+    if (!data.items.product_id || !data.items.variant_combination_id) {
+      throw new Error('Product ID or Variant Combination ID is missing.');
+    }
 
-  const findVariantOptionCombination =
-    await prisma.variantOptionCombination.findFirst({
-      where: {
-        id: data.items.variant_combination_id,
-      },
-      select: {
-        name: true,
+    const findShopId = await prisma.product.findFirst({
+      where: { id: data.items.product_id },
+      select: { shop_id: true },
+    });
+
+    if (!findShopId) {
+      throw new Error('Shop not found for the given product.');
+    }
+
+    const findVariantOptionCombination =
+      await prisma.variantOptionCombination.findFirst({
+        where: { id: data.items.variant_combination_id },
+        select: { name: true },
+      });
+
+    if (!findVariantOptionCombination) {
+      throw new Error('Variant option combination not found.');
+    }
+
+    // Calculate prices
+    const productTotalPrice = data.items.quantity * data.items.price;
+    const totalPrice = productTotalPrice + data.courier_price;
+
+    // Create the recipient
+    const initializingRecipient = await prisma.recipient.create({
+      data: {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
+        district: data.district,
+        city: data.city,
+        longitude: data.longitude,
+        latitude: data.latitude,
       },
     });
 
-  const productTotalPrice = data.items.quantity * data.items.price;
-  const totalPrice = productTotalPrice + data.courier_price;
-
-  const initializingRecipient = await prisma.recipient.create({
-    data: {
-      name: data.name,
-      email: data.email,
-      phone: data.phone,
-      address: data.address,
-      district: data.district,
-      city: data.city,
-      longitude: data.longitude,
-      latitude: data.latitude,
-    },
-  });
-
-  const invoice = await prisma.invoices.create({
-    data: {
-      recipient_id: initializingRecipient.id,
-      shop_id: findShopId.shop_id,
-      prices: productTotalPrice,
-      service_charge: data.courier_price,
-      invoice_number: generateInvoiceNumber(),
-    },
-  });
-
-  const order = await prisma.order.create({
-    data: {
-      recipient_id: initializingRecipient.id,
-      total_price: totalPrice,
-      OrderItem: {
-        create: {
-          product_id: data.items.product_id,
-          variant_combination_id: data.items.variant_combination_id,
-          quantity: data.items.quantity,
-        },
+    // Create the invoice
+    const invoice = await prisma.invoices.create({
+      data: {
+        recipient_id: initializingRecipient.id,
+        shop_id: findShopId.shop_id,
+        prices: productTotalPrice,
+        service_charge: data.courier_price,
+        invoice_number: generateInvoiceNumber(),
       },
-      Payment: {
-        create: {
-          invoice_id: invoice.id,
-          type: null,
-          url: '',
-          bank: null,
-          amount: totalPrice,
-          account_name: null,
-          account_number: null,
-          status: 'pending',
-        },
-      },
-      Courier: {
-        create: {
-          invoice_id: invoice.id,
-          origin_area_id: data.origin_area_id,
-          destination_area_id: data.destination_area_id,
-          price: data.courier_price,
-          courier_company: data.courier_company,
-          courier_code: data.courier_code,
-          courier_type: data.courier_type,
-        },
-      },
-    },
-  });
+    });
 
-  const midtransRequest = {
-    transaction_details: {
-      order_id: order.id,
-      gross_amount: totalPrice,
-    },
-    customer_details: {
-      first_name: data.name,
-      email: data.email,
-      phone: data.phone,
-    },
-    item_details: [
-      {
-        id: data.items.product_id,
-        price: data.items.price,
+    // Create the order
+    const order = await prisma.order.create({
+      data: {
+        recipient_id: initializingRecipient.id,
+        total_price: totalPrice,
+      },
+    });
+
+    // Add the order item
+    const orderItem = await prisma.orderItem.create({
+      data: {
+        order_id: order.id,
+        product_id: data.items.product_id,
+        variant_combination_id: data.items.variant_combination_id,
         quantity: data.items.quantity,
-        name: findVariantOptionCombination.name,
       },
-      {
-        id: 'courier_fee',
-        price: data.courier_price,
-        quantity: 1,
-        name: `Courier: ${data.courier_company} (${data.courier_type})`,
-      },
-    ],
-  };
+    });
 
-  try {
+    // Add the payment
+    const payment = await prisma.payment.create({
+      data: {
+        Invoice: { connect: { id: invoice.id } },
+        type: null,
+        url: '',
+        bank: null,
+        amount: totalPrice,
+        account_name: null,
+        account_number: null,
+        status: 'pending',
+        Order: { connect: { id: order.id } },
+      },
+    });
+
+    // Add the courier
+    const courier = await prisma.courier.create({
+      data: {
+        Invoices: { connect: { id: invoice.id } },
+        order: { connect: { id: order.id } },
+        origin_area_id: data.origin_area_id,
+        destination_area_id: data.destination_area_id,
+        price: data.courier_price,
+        courier_company: data.courier_company,
+        courier_code: data.courier_code,
+        courier_type: data.courier_type,
+      },
+    });
+
+    // Prepare Midtrans request
+    const midtransRequest = {
+      transaction_details: {
+        order_id: order.id,
+        gross_amount: totalPrice,
+      },
+      customer_details: {
+        first_name: data.name,
+        email: data.email,
+        phone: data.phone,
+      },
+      item_details: [
+        {
+          id: data.items.product_id,
+          price: data.items.price,
+          quantity: data.items.quantity,
+          name: findVariantOptionCombination.name,
+        },
+        {
+          id: 'courier_fee',
+          price: data.courier_price,
+          quantity: 1,
+          name: `Courier: ${data.courier_company} (${data.courier_type})`,
+        },
+      ],
+    };
+
+    // Call Midtrans API
     const midtransResponse = await axios.post(
       'https://app.sandbox.midtrans.com/snap/v1/transactions',
       midtransRequest,
       {
         headers: {
-          Authorization: `Basic ${Buffer.from('YOUR_SERVER_KEY:').toString('base64')}`,
+          Authorization: `Basic ${Buffer.from(
+            `${process.env.MIDTRANS_SERVER_KEY}:`,
+          ).toString('base64')}`,
           'Content-Type': 'application/json',
         },
       },
     );
 
+    if (midtransResponse.status !== 201) {
+      console.error('Midtrans API error:', midtransResponse.data);
+      throw new Error('Failed to create Midtrans transaction.');
+    }
+
     const { token, redirect_url } = midtransResponse.data;
 
-    await prisma.payment.update({
+    // Update payment with Midtrans URL
+    const updatedPayment = await prisma.payment.update({
       where: { invoice_id: invoice.id },
       data: { url: redirect_url },
     });
 
-    return {
+    const finalResponse: CreateOrderResponseDTO = {
       order_id: order.id,
-      token,
-      redirect_url,
+      token: token,
+      redirect_url: redirect_url,
     };
+
+    return finalResponse;
   } catch (error) {
-    console.error(
-      'Failed to create Midtrans payment:',
-      error.response?.data || error.message,
-    );
-    throw new Error('Failed to process payment.');
+    console.error('Error creating order:', error.message, error.stack);
+    throw new Error('Failed to create order.');
   }
 }
 
