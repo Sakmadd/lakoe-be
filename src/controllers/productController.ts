@@ -163,20 +163,6 @@ class productController {
     }
   }
 
-  async deleteProducts(req: Request, res: Response) {
-    const { id } = req.params;
-
-    const { error, message, payload } = await productService.deleteProduct(id);
-
-    return res.status(200).json(
-      new ResponseDTO({
-        error: error,
-        message: message,
-        data: payload,
-      }),
-    );
-  }
-
   async searchProducts(req: Request, res: Response) {
     const search = req.query.search as string;
 
