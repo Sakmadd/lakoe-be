@@ -5,7 +5,6 @@ import {
 } from '../dtos/seller/sellerDTO';
 import ServiceResponseDTO from '../dtos/serviceResponseDto';
 import sellerRepo from '../repo/sellerRepo';
-import { OrderItemType, ProductType } from '../types/types';
 import { serviceErrorHandler } from '../utils/serviceErrorHandler';
 
 class dashboardService {
