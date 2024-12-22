@@ -39,7 +39,6 @@ class OrderController {
           data: null,
         }),
       );
-
     }
   }
 
@@ -54,7 +53,6 @@ class OrderController {
           error: error,
           message: message,
           data: null,
-
         }),
       );
     }
