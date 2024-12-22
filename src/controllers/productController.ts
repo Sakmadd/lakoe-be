@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from 'express';
 import ResponseDTO from '../dtos/responseDto';
 import uploader from '../libs/cloudinary';

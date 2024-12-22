@@ -190,6 +190,7 @@ async function shipmentLocation(city: string, postal_code: string) {
       {
         headers: {
           Authorization: `Bearer ${token}`,
+
         },
       },
     );

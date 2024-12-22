@@ -236,6 +236,7 @@ model OrderItem {
   Order                  Order?   @relation(fields: [order_id], references: [id])
   Product                Product? @relation(fields: [product_id], references: [id])
 
+
   @@map("orderItems")
 }
 

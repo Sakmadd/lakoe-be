@@ -3,7 +3,7 @@ import { CreateOrdersDTO } from '../dtos/orders/createOrders';
 import orderService from '../services/orderService';
 import ResponseDTO from '../dtos/responseDto';
 import { CreateOrderRequestDTO } from '../dtos/orders/createOrderV2';
-import { error } from 'console';
+
 class OrderController {
   async postOrder(req: Request, res: Response) {
     try {
@@ -39,6 +39,7 @@ class OrderController {
           data: null,
         }),
       );
+
     }
   }
 
@@ -53,6 +54,7 @@ class OrderController {
           error: error,
           message: message,
           data: null,
+
         }),
       );
     }
