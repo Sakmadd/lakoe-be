@@ -228,13 +228,14 @@ model Order {
 }
 
 model OrderItem {
-  id                     String  @id @default(uuid())
-  order_id               String  @unique
+  id                     String   @id @default(uuid())
+  order_id               String   @unique
   product_id             String
   variant_combination_id String
   quantity               Int
-  Order                  Order   @relation(fields: [order_id], references: [id])
-  Product                Product @relation(fields: [product_id], references: [id])
+  Order                  Order?   @relation(fields: [order_id], references: [id])
+  Product                Product? @relation(fields: [product_id], references: [id])
+
 
   @@map("orderItems")
 }

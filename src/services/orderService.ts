@@ -13,11 +13,12 @@ class OrderServices {
     data: CreateOrderRequestDTO,
   ): Promise<ServiceResponseDTO<CreateOrderResponseDTO | null>> {
     try {
-      await orderRepo.createOrder(data);
+      const order = await orderRepo.createOrder(data);
+
       return new ServiceResponseDTO<CreateOrderResponseDTO>({
         error: false,
         message: null,
-        payload: null,
+        payload: order,
       });
     } catch (error) {
       return serviceErrorHandler<CreateOrderResponseDTO | null>(error);
@@ -29,6 +30,7 @@ class OrderServices {
   ): Promise<ServiceResponseDTO<RatesResponseDTO[] | null>> {
     try {
       const rates = await orderRepo.shipmentRates(data);
+
       return new ServiceResponseDTO<RatesResponseDTO[]>({
         error: false,
         message: null,
