@@ -14,16 +14,8 @@ class sellerRepo {
         where: {
           status: 'unpaid',
           Invoice: {
-            Payment: {
-              Order: {
-                OrderItem: {
-                  is: {
-                    Product: {
-                      shop_id,
-                    },
-                  },
-                },
-              },
+            is: {
+              shop_id,
             },
           },
         },
@@ -46,21 +38,73 @@ class sellerRepo {
       where: {
         status: 'done',
         Invoice: {
-          Payment: {
-            Order: {
-              OrderItem: {
-                is: {
-                  Product: {
-                    shop_id,
-                  },
-                },
-              },
-            },
+          is: {
+            shop_id,
           },
         },
       },
     });
     return graph;
+  }
+  async getAllOrder(shop_id: string) {
+    const [products, order] = await Promise.all([
+      prisma.product.findMany({
+        where: { shop_id },
+        include: {
+          OrderItem: {
+            select: {
+              Product: true,
+            },
+          },
+          Category: {
+            select: {
+              value: true,
+            },
+          },
+        },
+      }),
+      prisma.invoices.findMany({
+        where: {
+          shop_id,
+        },
+        include: {
+          Payment: {
+            select: {
+              amount: true,
+            },
+          },
+          Recipient: {
+            select: {
+              name: true,
+            },
+          },
+          OrderHistory: {
+            select: {
+              status: true,
+              timestamp: true,
+            },
+          },
+        },
+      }),
+    ]);
+    if (!products && !order) {
+      throw new Error('data not found');
+    }
+    const result = order.map((order) => {
+      const relatedProduct = products.find((product) =>
+        product.OrderItem.some((item) => item.Product.id === order.id),
+      );
+
+      return {
+        product: relatedProduct?.name || '',
+        category: relatedProduct?.Category?.value || '',
+        payment: order.Payment?.amount || 0,
+        recipient: order.Recipient?.name || '',
+        status: order.OrderHistory?.[0]?.status,
+        timestamp: order.OrderHistory?.[0]?.timestamp || new Date(),
+      };
+    });
+    return result;
   }
 }
 export default new sellerRepo();
