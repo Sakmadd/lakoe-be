@@ -4,6 +4,7 @@ import { ShopUpdateDTO } from '../dtos/shop/shopUpdateDTO';
 import ResponseDTO from '../dtos/responseDto';
 import uploader from '../libs/cloudinary';
 import { LocationType } from '../types/types';
+import { updateMainLocation } from '../dtos/shop/updateLocationDTO';
 
 class shopController {
   async getShop(req: Request, res: Response) {
@@ -28,6 +29,46 @@ class shopController {
     });
   }
 
+  async getAllLocation(req: Request, res: Response) {
+    const { id } = req.params;
+
+    const location = await shopService.getAllLocations(id);
+
+    if (!location) {
+      return res.status(404).json(
+        new ResponseDTO<string>({
+          error: true,
+          message: 'No Location found in the database',
+          data: null,
+        }),
+      );
+    }
+
+    return res.status(200).json({
+      error: false,
+      message: 'location Found',
+      data: location,
+    });
+  }
+  async updateMainLocation(req: Request, res: Response) {
+    const { id } = req.params;
+
+    const body: updateMainLocation = req.body;
+
+    const shop = await shopService.updateMainLocation(body, id);
+
+    if (!shop) {
+      res.status(404).json({
+        error: true,
+        message: 'No shop found',
+      });
+    } else {
+      res.status(200).json({
+        error: false,
+        message: 'Main Location Updated',
+      });
+    }
+  }
   async updateShop(req: Request, res: Response) {
     const { id } = req.params;
     const id_shop = res.locals.user.shop_id;
@@ -136,9 +177,11 @@ class shopController {
 
     const {
       name,
-      address,
+      province,
       city,
       district,
+      subdistrict,
+      address,
       postal_code,
       longitude,
       latitude,
@@ -147,9 +190,11 @@ class shopController {
 
     const updateLocation = {
       name,
-      address,
+      province,
       city,
       district,
+      subdistrict,
+      address,
       postal_code,
       longitude,
       latitude,

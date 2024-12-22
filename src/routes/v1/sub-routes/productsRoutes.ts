@@ -15,7 +15,7 @@ router.post(
 );
 
 router.delete(
-  '/',
+  '/:id',
   authentication,
   productController.deleteProducts.bind(productController),
 );

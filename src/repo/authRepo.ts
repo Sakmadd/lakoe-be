@@ -37,21 +37,15 @@ export async function registerRepo(data: RegisterDto) {
   });
   delete user.password;
 
-  console.log('Created User : ', user);
-
   return user;
 }
 
 export async function loginRepo(data: LoginDTO) {
-  console.log('Test Repo : ', data);
-
   const requestedUser = await prisma.user.findFirst({
     where: {
       email: data.email,
     },
   });
-
-  console.log('Found User : ', requestedUser);
 
   if (!requestedUser) {
     throw new Error('User not found');

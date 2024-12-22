@@ -1,11 +1,4 @@
 import { OrderStatus } from '@prisma/client';
-import {
-  OrderHistoryType,
-  OrderItemType,
-  PaymentType,
-  RecipientType,
-} from '../../types/types';
-import { CategoriesDTO } from '../products/categoriesDTO';
 
 export interface sellerShopRes {
   balance: number;

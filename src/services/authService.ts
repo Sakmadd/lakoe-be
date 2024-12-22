@@ -39,11 +39,7 @@ class AuthServices {
         throw new Error(`Validation Error: ${validationErrorHandler(error)}`);
       }
 
-      console.log('Test service : ', data);
-
       const user = await loginRepo(data);
-
-      console.log('Test service : ', user);
 
       const token = jwt.sign(user, CONFIGS.JWT_SECRET);
 

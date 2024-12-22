@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from 'express';
 import ResponseDTO from '../dtos/responseDto';
 import uploader from '../libs/cloudinary';
@@ -163,23 +164,9 @@ class productController {
   }
 
   async deleteProducts(req: Request, res: Response) {
-    const { id } = req.body;
+    const { id } = req.params;
 
-    const ids = Array.isArray(id) ? id : [id];
-
-    if (!ids.every((id) => typeof id === 'string') || ids.length === 0) {
-      return res.status(400).json(
-        new ResponseDTO({
-          error: true,
-          message:
-            'Please provide a valid product ID or an array of product IDs to delete.',
-          data: null,
-        }),
-      );
-    }
-
-    const { error, message, payload } =
-      await productService.deleteProducts(ids);
+    const { error, message, payload } = await productService.deleteProduct(id);
 
     return res.status(200).json(
       new ResponseDTO({

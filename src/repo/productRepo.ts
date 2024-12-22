@@ -1,13 +1,25 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { BatchDeleteDTO } from '../dtos/products/batchDeleteDTO';
 import { CreateProductDTO } from '../dtos/products/createProduct';
+import { ProductByShopDTO } from '../dtos/products/ProductByShopDTO';
 import { ProductDetailDTO } from '../dtos/products/productDetailDTO';
 import { ProductsDTO } from '../dtos/products/productsDTO';
 import { SearchDTO } from '../dtos/products/searchProductDTO';
-import { prisma } from '../libs/prisma';
-import { CategoriesDTO } from '../dtos/products/categoriesDTO';
-import { ProductByShopDTO } from '../dtos/products/ProductByShopDTO';
-import { UpdateStockDTO } from '../dtos/products/updateProductStockDTO';
 import { UpdatePriceDTO } from '../dtos/products/UpdateProductPriceDTO';
-import { BatchDeleteDTO } from '../dtos/products/batchDeleteDTO';
+import { UpdateStockDTO } from '../dtos/products/updateProductStockDTO';
+import { prisma } from '../libs/prisma';
+import { CategoryWithChildren } from '../types/types';
+
+function addSubchildren(
+  category: CategoryWithChildren,
+  categoryMap: Map<string, CategoryWithChildren>,
+) {
+  category.children.forEach((child) => {
+    const subchildren = categoryMap.get(child.id)?.children ?? [];
+    child.children.push(...subchildren);
+    addSubchildren(child, categoryMap);
+  });
+}
 
 export async function getAllProducts(take: number, skip: number) {
   const products = await prisma.product.findMany({
@@ -105,6 +117,40 @@ export async function getProductsByShopId(id: string) {
   return productsFinal;
 }
 
+export async function getCategories(id: string) {
+  // Mencari kategori berdasarkan id
+  const category = await prisma.category.findUnique({
+    where: { id },
+    include: {
+      Parent: true, // Menyertakan parent kategori
+      Children: {
+        // Menyertakan anak-anak kategori
+        include: {
+          Children: true, // Menyertakan anak-anak dari children (rekursif)
+        },
+      },
+    },
+  });
+
+  if (!category) {
+    throw new Error(`Category with id ${id} not found`);
+  }
+
+  function buildHierarchy(cat: any): any {
+    if (!cat) return null;
+    return {
+      id: cat.id,
+      parent_id: cat.parent_id,
+      label: cat.label,
+      value: cat.value,
+      children: cat.Children
+        ? cat.Children.map((child: any) => buildHierarchy(child))
+        : [], // Jika tidak ada children, kembalikan array kosong
+    };
+  }
+  return buildHierarchy(category);
+}
+
 export async function getAllCategories() {
   const categories = await prisma.category.findMany({
     select: {
@@ -112,25 +158,39 @@ export async function getAllCategories() {
       parent_id: true,
       label: true,
       value: true,
-      Children: true,
     },
   });
-
-  const finalCategories: CategoriesDTO[] = (categories ?? []).map(
-    (category) => ({
+  const categoryMap = new Map<string, CategoryWithChildren>();
+  categories.forEach((category) => {
+    categoryMap.set(category.id, {
       id: category.id,
       label: category.label,
       value: category.value,
-      children: category.Children.map((child) => ({
-        id: child.id,
-        parent_id: child.parent_id,
-        label: child.label,
-        value: child.value,
-      })),
-    }),
-  );
+      children: [],
+    });
+  });
+  const rootCategories: CategoryWithChildren[] = [];
 
-  return finalCategories;
+  categories.forEach((category) => {
+    if (category.parent_id) {
+      const parentCategory = categoryMap.get(category.parent_id);
+      if (parentCategory) {
+        parentCategory.children.push({
+          id: category.id,
+          parent_id: category.parent_id,
+          label: category.label,
+          value: category.value,
+          children: [],
+        });
+      }
+    } else {
+      rootCategories.push(categoryMap.get(category.id)!);
+    }
+  });
+  rootCategories.forEach((category) => {
+    addSubchildren(category, categoryMap);
+  });
+  return rootCategories;
 }
 
 export async function createProduct(data: CreateProductDTO, user_id: string) {
@@ -280,12 +340,10 @@ export async function createProduct(data: CreateProductDTO, user_id: string) {
   }
 }
 
-export async function getProductsByIds(id: string[]) {
-  const products = await prisma.product.findMany({
+export async function getProductsById(id: string) {
+  const products = await prisma.product.findFirst({
     where: {
-      id: {
-        in: id,
-      },
+      id: id,
     },
     include: {
       Images: true,
@@ -295,12 +353,10 @@ export async function getProductsByIds(id: string[]) {
   return products;
 }
 
-export async function deleteProducts(id: string[]) {
-  const product = await prisma.product.deleteMany({
+export async function deleteProduct(id: string) {
+  const product = await prisma.product.delete({
     where: {
-      id: {
-        in: id,
-      },
+      id: id,
     },
   });
 
@@ -339,7 +395,7 @@ export async function batchDelete(ids: string[]): Promise<BatchDeleteDTO> {
       where: { product_id: { in: ids } },
     });
 
-    const deleteResult = await prisma.product.deleteMany({
+    await prisma.product.deleteMany({
       where: { id: { in: ids } },
     });
 
