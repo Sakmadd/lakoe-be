@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from 'axios';
 import { prisma } from '../libs/prisma';
 import { RatesRequestDTO, RatesResponseDTO } from '../dtos/orders/ratesOrder';
@@ -150,11 +151,15 @@ function generateInvoiceNumber(): string {
   return `INV-${Date.now()}`;
 }
 
+function formatCityName(input: string) {
+  return input.replace(/^(Kabupaten|Kota)\s+/i, '').toLowerCase();
+}
+
 async function shipmentLocation(city: string, postal_code: string) {
   try {
     const token = CONFIGS.BITESHIP_API_KEY;
 
-    const formatInputLocation = city.replace(/ /g, '+');
+    const formatInputLocation = formatCityName(city).replace(/ /g, '+');
 
     const hitLocation = await axios.get(
       `https://api.biteship.com/v1/maps/areas?countries=ID&input=${formatInputLocation}&type=single`,
