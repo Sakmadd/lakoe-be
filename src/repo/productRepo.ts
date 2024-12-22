@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { BatchDeleteDTO } from '../dtos/products/batchDeleteDTO';
 import { CreateProductDTO } from '../dtos/products/createProduct';
 import { ProductByShopDTO } from '../dtos/products/ProductByShopDTO';
@@ -8,6 +9,17 @@ import { UpdatePriceDTO } from '../dtos/products/UpdateProductPriceDTO';
 import { UpdateStockDTO } from '../dtos/products/updateProductStockDTO';
 import { prisma } from '../libs/prisma';
 import { CategoryWithChildren } from '../types/types';
+
+function addSubchildren(
+  category: CategoryWithChildren,
+  categoryMap: Map<string, CategoryWithChildren>,
+) {
+  category.children.forEach((child) => {
+    const subchildren = categoryMap.get(child.id)?.children ?? [];
+    child.children.push(...subchildren);
+    addSubchildren(child, categoryMap);
+  });
+}
 
 export async function getAllProducts(take: number, skip: number) {
   const products = await prisma.product.findMany({
@@ -105,6 +117,40 @@ export async function getProductsByShopId(id: string) {
   return productsFinal;
 }
 
+export async function getCategories(id: string) {
+  // Mencari kategori berdasarkan id
+  const category = await prisma.category.findUnique({
+    where: { id },
+    include: {
+      Parent: true, // Menyertakan parent kategori
+      Children: {
+        // Menyertakan anak-anak kategori
+        include: {
+          Children: true, // Menyertakan anak-anak dari children (rekursif)
+        },
+      },
+    },
+  });
+
+  if (!category) {
+    throw new Error(`Category with id ${id} not found`);
+  }
+
+  function buildHierarchy(cat: any): any {
+    if (!cat) return null;
+    return {
+      id: cat.id,
+      parent_id: cat.parent_id,
+      label: cat.label,
+      value: cat.value,
+      children: cat.Children
+        ? cat.Children.map((child: any) => buildHierarchy(child))
+        : [], // Jika tidak ada children, kembalikan array kosong
+    };
+  }
+  return buildHierarchy(category);
+}
+
 export async function getAllCategories() {
   const categories = await prisma.category.findMany({
     select: {
@@ -145,16 +191,6 @@ export async function getAllCategories() {
     addSubchildren(category, categoryMap);
   });
   return rootCategories;
-}
-function addSubchildren(
-  category: CategoryWithChildren,
-  categoryMap: Map<string, CategoryWithChildren>,
-) {
-  category.children.forEach((child) => {
-    const subchildren = categoryMap.get(child.id)?.children ?? [];
-    child.children.push(...subchildren);
-    addSubchildren(child, categoryMap);
-  });
 }
 
 export async function createProduct(data: CreateProductDTO, user_id: string) {

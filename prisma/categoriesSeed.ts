@@ -1222,7 +1222,7 @@ export const categories = [
   },
   {
     id: 'cat-500',
-    label: 'Audio, Kamera and Other Electronics',
+    label: 'Audio, Camera and Other Electronics',
     value: 'audio-camera-and-other-electronics',
   },
   {
