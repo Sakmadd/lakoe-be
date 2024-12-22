@@ -20,7 +20,6 @@ export interface CreateOrderRequestDTO {
 }
 
 interface ProductDTO {
-  id: string;
   product_id: string;
   variant_combination_id: string;
   price: number;

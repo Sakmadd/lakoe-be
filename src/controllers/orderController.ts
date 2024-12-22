@@ -3,23 +3,43 @@ import { CreateOrdersDTO } from '../dtos/orders/createOrders';
 import orderService from '../services/orderService';
 import ResponseDTO from '../dtos/responseDto';
 import { CreateOrderRequestDTO } from '../dtos/orders/createOrderV2';
+
 class OrderController {
   async postOrder(req: Request, res: Response) {
     try {
       const data: CreateOrderRequestDTO = req.body;
 
-      const order = await orderService.createOrder(data);
-      res.status(200).json({
-        error: false,
-        massage: 'Orders retrieved successfully',
-        data: order,
-      });
-    } catch {
-      res.status(400).send({
-        error: true,
-        massage: 'Error retrieving orders',
-        data: null,
-      });
+      const { error, message, payload } = await orderService.createOrder(data);
+
+      if (error) {
+        // Return here to prevent further execution
+        return res.status(400).json(
+          new ResponseDTO({
+            error: error,
+            message: message,
+            data: null,
+          }),
+        );
+      }
+
+      // This will execute only if there's no error
+      res.status(200).json(
+        new ResponseDTO({
+          error: false,
+          message: message,
+          data: payload,
+        }),
+      );
+    } catch (err) {
+      // Catch any unexpected errors
+      res.status(500).json(
+        new ResponseDTO({
+          error: true,
+          message: 'An unexpected error occurred.',
+          data: null,
+        }),
+      );
+
     }
   }
 
@@ -33,7 +53,8 @@ class OrderController {
         new ResponseDTO({
           error: error,
           message: message,
-          data: payload,
+          data: null,
+
         }),
       );
     }
