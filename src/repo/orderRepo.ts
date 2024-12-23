@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from 'axios';
 import { prisma } from '../libs/prisma';
 import { RatesRequestDTO, RatesResponseDTO } from '../dtos/orders/ratesOrder';
@@ -29,15 +28,14 @@ export async function createOrder(data: CreateOrderRequestDTO) {
         select: { name: true },
       });
 
-    if (!findVariantOptionCombination) {
-      throw new Error('Variant option combination not found.');
-    }
+    const findProductName = await prisma.product.findFirst({
+      where: { id: data.items.product_id },
+      select: { name: true },
+    });
 
-    // Calculate prices
     const productTotalPrice = data.items.quantity * data.items.price;
     const totalPrice = productTotalPrice + data.courier_price;
 
-    // Create the recipient
     const initializingRecipient = await prisma.recipient.create({
       data: {
         name: data.name,
@@ -51,7 +49,6 @@ export async function createOrder(data: CreateOrderRequestDTO) {
       },
     });
 
-    // Create the invoice
     const invoice = await prisma.invoices.create({
       data: {
         recipient_id: initializingRecipient.id,
@@ -62,7 +59,6 @@ export async function createOrder(data: CreateOrderRequestDTO) {
       },
     });
 
-    // Create the order
     const order = await prisma.order.create({
       data: {
         recipient_id: initializingRecipient.id,
@@ -70,17 +66,15 @@ export async function createOrder(data: CreateOrderRequestDTO) {
       },
     });
 
-    // Add the order item
     const orderItem = await prisma.orderItem.create({
       data: {
         order_id: order.id,
         product_id: data.items.product_id,
-        variant_combination_id: data.items.variant_combination_id,
+        variant_combination_id: data.items.variant_combination_id || null,
         quantity: data.items.quantity,
       },
     });
 
-    // Add the payment
     const payment = await prisma.payment.create({
       data: {
         Invoice: { connect: { id: invoice.id } },
@@ -109,7 +103,6 @@ export async function createOrder(data: CreateOrderRequestDTO) {
       },
     });
 
-    // Prepare Midtrans request
     const midtransRequest = {
       transaction_details: {
         order_id: order.id,
@@ -125,7 +118,7 @@ export async function createOrder(data: CreateOrderRequestDTO) {
           id: data.items.product_id,
           price: data.items.price,
           quantity: data.items.quantity,
-          name: findVariantOptionCombination.name,
+          name: findProductName.name,
         },
         {
           id: 'courier_fee',
@@ -136,7 +129,6 @@ export async function createOrder(data: CreateOrderRequestDTO) {
       ],
     };
 
-    // Call Midtrans API
     const midtransResponse = await axios.post(
       'https://app.sandbox.midtrans.com/snap/v1/transactions',
       midtransRequest,
@@ -157,7 +149,6 @@ export async function createOrder(data: CreateOrderRequestDTO) {
 
     const { token, redirect_url } = midtransResponse.data;
 
-    // Update payment with Midtrans URL
     const updatedPayment = await prisma.payment.update({
       where: { invoice_id: invoice.id },
       data: { url: redirect_url },
