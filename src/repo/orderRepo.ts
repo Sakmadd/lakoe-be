@@ -9,8 +9,8 @@ import {
 
 export async function createOrder(data: CreateOrderRequestDTO) {
   try {
-    if (!data.items.product_id || !data.items.variant_combination_id) {
-      throw new Error('Product ID or Variant Combination ID is missing.');
+    if (!data.items.product_id) {
+      throw new Error('Product ID is missing.');
     }
 
     const findShopId = await prisma.product.findFirst({
@@ -70,7 +70,7 @@ export async function createOrder(data: CreateOrderRequestDTO) {
       data: {
         order_id: order.id,
         product_id: data.items.product_id,
-        variant_combination_id: data.items.variant_combination_id || null,
+        variant_combination_id: data.items.variant_combination_id || '',
         quantity: data.items.quantity,
       },
     });
@@ -89,7 +89,6 @@ export async function createOrder(data: CreateOrderRequestDTO) {
       },
     });
 
-    // Add the courier
     const courier = await prisma.courier.create({
       data: {
         Invoices: { connect: { id: invoice.id } },
