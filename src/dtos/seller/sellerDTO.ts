@@ -9,3 +9,12 @@ export interface sellerShopRes {
 export interface sellerGraphRes {
   status: String;
 }
+
+export interface getAllOrder {
+  product: String;
+  category: String;
+  payment: Number;
+  recipient: String;
+  status: OrderStatus;
+  timestamp: Date;
+}

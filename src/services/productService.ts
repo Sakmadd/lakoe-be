@@ -1,17 +1,16 @@
-import * as productRepo from '../repo/productRepo';
-import ServiceResponseDTO from '../dtos/serviceResponseDto';
-import { serviceErrorHandler } from '../utils/serviceErrorHandler';
-import { ProductsDTO } from '../dtos/products/productsDTO';
-import { CreateProductDTO } from '../dtos/products/createProduct';
-import { ProductType } from '../types/types';
-import { SearchDTO } from '../dtos/products/searchProductDTO';
-import { ProductDetailDTO } from '../dtos/products/productDetailDTO';
-import { ToggleProductDTO } from '../dtos/products/toggleProductDTO';
-import { CategoriesDTO } from '../dtos/products/categoriesDTO';
-import { ProductByShopDTO } from '../dtos/products/ProductByShopDTO';
 import { BatchDeleteDTO } from '../dtos/products/batchDeleteDTO';
+import { CategoriesDTO } from '../dtos/products/categoriesDTO';
+import { CreateProductDTO } from '../dtos/products/createProduct';
+import { ProductByShopDTO } from '../dtos/products/ProductByShopDTO';
+import { ProductDetailDTO } from '../dtos/products/productDetailDTO';
+import { ProductsDTO } from '../dtos/products/productsDTO';
+import { SearchDTO } from '../dtos/products/searchProductDTO';
+import { ToggleProductDTO } from '../dtos/products/toggleProductDTO';
 import { UpdatePriceDTO } from '../dtos/products/UpdateProductPriceDTO';
 import { UpdateStockDTO } from '../dtos/products/updateProductStockDTO';
+import ServiceResponseDTO from '../dtos/serviceResponseDto';
+import * as productRepo from '../repo/productRepo';
+import { serviceErrorHandler } from '../utils/serviceErrorHandler';
 
 class ProductService {
   async getAllProducts(
@@ -71,24 +70,6 @@ class ProductService {
       const product = await productRepo.createProduct(data, user_id);
 
       return new ServiceResponseDTO<CreateProductDTO>({
-        error: false,
-        message: null,
-        payload: product,
-      });
-    } catch (error) {
-      return serviceErrorHandler<null>(error);
-    }
-  }
-
-  async deleteProduct(
-    id: string,
-  ): Promise<ServiceResponseDTO<ProductType | null>> {
-    try {
-      const product = await productRepo.getProductsById(id);
-
-      await productRepo.deleteProduct(id);
-
-      return new ServiceResponseDTO<ProductType>({
         error: false,
         message: null,
         payload: product,

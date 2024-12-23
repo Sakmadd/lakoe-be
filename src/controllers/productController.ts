@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from 'express';
 import ResponseDTO from '../dtos/responseDto';
 import uploader from '../libs/cloudinary';
@@ -160,20 +161,6 @@ class productController {
         data: null,
       });
     }
-  }
-
-  async deleteProducts(req: Request, res: Response) {
-    const { id } = req.params;
-
-    const { error, message, payload } = await productService.deleteProduct(id);
-
-    return res.status(200).json(
-      new ResponseDTO({
-        error: error,
-        message: message,
-        data: payload,
-      }),
-    );
   }
 
   async searchProducts(req: Request, res: Response) {
