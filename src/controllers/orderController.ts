@@ -3,7 +3,6 @@ import { CreateOrdersDTO } from '../dtos/orders/createOrders';
 import orderService from '../services/orderService';
 import ResponseDTO from '../dtos/responseDto';
 import { CreateOrderRequestDTO } from '../dtos/orders/createOrderV2';
-import { error } from 'console';
 class OrderController {
   async postOrder(req: Request, res: Response) {
     try {
@@ -12,7 +11,6 @@ class OrderController {
       const { error, message, payload } = await orderService.createOrder(data);
 
       if (error) {
-        // Return here to prevent further execution
         return res.status(400).json(
           new ResponseDTO({
             error: error,
@@ -22,7 +20,6 @@ class OrderController {
         );
       }
 
-      // This will execute only if there's no error
       res.status(200).json(
         new ResponseDTO({
           error: false,
@@ -31,7 +28,6 @@ class OrderController {
         }),
       );
     } catch (err) {
-      // Catch any unexpected errors
       res.status(500).json(
         new ResponseDTO({
           error: true,
