@@ -163,9 +163,10 @@ model Invoices {
   id             String         @id @default(uuid())
   recipient_id   String         @unique
   shop_id        String
-  prices         Float
+  price          Float
   service_charge Float
   invoice_number String
+  created_at     DateTime       @default(now())
   Courier        Courier?
   Payment        Payment?
   Shop           Shop           @relation(fields: [shop_id], references: [id])
