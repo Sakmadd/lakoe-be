@@ -8,6 +8,7 @@ import shopsRoutes from './sub-routes/shopsRoutes';
 import templateRouter from './sub-routes/tempMassageRoutes';
 import usersRoutes from './sub-routes/usersRoutes';
 import sellerDasboard from './sub-routes/sellerRoutes';
+import invoiceRoutes from './sub-routes/invoiceRoutes';
 
 const app = express();
 
@@ -19,5 +20,6 @@ app.use('/orders', orderRoutes);
 app.use('/admins', adminsRoutes);
 app.use('/template-message', templateRouter);
 app.use('/seller', authentication, sellerDasboard);
+app.use('/invoice', invoiceRoutes);
 
 export const API_V1 = app;

@@ -154,10 +154,12 @@ export async function createOrder(data: CreateOrderRequestDTO) {
       data: { url: redirect_url },
     });
 
+    const findData = await getOrderByID(order.id);
+
     const finalResponse: CreateOrderResponseDTO = {
-      order_id: order.id,
       token: token,
       redirect_url: redirect_url,
+      order: findData,
     };
 
     return finalResponse;
