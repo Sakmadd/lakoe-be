@@ -1,3 +1,5 @@
+import { GetOrderByIdDTO } from './getOrderByID';
+
 export interface CreateOrderRequestDTO {
   name: string;
   email: string;
@@ -27,9 +29,9 @@ interface ProductDTO {
 }
 
 export interface CreateOrderResponseDTO {
-  order_id: string;
   token: string;
   redirect_url;
+  order: GetOrderByIdDTO;
 }
 
 // export interface CreateOrderResponse {
