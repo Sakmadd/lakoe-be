@@ -75,5 +75,30 @@ class sellerController {
       data: result,
     });
   }
+
+  // async getOrderByIdOrder (req: Request, res:Response) {
+  //   const shop_id = res.locals.user.shop_id;
+  //   const { id } = req.params;
+  //   if (!shop_id) {
+  //     throw new Error(' you cannot allowed to this order')
+  //   }
+  //   const result = await selerService.getOrderByIdOrder(id);
+  //   // let result : any
+
+  //   if (!result) {
+  //   return {
+  //     error: false,
+  //     message: 'data found',
+  //     data: result,
+  //   }
+  // }
+  // else{
+  //   return {
+  //     error: true,
+  //     message: 'No data found in the database',
+  //     data: null,
+  //   }
+  // }
+  // }
 }
 export default new sellerController();

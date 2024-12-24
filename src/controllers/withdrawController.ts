@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import withdrawService from '../services/withdrawService';
+import { CreateWithdrawDTO } from '../dtos/withdraw/createWithdrawDTO';
 
 class withdrawController {
   async getWithdraw(req: Request, res: Response) {
@@ -21,23 +22,21 @@ class withdrawController {
   }
 
   async createWithdraw(req: Request, res: Response) {
-    const { amount } = req.body;
-    const id = res.locals.user.id;
-
-    const withdraw = await withdrawService.createWithdraw(amount, id);
-
-    if (!withdraw) {
+    const shop_id = res.locals.user.shop_id;
+    const body: CreateWithdrawDTO = req.body;
+    const user = await withdrawService.createWithDraw(body, shop_id);
+    if (!user) {
       return res.status(404).json({
         error: true,
-        message: 'Withdraw Request failed. Please try again',
+        message: 'you cannot access this account',
         data: null,
       });
     }
 
     return res.status(200).json({
       error: false,
-      message: 'Withdraw created',
-      data: withdraw,
+      message: 'Withdraw created successfully',
+      data: user,
     });
   }
 }

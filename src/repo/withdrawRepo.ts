@@ -1,3 +1,5 @@
+import { withDrawStatus } from '@prisma/client';
+import { CreateWithdrawDTO } from '../dtos/withdraw/createWithdrawDTO';
 import { WithdrawDTO } from '../dtos/withdraw/withdrawDTO';
 import { prisma } from '../libs/prisma';
 
@@ -47,4 +49,30 @@ export async function getAllWithdraw() {
   }));
 
   return response;
+}
+export async function createWithdraw(body: CreateWithdrawDTO, shopId: string) {
+  const withdraw = await prisma.withdraw.create({
+    data: {
+      amount: body.amount,
+      status: withDrawStatus.pending,
+      notes: body.notes || '',
+      created_at: new Date(),
+      updated_at: new Date(),
+      Shop: {
+        connect: { id: shopId },
+      },
+      BankAccount: {
+        create: {
+          name: 'gibun',
+          account: '12312314',
+          bank: 'Gibun',
+        },
+      },
+    },
+    include: {
+      Shop: true,
+      BankAccount: true,
+    },
+  });
+  return withdraw;
 }

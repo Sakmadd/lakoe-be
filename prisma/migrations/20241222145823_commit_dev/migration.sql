@@ -42,7 +42,7 @@ CREATE TABLE "locations" (
     "postal_code" TEXT NOT NULL,
     "longitude" TEXT NOT NULL,
     "latitude" TEXT NOT NULL,
-    "is_main" BOOLEAN NOT NULL,
+    "is_main" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "locations_pkey" PRIMARY KEY ("id")
 );
@@ -133,8 +133,8 @@ CREATE TABLE "invoices" (
     "recipient_id" TEXT NOT NULL,
     "shop_id" TEXT NOT NULL,
     "prices" DOUBLE PRECISION NOT NULL,
-    "serviceCharge" DOUBLE PRECISION NOT NULL,
-    "invoiceNumber" TEXT NOT NULL,
+    "service_charge" DOUBLE PRECISION NOT NULL,
+    "invoice_number" TEXT NOT NULL,
 
     CONSTRAINT "invoices_pkey" PRIMARY KEY ("id")
 );
@@ -168,8 +168,11 @@ CREATE TABLE "couriers" (
     "origin_area_id" TEXT NOT NULL,
     "destination_area_id" TEXT NOT NULL,
     "price" DOUBLE PRECISION NOT NULL,
-    "courierCode" TEXT NOT NULL,
-    "waybill_id" TEXT NOT NULL,
+    "courier_company" TEXT NOT NULL,
+    "courier_code" TEXT NOT NULL,
+    "courier_type" TEXT NOT NULL,
+    "tracking_id" TEXT,
+    "waybill_id" TEXT,
 
     CONSTRAINT "couriers_pkey" PRIMARY KEY ("id")
 );
@@ -190,6 +193,7 @@ CREATE TABLE "orderItems" (
     "id" TEXT NOT NULL,
     "order_id" TEXT NOT NULL,
     "product_id" TEXT NOT NULL,
+    "variant_combination_id" TEXT NOT NULL,
     "quantity" INTEGER NOT NULL,
 
     CONSTRAINT "orderItems_pkey" PRIMARY KEY ("id")
@@ -215,13 +219,12 @@ CREATE TABLE "payments" (
     "id" TEXT NOT NULL,
     "order_id" TEXT NOT NULL,
     "invoice_id" TEXT NOT NULL,
-    "mt_order_id" TEXT NOT NULL,
-    "type" TEXT NOT NULL,
+    "type" TEXT,
     "url" TEXT NOT NULL,
     "bank" TEXT,
     "amount" DOUBLE PRECISION NOT NULL,
-    "account_name" TEXT NOT NULL,
-    "account_number" TEXT NOT NULL,
+    "account_name" TEXT,
+    "account_number" TEXT,
     "status" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,

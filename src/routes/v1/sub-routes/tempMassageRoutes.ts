@@ -22,4 +22,5 @@ templateRouter.delete(
   '/delete/:id',
   templateController.deleteTemplates.bind(templateController),
 );
+
 export default templateRouter;
