@@ -118,15 +118,13 @@ export async function getProductsByShopId(id: string) {
 }
 
 export async function getCategories(id: string) {
-  // Mencari kategori berdasarkan id
   const category = await prisma.category.findUnique({
     where: { id },
     include: {
-      Parent: true, // Menyertakan parent kategori
+      Parent: true,
       Children: {
-        // Menyertakan anak-anak kategori
         include: {
-          Children: true, // Menyertakan anak-anak dari children (rekursif)
+          Children: true,
         },
       },
     },
@@ -145,7 +143,7 @@ export async function getCategories(id: string) {
       value: cat.value,
       children: cat.Children
         ? cat.Children.map((child: any) => buildHierarchy(child))
-        : [], // Jika tidak ada children, kembalikan array kosong
+        : [],
     };
   }
   return buildHierarchy(category);
