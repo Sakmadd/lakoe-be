@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from 'axios';
 import { prisma } from '../libs/prisma';
 import { RatesRequestDTO, RatesResponseDTO } from '../dtos/orders/ratesOrder';
@@ -10,8 +9,8 @@ import {
 
 export async function createOrder(data: CreateOrderRequestDTO) {
   try {
-    if (!data.items.product_id || !data.items.variant_combination_id) {
-      throw new Error('Product ID or Variant Combination ID is missing.');
+    if (!data.items.product_id) {
+      throw new Error('Product ID is missing.');
     }
 
     const findShopId = await prisma.product.findFirst({
@@ -29,15 +28,14 @@ export async function createOrder(data: CreateOrderRequestDTO) {
         select: { name: true },
       });
 
-    if (!findVariantOptionCombination) {
-      throw new Error('Variant option combination not found.');
-    }
+    const findProductName = await prisma.product.findFirst({
+      where: { id: data.items.product_id },
+      select: { name: true },
+    });
 
-    // Calculate prices
     const productTotalPrice = data.items.quantity * data.items.price;
     const totalPrice = productTotalPrice + data.courier_price;
 
-    // Create the recipient
     const initializingRecipient = await prisma.recipient.create({
       data: {
         name: data.name,
@@ -51,7 +49,6 @@ export async function createOrder(data: CreateOrderRequestDTO) {
       },
     });
 
-    // Create the invoice
     const invoice = await prisma.invoices.create({
       data: {
         recipient_id: initializingRecipient.id,
@@ -62,7 +59,6 @@ export async function createOrder(data: CreateOrderRequestDTO) {
       },
     });
 
-    // Create the order
     const order = await prisma.order.create({
       data: {
         recipient_id: initializingRecipient.id,
@@ -70,17 +66,15 @@ export async function createOrder(data: CreateOrderRequestDTO) {
       },
     });
 
-    // Add the order item
     const orderItem = await prisma.orderItem.create({
       data: {
         order_id: order.id,
         product_id: data.items.product_id,
-        variant_combination_id: data.items.variant_combination_id,
+        variant_combination_id: data.items.variant_combination_id || '',
         quantity: data.items.quantity,
       },
     });
 
-    // Add the payment
     const payment = await prisma.payment.create({
       data: {
         Invoice: { connect: { id: invoice.id } },
@@ -95,7 +89,6 @@ export async function createOrder(data: CreateOrderRequestDTO) {
       },
     });
 
-    // Add the courier
     const courier = await prisma.courier.create({
       data: {
         Invoices: { connect: { id: invoice.id } },
@@ -109,7 +102,6 @@ export async function createOrder(data: CreateOrderRequestDTO) {
       },
     });
 
-    // Prepare Midtrans request
     const midtransRequest = {
       transaction_details: {
         order_id: order.id,
@@ -125,7 +117,7 @@ export async function createOrder(data: CreateOrderRequestDTO) {
           id: data.items.product_id,
           price: data.items.price,
           quantity: data.items.quantity,
-          name: findVariantOptionCombination.name,
+          name: findProductName.name,
         },
         {
           id: 'courier_fee',
@@ -136,7 +128,6 @@ export async function createOrder(data: CreateOrderRequestDTO) {
       ],
     };
 
-    // Call Midtrans API
     const midtransResponse = await axios.post(
       'https://app.sandbox.midtrans.com/snap/v1/transactions',
       midtransRequest,
@@ -157,7 +148,6 @@ export async function createOrder(data: CreateOrderRequestDTO) {
 
     const { token, redirect_url } = midtransResponse.data;
 
-    // Update payment with Midtrans URL
     const updatedPayment = await prisma.payment.update({
       where: { invoice_id: invoice.id },
       data: { url: redirect_url },
@@ -302,11 +292,10 @@ export async function shipmentRates(data: RatesRequestDTO) {
 
     const courierImages: Record<string, string> = {
       paxel:
-        'https://static.wixstatic.com/media/ea5b1d_aab4e6818d9f432e9c7e31a21f133ef0~mv2.png/v1/fill/w_600,h_300,al_c/portfolio_paxel.png',
-      jne: 'https://w7.pngwing.com/pngs/853/492/png-transparent-jalur-nugraha-ekakurir-logo-mail-business-jne-logistic-semarang-business-cdr-text-people-thumbnail.png',
-      sicepat:
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTAdNW-mh6qNAWRzXjFTL2jwqBZy2a0q8W3Lw&s',
-      jnt: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhfD1sqgqqcl5iuI2m4zXMLXxBgP9CIOi1RID-mFoww1XacwfU-qOD-WJyWgPscIyFB-14qS-z13gJPx_eZzYyptYnG7TUSznlU7gOR9_BmqyhpwPbnECFBpDg0ymGq-rwj99ZTkyyTfXo/s320/J%2526T+Express+Logo+-+Free+Vector+Download+PNG.webp',
+        'https://static.wikia.nocookie.net/logopedia/images/2/25/Paxel.svg/revision/latest/scale-to-width-down/300?cb=20230909131511',
+      jne: 'https://upload.wikimedia.org/wikipedia/commons/9/92/New_Logo_JNE.png',
+      sicepat: 'https://pakar.co.id/storage/2019/08/si-cepat.png',
+      jnt: 'https://i.pinimg.com/originals/27/33/d4/2733d452329a7a5a73e3922a36e69370.png',
     };
 
     const finalResponse: RatesResponseDTO[] = response.data.pricing.map(

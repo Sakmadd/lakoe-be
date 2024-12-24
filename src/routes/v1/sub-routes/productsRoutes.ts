@@ -14,12 +14,6 @@ router.post(
   productController.createProduct.bind(productController),
 );
 
-router.delete(
-  '/:id',
-  authentication,
-  productController.deleteProducts.bind(productController),
-);
-
 router.get(
   '/shop',
   authentication,
