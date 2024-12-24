@@ -159,7 +159,7 @@ export async function createOrder(data: CreateOrderRequestDTO) {
     const finalResponse: CreateOrderResponseDTO = {
       token: token,
       redirect_url: redirect_url,
-      data: findData,
+      order: findData,
     };
 
     return finalResponse;
