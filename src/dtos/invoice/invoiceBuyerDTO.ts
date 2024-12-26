@@ -28,6 +28,7 @@ interface PaymentDTO {
 interface RecipientDTO {
   name: string;
   address: string;
+  phone: string;
 }
 
 interface ShopDTO {
