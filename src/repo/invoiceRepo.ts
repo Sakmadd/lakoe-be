@@ -403,6 +403,7 @@ export async function getInvoiceDetail(id: string) {
     Recipient: {
       name: invoice.Recipient?.name,
       address: invoice.Recipient?.address,
+      phone: invoice.Recipient?.phone,
     },
     Shop: {
       name: invoice.Shop?.name,
