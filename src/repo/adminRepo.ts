@@ -20,7 +20,7 @@ export async function getAllTransaction() {
     select: {
       id: true,
       recipient_id: true,
-      prices: true,
+      price: true,
       service_charge: true,
       invoice_number: true,
       Courier: {
@@ -72,7 +72,7 @@ export async function getAllTransaction() {
     (inv): InvoiceDTO => ({
       id: inv.id,
       recipientId: inv.recipient_id,
-      prices: inv.prices,
+      prices: inv.price,
       serviceCharge: inv.service_charge,
       invoiceNumber: inv.invoice_number,
       courier: {

@@ -163,9 +163,11 @@ model Invoices {
   id             String         @id @default(uuid())
   recipient_id   String         @unique
   shop_id        String
-  prices         Float
+  price          Float
   service_charge Float
   invoice_number String
+  created_at     DateTime       @default(now())
+  updated_at     DateTime       @default(now())
   Courier        Courier?
   Payment        Payment?
   Shop           Shop           @relation(fields: [shop_id], references: [id])
@@ -196,8 +198,9 @@ model OrderHistory {
 
 model Courier {
   id                  String  @id @default(uuid())
-  invoice_id          String  @unique
-  order_id            String  @unique
+  invoice_id          String? @unique
+  order_id            String? @unique
+  biteship_order_id   String?
   origin_area_id      String
   destination_area_id String
   price               Float
@@ -207,7 +210,7 @@ model Courier {
   tracking_id         String?
   waybill_id          String?
 
-  order    Order     @relation(fields: [order_id], references: [id])
+  order    Order?    @relation(fields: [order_id], references: [id])
   Invoices Invoices? @relation(fields: [invoice_id], references: [id])
 
   @@map("couriers")
@@ -240,17 +243,18 @@ model OrderItem {
 }
 
 model Recipient {
-  id        String    @id @default(uuid())
-  name      String
-  email     String
-  address   String
-  phone     String
-  district  String
-  city      String
-  longitude String
-  latitude  String
-  Order     Order?
-  Invoices  Invoices?
+  id          String    @id @default(uuid())
+  name        String
+  email       String
+  address     String
+  phone       String
+  district    String
+  city        String
+  postal_code String
+  longitude   String
+  latitude    String
+  Order       Order?
+  Invoices    Invoices?
 
   @@map("recipients")
 }
