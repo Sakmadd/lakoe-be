@@ -184,12 +184,10 @@ export async function createOrder(data: CreateOrderRequestDTO) {
       data: { url: redirect_url },
     });
 
-    const findData = await getOrderByID(order.id);
-
     const finalResponse: CreateOrderResponseDTO = {
+      order_id: order.id,
       token: token,
       redirect_url: redirect_url,
-      order: findData,
     };
 
     return finalResponse;
@@ -309,71 +307,4 @@ export async function shipmentRates(data: RatesRequestDTO) {
       `Error calculating shipment rates: ${error instanceof Error ? error.message : error}`,
     );
   }
-}
-
-export async function getOrderByID(id: string) {
-  const order = await prisma.order.findUnique({
-    where: {
-      id: id,
-    },
-    select: {
-      id: true,
-      total_price: true,
-      created_at: true,
-      updated_at: true,
-      OrderItem: {
-        select: {
-          id: true,
-          product_id: true,
-          quantity: true,
-          Product: {
-            select: {
-              id: true,
-              name: true,
-              description: true,
-              price: true,
-              Images: true,
-            },
-          },
-        },
-      },
-      Payment: {
-        select: {
-          id: true,
-          url: true,
-        },
-      },
-      Recipient: true,
-    },
-  });
-
-  if (!order) {
-    throw new Error('Order not found');
-  }
-
-  const finalResponse: GetOrderByIdDTO = {
-    id: order.id,
-    total_price: order.total_price,
-    created_at: order.created_at,
-    updated_at: order.updated_at,
-    OrderItem: {
-      id: order.OrderItem.id,
-      product_id: order.OrderItem.product_id,
-      quantity: order.OrderItem.quantity,
-      Product: {
-        id: order.OrderItem.Product.id,
-        name: order.OrderItem.Product.name,
-        description: order.OrderItem.Product.description,
-        price: order.OrderItem.Product.price,
-        image: order.OrderItem.Product.Images[0].src || '',
-      },
-    },
-    Payment: {
-      id: order.Payment.id,
-      url: order.Payment.url,
-    },
-    Recipient: order.Recipient,
-  };
-
-  return finalResponse;
 }
