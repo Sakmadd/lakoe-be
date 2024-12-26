@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import { addTemplateDTO } from '../dtos/shop/addTemplateMassageDTO';
 import templateService from '../services/templateService';
+import { assginDTO } from '../dtos/template/assignTemplate';
 
 class templateController {
   async getTemplateMassage(req: Request, res: Response) {
     const template = await templateService.getTemplateMassage();
-
     if (!template) {
       return res.status(404).json({
         error: true,
@@ -22,8 +22,11 @@ class templateController {
   }
   async createTemplates(req: Request, res: Response) {
     const bodyTemplate: addTemplateDTO = req.body;
-
-    const template = await templateService.createTemplate(bodyTemplate);
+    const shop_id = res.locals.shop_id;
+    const template = await templateService.createTemplate(
+      bodyTemplate,
+      shop_id,
+    );
 
     if (!bodyTemplate) {
       return res.status(404).json({
@@ -75,6 +78,24 @@ class templateController {
     return res.status(200).json({
       error: false,
       message: 'Template Message Has been deleted',
+      data: template,
+    });
+  }
+  async assignTemplates(req: Request, res: Response) {
+    const { invo_id } = req.params;
+    const shop_id = res.locals.shop_id;
+    const template = await templateService.assignTemplates(invo_id, shop_id);
+
+    if (!template) {
+      return {
+        error: true,
+        message: 'cannot assign templates',
+        data: null,
+      };
+    }
+    return res.status(200).json({
+      error: false,
+      message: 'assgin has been successfully assigned templates',
       data: template,
     });
   }

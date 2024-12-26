@@ -1,3 +1,4 @@
+import { bankAccount } from '../dtos/bankAccount/createBank';
 import { addLocationDTO } from '../dtos/shop/addLocationDTO';
 import { ShopUpdateDTO } from '../dtos/shop/shopUpdateDTO';
 import {
@@ -227,4 +228,50 @@ export async function deleteLocation(id: string) {
   }
 
   return locations;
+}
+
+export async function postBank(shop_id: string, body: bankAccount) {
+  const bank = await prisma.bankAccount.create({
+    data: {
+      name: body.name,
+      account: body.account,
+      bank: body.bank,
+      shop_id,
+    },
+  });
+
+  if (!bank) {
+    throw new Error('Bank account not created');
+  }
+
+  return bank;
+}
+
+export async function updateBank(shop_id: string, body: bankAccount) {
+  const findShop = await prisma.bankAccount.findUnique({
+    where: {
+      shop_id,
+    },
+  });
+  if (!findShop) {
+    throw new Error('Shop not found');
+  }
+  const result = await prisma.bankAccount.update({
+    where: {
+      shop_id,
+    },
+    data: {
+      name: body.name,
+      account: body.account,
+      bank: body.bank,
+    },
+  });
+  return result;
+}
+export async function deleteBank(shop_id: string) {
+  const result = await prisma.bankAccount.delete({
+    where: {
+      shop_id,
+    },
+  });
 }

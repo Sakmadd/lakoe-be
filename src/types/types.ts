@@ -222,7 +222,6 @@ export interface BankAccountType {
   name: string;
   account: string;
   bank: string;
-  Withdraw?: WithdrawType[];
 }
 
 export interface WithdrawType {

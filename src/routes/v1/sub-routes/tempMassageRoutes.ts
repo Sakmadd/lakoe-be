@@ -22,5 +22,5 @@ templateRouter.delete(
   '/delete/:id',
   templateController.deleteTemplates.bind(templateController),
 );
-
+// templateRouter.get('/sign/:id', templateController.assignTemplates.bind(templateController))
 export default templateRouter;

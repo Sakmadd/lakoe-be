@@ -32,4 +32,7 @@ router.delete(
   shopController.deleteLocation.bind(shopController),
 );
 
+router.post('/bank', shopController.postBank.bind(shopController));
+router.patch('/bank/update', shopController.updateBank.bind(shopController));
+router.delete('/bank/delete', shopController.deleteBank.bind(shopController));
 export default router;

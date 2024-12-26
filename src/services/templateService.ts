@@ -1,5 +1,6 @@
 import ServiceResponseDTO from '../dtos/serviceResponseDto';
 import { addTemplateDTO } from '../dtos/shop/addTemplateMassageDTO';
+import { assginDTO } from '../dtos/template/assignTemplate';
 import templateRepo from '../repo/templateRepo';
 import { TemplateType } from '../types/types';
 import { serviceErrorHandler } from '../utils/serviceErrorHandler';
@@ -7,9 +8,10 @@ import { serviceErrorHandler } from '../utils/serviceErrorHandler';
 class templateService {
   async createTemplate(
     bodyTemplate: addTemplateDTO,
+    shop_id: string,
   ): Promise<ServiceResponseDTO<TemplateType | null>> {
     try {
-      const template = await templateRepo.createTemplate(bodyTemplate);
+      const template = await templateRepo.createTemplate(bodyTemplate, shop_id);
       return new ServiceResponseDTO<TemplateType>({
         error: false,
         message: null,
@@ -80,6 +82,22 @@ class templateService {
         message: error.message,
         payload: null,
       };
+    }
+  }
+  async assignTemplates(
+    invo_id: string,
+    shop_id: string,
+  ): Promise<ServiceResponseDTO<TemplateType | null>> {
+    try {
+      const findData = await templateRepo.findData(invo_id);
+      const assign = await templateRepo.assignTemplates(shop_id);
+      return new ServiceResponseDTO<TemplateType>({
+        error: false,
+        message: null,
+        payload: assign,
+      });
+    } catch (error) {
+      return serviceErrorHandler<TemplateType>(error);
     }
   }
 }

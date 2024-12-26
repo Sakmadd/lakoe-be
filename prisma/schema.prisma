@@ -49,12 +49,13 @@ model Shop {
   logo        String?
   balance     Float   @default(0)
 
-  Bank     BankAccount?
-  User     User?
-  location Location[]
-  Product  Product[]
-  Withdraw Withdraw[]
-  Invoices Invoices[]
+  Bank            BankAccount?
+  User            User?
+  location        Location[]
+  Product         Product[]
+  Withdraw        Withdraw[]
+  Invoices        Invoices[]
+  TemplateMessage TemplateMessage[]
 
   @@map("shops")
 }
@@ -188,7 +189,9 @@ model TemplateMessage {
   contain_message String
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  shop_id String @unique
 
+  shop     Shop       @relation(fields: [shop_id], references: [id])
   @@map("templateMessages")
 }
 

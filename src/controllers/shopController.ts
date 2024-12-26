@@ -5,6 +5,7 @@ import ResponseDTO from '../dtos/responseDto';
 import uploader from '../libs/cloudinary';
 import { LocationType } from '../types/types';
 import { updateMainLocation } from '../dtos/shop/updateLocationDTO';
+import { bankAccount } from '../dtos/bankAccount/createBank';
 
 class shopController {
   async getShop(req: Request, res: Response) {
@@ -241,6 +242,63 @@ class shopController {
       message: 'Location Found',
       data: location,
     });
+  }
+
+  async postBank(req: Request, res: Response) {
+    const shop_id = res.locals.user.shop_id;
+    const body: bankAccount = req.body;
+    const post = await shopService.postBank(shop_id, body);
+
+    if (!post) {
+      return res.status(404).json({
+        error: true,
+        message: 'No bank cannot created',
+        data: null,
+      });
+    } else {
+      return res.status(200).json({
+        error: false,
+        message: 'Bank created successfully',
+        data: post,
+      });
+    }
+  }
+  async updateBank(req: Request, res: Response) {
+    const shop_id = res.locals.user.shop_id;
+    const body: bankAccount = req.body;
+    const update = await shopService.updateBank(shop_id, body);
+
+    if (!update) {
+      return res.status(404).json({
+        error: true,
+        message: 'No bank cannot updated',
+        data: null,
+      });
+    } else {
+      return res.status(200).json({
+        error: false,
+        message: 'Bank updated successfully',
+        data: update,
+      });
+    }
+  }
+  async deleteBank(req: Request, res: Response) {
+    const shop_id = res.locals.user.shop_id;
+    const deleteBank = await shopService.deleteBank(shop_id);
+
+    if (!deleteBank) {
+      return res.status(404).json({
+        error: true,
+        message: 'No bank cannot deleted',
+        data: null,
+      });
+    } else {
+      return res.status(200).json({
+        error: false,
+        message: 'Bank deleted successfully',
+        data: deleteBank,
+      });
+    }
   }
 }
 
