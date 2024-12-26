@@ -20,7 +20,7 @@ class shopService {
 
       return new ServiceResponseDTO<ShopType>({
         error: false,
-        message: null,
+        message: 'Shop Found',
         payload: shop,
       });
     } catch (error) {
@@ -39,7 +39,7 @@ class shopService {
       const locations = await shopRepo.getAllLocations(id);
       return new ServiceResponseDTO<addLocationDTO[]>({
         error: false,
-        message: null,
+        message: "shop's locations",
         payload: locations,
       });
     } catch (error) {
@@ -80,7 +80,7 @@ class shopService {
 
       return new ServiceResponseDTO<ShopType>({
         error: false,
-        message: null,
+        message: 'Shop Updated',
         payload: shop,
       });
     } catch (error) {
@@ -100,7 +100,7 @@ class shopService {
 
       return new ServiceResponseDTO<LocationType[]>({
         error: false,
-        message: null,
+        message: 'Location Found',
         payload: location,
       });
     } catch (error) {

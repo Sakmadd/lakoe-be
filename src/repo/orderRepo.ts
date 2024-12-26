@@ -6,6 +6,8 @@ import {
   CreateOrderRequestDTO,
   CreateOrderResponseDTO,
 } from '../dtos/orders/createOrderV2';
+import { GetOrderByIdDTO } from '../dtos/orders/getOrderByID';
+import { generateInvoiceNumber, shipmentLocation } from '../utils/order';
 
 export async function createOrder(data: CreateOrderRequestDTO) {
   try {
@@ -13,27 +15,32 @@ export async function createOrder(data: CreateOrderRequestDTO) {
       throw new Error('Product ID is missing.');
     }
 
-    const findShopId = await prisma.product.findFirst({
-      where: { id: data.items.product_id },
-      select: { shop_id: true },
-    });
+    let variantPrice: number | null = null;
 
-    if (!findShopId) {
-      throw new Error('Shop not found for the given product.');
+    if (data.items.variant_combination_id) {
+      const variantOptionCombination =
+        await prisma.variantOptionCombination.findUnique({
+          where: { id: data.items.variant_combination_id },
+          select: { price: true },
+        });
+
+      if (!variantOptionCombination) {
+        throw new Error('Variant option combination not found.');
+      }
+      variantPrice = variantOptionCombination.price;
     }
 
-    const findVariantOptionCombination =
-      await prisma.variantOptionCombination.findFirst({
-        where: { id: data.items.variant_combination_id },
-        select: { name: true },
-      });
-
-    const findProductName = await prisma.product.findFirst({
+    const findProduct = await prisma.product.findFirst({
       where: { id: data.items.product_id },
-      select: { name: true },
+      select: { shop_id: true, price: true, name: true },
     });
 
-    const productTotalPrice = data.items.quantity * data.items.price;
+    if (!findProduct) {
+      throw new Error('Product not found.');
+    }
+
+    const productPrice = variantPrice ?? findProduct.price;
+    const productTotalPrice = data.items.quantity * productPrice;
     const totalPrice = productTotalPrice + data.courier_price;
 
     const initializingRecipient = await prisma.recipient.create({
@@ -44,6 +51,7 @@ export async function createOrder(data: CreateOrderRequestDTO) {
         address: data.address,
         district: data.district,
         city: data.city,
+        postal_code: data.postal_code,
         longitude: data.longitude,
         latitude: data.latitude,
       },
@@ -52,10 +60,35 @@ export async function createOrder(data: CreateOrderRequestDTO) {
     const invoice = await prisma.invoices.create({
       data: {
         recipient_id: initializingRecipient.id,
-        shop_id: findShopId.shop_id,
-        prices: productTotalPrice,
+        shop_id: findProduct.shop_id,
+        price: productTotalPrice,
         service_charge: data.courier_price,
-        invoice_number: generateInvoiceNumber(),
+        invoice_number: '',
+      },
+    });
+
+    const currentDate = new Date();
+    const startOfDay = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      currentDate.getDate(),
+    );
+    const endOfDay = new Date(startOfDay.getTime() + 86399999);
+
+    const invoiceCountToday = await prisma.invoices.count({
+      where: {
+        created_at: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
+      },
+    });
+    const invoiceNumber = generateInvoiceNumber(invoiceCountToday);
+
+    const updateInvoice = await prisma.invoices.update({
+      where: { id: invoice.id },
+      data: {
+        invoice_number: invoiceNumber,
       },
     });
 
@@ -115,9 +148,9 @@ export async function createOrder(data: CreateOrderRequestDTO) {
       item_details: [
         {
           id: data.items.product_id,
-          price: data.items.price,
+          price: productPrice,
           quantity: data.items.quantity,
-          name: findProductName.name,
+          name: findProduct.name,
         },
         {
           id: 'courier_fee',
@@ -133,9 +166,7 @@ export async function createOrder(data: CreateOrderRequestDTO) {
       midtransRequest,
       {
         headers: {
-          Authorization: `Basic ${Buffer.from(
-            `${process.env.MIDTRANS_SERVER_KEY}:`,
-          ).toString('base64')}`,
+          Authorization: `Basic ${Buffer.from(`${CONFIGS.MIDTRANS_SERVER_KEY}:`).toString('base64')}`,
           'Content-Type': 'application/json',
         },
       },
@@ -153,57 +184,18 @@ export async function createOrder(data: CreateOrderRequestDTO) {
       data: { url: redirect_url },
     });
 
+    const findData = await getOrderByID(order.id);
+
     const finalResponse: CreateOrderResponseDTO = {
-      order_id: order.id,
       token: token,
       redirect_url: redirect_url,
+      order: findData,
     };
 
     return finalResponse;
   } catch (error) {
     console.error('Error creating order:', error.message, error.stack);
     throw new Error('Failed to create order.');
-  }
-}
-
-function generateInvoiceNumber(): string {
-  return `INV-${Date.now()}`;
-}
-
-function formatCityName(input: string) {
-  return input.replace(/^(Kabupaten|Kota)\s+/i, '').toLowerCase();
-}
-
-async function shipmentLocation(city: string, postal_code: string) {
-  try {
-    const token = CONFIGS.BITESHIP_API_KEY;
-
-    const formatInputLocation = formatCityName(city).replace(/ /g, '+');
-
-    const hitLocation = await axios.get(
-      `https://api.biteship.com/v1/maps/areas?countries=ID&input=${formatInputLocation}&type=single`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    );
-
-    if (hitLocation.data?.success && hitLocation.data?.areas?.length > 0) {
-      const areas = hitLocation.data.areas;
-
-      const matchingArea = areas.find(
-        (area: any) => area.postal_code === postal_code,
-      );
-
-      return matchingArea ? matchingArea.id : areas[0].id;
-    } else {
-      throw new Error('Invalid API response or no areas found');
-    }
-  } catch (error) {
-    throw new Error(
-      `Error fetching shipment location: ${error instanceof Error ? error.message : error}`,
-    );
   }
 }
 
@@ -317,4 +309,71 @@ export async function shipmentRates(data: RatesRequestDTO) {
       `Error calculating shipment rates: ${error instanceof Error ? error.message : error}`,
     );
   }
+}
+
+export async function getOrderByID(id: string) {
+  const order = await prisma.order.findUnique({
+    where: {
+      id: id,
+    },
+    select: {
+      id: true,
+      total_price: true,
+      created_at: true,
+      updated_at: true,
+      OrderItem: {
+        select: {
+          id: true,
+          product_id: true,
+          quantity: true,
+          Product: {
+            select: {
+              id: true,
+              name: true,
+              description: true,
+              price: true,
+              Images: true,
+            },
+          },
+        },
+      },
+      Payment: {
+        select: {
+          id: true,
+          url: true,
+        },
+      },
+      Recipient: true,
+    },
+  });
+
+  if (!order) {
+    throw new Error('Order not found');
+  }
+
+  const finalResponse: GetOrderByIdDTO = {
+    id: order.id,
+    total_price: order.total_price,
+    created_at: order.created_at,
+    updated_at: order.updated_at,
+    OrderItem: {
+      id: order.OrderItem.id,
+      product_id: order.OrderItem.product_id,
+      quantity: order.OrderItem.quantity,
+      Product: {
+        id: order.OrderItem.Product.id,
+        name: order.OrderItem.Product.name,
+        description: order.OrderItem.Product.description,
+        price: order.OrderItem.Product.price,
+        image: order.OrderItem.Product.Images[0].src || '',
+      },
+    },
+    Payment: {
+      id: order.Payment.id,
+      url: order.Payment.url,
+    },
+    Recipient: order.Recipient,
+  };
+
+  return finalResponse;
 }

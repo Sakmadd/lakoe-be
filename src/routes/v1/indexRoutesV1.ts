@@ -9,6 +9,8 @@ import templateRouter from './sub-routes/tempMassageRoutes';
 import usersRoutes from './sub-routes/usersRoutes';
 import sellerDasboard from './sub-routes/sellerRoutes';
 import withdrawRoutes from './sub-routes/withdrawRoutes';
+import invoiceRoutes from './sub-routes/invoiceRoutes';
+import webhookRoutes from './sub-routes/webhookRoutes';
 
 const app = express();
 
@@ -21,5 +23,7 @@ app.use('/admins', adminsRoutes);
 app.use('/template-message', templateRouter);
 app.use('/seller', authentication, sellerDasboard);
 app.use('/withdraw', authentication, withdrawRoutes);
+app.use('/invoice', invoiceRoutes);
+app.use('/webhook', webhookRoutes);
 
 export const API_V1 = app;

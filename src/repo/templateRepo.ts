@@ -96,11 +96,46 @@ class templateRepo {
     return formattedData;
   }
 
-  // async assignTemplates(shop_id: string) {
-  //   try {
-  //     const template = prisma.templateMessage.findUnique();
-  //   } catch (error) {}
-  // }
+  async assignTemplates(invo_id: string, shop_id: string) {
+    try {
+      const data = await this.findData(invo_id);
+
+      const templates = await prisma.templateMessage.findMany({
+        where: {
+          shop_id,
+        },
+      });
+
+      const processedTemplates = templates.map((template) => {
+        const newContent = template.contain_message.replace(
+          /\[([^\]]+)\]/g,
+          (_, key) => {
+            const formattedKey = key.trim().toLowerCase().replace(/ /g, '');
+            if (formattedKey === 'customername') {
+              return data.customer;
+            }
+            if (formattedKey === 'storename') {
+              return data.shop;
+            }
+            if (formattedKey === 'productname') {
+              return data.products[0];
+            }
+            return key;
+          },
+        );
+
+        return {
+          ...template,
+          content: newContent,
+        };
+      });
+
+      return processedTemplates;
+    } catch (error) {
+      console.error('Error in assignTemplates:', error);
+      throw error;
+    }
+  }
 }
 
 export default new templateRepo();
