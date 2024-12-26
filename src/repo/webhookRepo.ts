@@ -1,55 +1,52 @@
+import { BiteshipStatusRequestDTO } from '../dtos/webhook/biteshipStatus';
 import { MidtransDTO } from '../dtos/webhook/midtrans';
-import { midtrans } from '../libs/midtrans';
-import { prisma } from '../libs/prisma';
-
-async function updatePaymentStatus(orderId: string, status: string) {
-  await prisma.payment.update({
-    where: { order_id: orderId },
-    data: { status },
-  });
-}
+import { updateOrderStatus } from '../utils/webhookBiteship';
+import { updatePaymentStatus } from '../utils/webhookMidtrans';
 
 export async function postMidtrans(notificationJSON: MidtransDTO) {
   try {
-    if (!notificationJSON || !notificationJSON.order_id) {
-      throw new Error('Invalid notification JSON');
-    }
+    let status = '';
 
-    const statusResponse =
-      await midtrans.transaction.notification(notificationJSON);
-    const {
-      order_id: orderId,
-      transaction_status: transactionStatus,
-      fraud_status: fraudStatus,
-    } = statusResponse;
-
-    if (transactionStatus === 'capture') {
-      if (fraudStatus === 'accept') {
-        console.log(`Order ${orderId} is successful.`);
-        await updatePaymentStatus(orderId, 'success');
-      } else if (fraudStatus === 'challenge') {
-        console.log(`Order ${orderId} requires manual review.`);
-        await updatePaymentStatus(orderId, 'challenge');
-      }
-    } else if (transactionStatus === 'settlement') {
-      console.log(`Order ${orderId} has been settled.`);
-      await updatePaymentStatus(orderId, 'settlement');
-    } else if (
-      transactionStatus === 'cancel' ||
-      transactionStatus === 'deny' ||
-      transactionStatus === 'expire'
-    ) {
-      console.log(`Order ${orderId} has failed.`);
-      await updatePaymentStatus(orderId, 'failure');
-    } else if (transactionStatus === 'pending') {
-      console.log(`Order ${orderId} is pending.`);
-      await updatePaymentStatus(orderId, 'pending');
+    if (notificationJSON.transaction_status === 'settlement') {
+      status = await updatePaymentStatus(notificationJSON.order_id, 'paid');
+    } else if (notificationJSON.transaction_status === 'success') {
+      status = await updatePaymentStatus(notificationJSON.order_id, 'paid');
+    } else if (notificationJSON.transaction_status === 'cancel') {
+      status = await updatePaymentStatus(notificationJSON.order_id, 'canceled');
+    } else if (notificationJSON.transaction_status === 'deny') {
+      status = await updatePaymentStatus(notificationJSON.order_id, 'canceled');
+    } else if (notificationJSON.transaction_status === 'expire') {
+      status = await updatePaymentStatus(notificationJSON.order_id, 'canceled');
+    } else if (notificationJSON.transaction_status === 'pending') {
+      status = await updatePaymentStatus(notificationJSON.order_id, 'pending');
+    } else if (notificationJSON.transaction_status === 'refund') {
+      status = await updatePaymentStatus(notificationJSON.order_id, 'refunded');
     } else {
-      console.log(`Unhandled transaction status: ${transactionStatus}`);
+      throw new Error(
+        `Unknown transaction status: "${notificationJSON.transaction_status}"`,
+      );
     }
 
-    return transactionStatus;
+    return { status };
   } catch (error) {
-    return error;
+    console.error('Error processing Midtrans webhook:', error);
+    throw new Error('Failed to process the notification.');
+  }
+}
+
+export async function biteshipStatus(data: BiteshipStatusRequestDTO) {
+  try {
+    let status = '';
+
+    if (data.status === 'dropping_off') {
+      status = await updateOrderStatus(data.order_id, 'dropping_off');
+    } else if (data.status === 'delivered') {
+      status = await updateOrderStatus(data.order_id, 'delivered');
+    }
+
+    return { status };
+  } catch (error) {
+    console.error('Error processing Biteship webhook:', error);
+    throw new Error('Failed to process the notification.');
   }
 }

@@ -51,8 +51,19 @@ export async function createOrder(data: CreateOrderRequestDTO) {
         address: data.address,
         district: data.district,
         city: data.city,
+        postal_code: data.postal_code,
         longitude: data.longitude,
         latitude: data.latitude,
+      },
+    });
+
+    const invoice = await prisma.invoices.create({
+      data: {
+        recipient_id: initializingRecipient.id,
+        shop_id: findProduct.shop_id,
+        price: productTotalPrice,
+        service_charge: data.courier_price,
+        invoice_number: '',
       },
     });
 
@@ -74,12 +85,9 @@ export async function createOrder(data: CreateOrderRequestDTO) {
     });
     const invoiceNumber = generateInvoiceNumber(invoiceCountToday);
 
-    const invoice = await prisma.invoices.create({
+    const updateInvoice = await prisma.invoices.update({
+      where: { id: invoice.id },
       data: {
-        recipient_id: initializingRecipient.id,
-        shop_id: findProduct.shop_id,
-        price: productTotalPrice,
-        service_charge: data.courier_price,
         invoice_number: invoiceNumber,
       },
     });

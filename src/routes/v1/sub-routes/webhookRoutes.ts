@@ -8,4 +8,9 @@ router.post(
   webhookController.postMidtrans.bind(webhookController),
 );
 
+router.post(
+  '/biteship/status',
+  webhookController.biteshipStatus.bind(webhookController),
+);
+
 export default router;

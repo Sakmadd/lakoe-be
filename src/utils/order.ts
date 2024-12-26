@@ -8,7 +8,7 @@ export function generateInvoiceNumber(currentInvoiceCount: number): string {
   const day = String(currentDate.getDate()).padStart(2, '0');
   const formattedDate = `${year}${month}${day}`;
   const sequenceNumber = String(currentInvoiceCount + 1).padStart(6, '0');
-  return `INV/${formattedDate}/MPL/${sequenceNumber}`;
+  return `INV/${formattedDate}/${sequenceNumber}`;
 }
 
 export function formatCityName(input: string) {
