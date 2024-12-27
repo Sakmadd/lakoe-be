@@ -4,16 +4,22 @@ import { authentication } from '../../../middlewares/authentication';
 
 const router = Router();
 
+router.get(
+  '/',
+  authentication,
+  invoiceController.getAllInvoiceBySellerId.bind(invoiceController),
+);
+
 router.get('/:id', invoiceController.getInvoiceDetail.bind(invoiceController));
 
-router.patch(
-  '/:id',
+router.post(
+  '/decline/:id',
   authentication,
   invoiceController.rejectOrder.bind(invoiceController),
 );
 
 router.post(
-  '/:id',
+  '/accept/:id',
   authentication,
   invoiceController.createOrderBiteship.bind(invoiceController),
 );

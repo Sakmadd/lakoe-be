@@ -5,6 +5,10 @@ import { twilio } from '../libs/twillio';
 import { OrderStatus } from '@prisma/client';
 import { CreateOrderBiteshipResponseDTO } from '../dtos/invoice/createOrderBiteshipDTO';
 import { InvoiceBuyerDTO, ProductDTO } from '../dtos/invoice/invoiceBuyerDTO';
+import {
+  GetAllInvoiceBySellerId,
+  ProductsDTO,
+} from '../dtos/invoice/getAllInvoiceBySellerId';
 
 export async function postToWa(id: string) {
   const invoiceId = await prisma.order.findUnique({
@@ -449,4 +453,97 @@ export async function rejectOrder(id: string) {
   });
 
   return update.status;
+}
+
+export async function getAllInvoiceBySellerId(id: string) {
+  try {
+    const invoices = await prisma.invoices.findMany({
+      where: {
+        shop_id: id,
+      },
+      select: {
+        id: true,
+        OrderHistory: {
+          orderBy: {
+            timestamp: 'desc',
+          },
+          select: {
+            status: true,
+            timestamp: true,
+          },
+        },
+        invoice_number: true,
+        created_at: true,
+        Recipient: {
+          select: {
+            phone: true,
+            Order: {
+              select: {
+                OrderItem: {
+                  select: {
+                    product_id: true,
+                    variant_combination_id: true,
+                    quantity: true,
+                    Product: {
+                      select: {
+                        name: true,
+                        price: true,
+                        Images: {
+                          select: { src: true },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!invoices || invoices.length === 0) {
+      throw new Error('No invoices found for this seller.');
+    }
+
+    const finalResponse: GetAllInvoiceBySellerId[] = invoices.map((invoice) => {
+      const orderItems = Array.isArray(invoice.Recipient?.Order?.OrderItem)
+        ? invoice.Recipient?.Order?.OrderItem
+        : invoice.Recipient?.Order?.OrderItem
+          ? [invoice.Recipient?.Order?.OrderItem]
+          : [];
+
+      const products: ProductsDTO =
+        orderItems.length > 0
+          ? {
+              name: orderItems[0].Product?.name || '',
+              image: orderItems[0].Product?.Images?.[0]?.src || '',
+              quantity: orderItems[0].quantity,
+              total_price:
+                (orderItems[0].Product?.price || 0) * orderItems[0].quantity,
+            }
+          : {
+              name: '',
+              image: '',
+              quantity: 0,
+              total_price: 0,
+            };
+
+      const latestStatus = invoice.OrderHistory[0]?.status;
+
+      return {
+        invoice_id: invoice.id,
+        status: latestStatus,
+        phone: invoice.Recipient.phone,
+        invoice_number: invoice.invoice_number,
+        created_at: invoice.created_at,
+        product: products,
+      };
+    });
+
+    return finalResponse;
+  } catch (error) {
+    console.log(error);
+    throw new Error(`Error fetching invoices for seller ${id}: ${error}`);
+  }
 }

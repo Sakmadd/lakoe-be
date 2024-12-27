@@ -104,5 +104,30 @@ class invoiceController {
       }),
     );
   }
+
+  async getAllInvoiceBySellerId(req: Request, res: Response) {
+    const id = res.locals.user.shop_id;
+
+    const { error, message, payload } =
+      await invoiceService.getAllInvoiceBySellerId(id);
+
+    if (error) {
+      return res.status(404).json(
+        new ResponseDTO({
+          error: error,
+          message: message,
+          data: null,
+        }),
+      );
+    }
+
+    return res.status(200).json(
+      new ResponseDTO({
+        error: error,
+        message: message,
+        data: payload,
+      }),
+    );
+  }
 }
 export default new invoiceController();
