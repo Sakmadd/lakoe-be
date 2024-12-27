@@ -300,18 +300,16 @@ export async function shipmentRates(data: RatesRequestDTO) {
       (item: any) => item.type && item.type.toLowerCase() === 'reg',
     );
 
-    const finalResponse: RatesResponseDTO[] = response.data.pricing.map(
-      (item: any) => ({
-        price: item.price,
-        origin_area_id: originId,
-        destination_area_id: destinationId,
-        company: item.company,
-        courier_name: item.courier_name,
-        courier_code: item.courier_code,
-        courier_type: item.type,
-        courier_image: courierImages[item.courier_code] || '',
-      }),
-    );
+    const finalResponse: RatesResponseDTO[] = regRates.map((item: any) => ({
+      price: item.price,
+      origin_area_id: originId,
+      destination_area_id: destinationId,
+      company: item.company,
+      courier_name: item.courier_name,
+      courier_code: item.courier_code,
+      courier_type: item.type,
+      courier_image: courierImages[item.courier_code] || '',
+    }));
 
     return finalResponse;
   } catch (error) {
