@@ -296,6 +296,10 @@ export async function shipmentRates(data: RatesRequestDTO) {
       jnt: 'https://i.pinimg.com/originals/27/33/d4/2733d452329a7a5a73e3922a36e69370.png',
     };
 
+    const regRates = response.data.pricing.filter(
+      (item: any) => item.type && item.type.toLowerCase() === 'reg',
+    );
+
     const finalResponse: RatesResponseDTO[] = response.data.pricing.map(
       (item: any) => ({
         price: item.price,
