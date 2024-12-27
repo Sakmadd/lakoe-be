@@ -2,6 +2,7 @@ import ServiceResponseDTO from '../dtos/serviceResponseDto';
 import { serviceErrorHandler } from '../utils/serviceErrorHandler';
 import * as withdrawRepo from '../repo/withdrawRepo';
 import { WithdrawDTO } from '../dtos/withdraw/withdrawDTO';
+import { GetAllWithdrawSellerDTO } from '../dtos/seller/getAllWithdrawSellerDTO';
 
 class withdrawService {
   async getAllWithdraw(): Promise<ServiceResponseDTO<WithdrawDTO[] | null>> {
@@ -27,6 +28,22 @@ class withdrawService {
   ): Promise<ServiceResponseDTO<CreateWithdrawDTO | null>> {
     try {
     } catch (error) {}
+  }
+
+  async getAllWithdrawSeller(
+    id: string,
+  ): Promise<ServiceResponseDTO<GetAllWithdrawSellerDTO[] | null>> {
+    try {
+      const withdraw = await withdrawRepo.getAllWithdrawSeller(id);
+
+      return new ServiceResponseDTO<GetAllWithdrawSellerDTO[]>({
+        error: false,
+        message: null,
+        payload: withdraw,
+      });
+    } catch (error) {
+      return serviceErrorHandler<null>(error);
+    }
   }
 }
 

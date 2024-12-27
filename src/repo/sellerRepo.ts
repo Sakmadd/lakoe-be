@@ -1,3 +1,4 @@
+import { GetAllWithdrawSellerDTO } from '../dtos/seller/getAllWithdrawSellerDTO';
 import { prisma } from '../libs/prisma';
 
 class sellerRepo {

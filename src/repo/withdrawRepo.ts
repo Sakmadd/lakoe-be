@@ -1,3 +1,4 @@
+import { GetAllWithdrawSellerDTO } from '../dtos/seller/getAllWithdrawSellerDTO';
 import { WithdrawDTO } from '../dtos/withdraw/withdrawDTO';
 import { prisma } from '../libs/prisma';
 
@@ -47,4 +48,35 @@ export async function getAllWithdraw() {
   }));
 
   return response;
+}
+
+export async function getAllWithdrawSeller(
+  id: string,
+): Promise<GetAllWithdrawSellerDTO[]> {
+  const shop = await prisma.shop.findMany({
+    where: {
+      id: id,
+    },
+    select: {
+      Withdraw: true,
+    },
+  });
+
+  if (!shop) {
+    throw new Error('Shop not found');
+  }
+
+  if (shop.length === 0) {
+    return [];
+  }
+
+  const finalResponse: GetAllWithdrawSellerDTO[] = shop[0].Withdraw.map(
+    (withdraw) => ({
+      amount: withdraw.amount,
+      status: withdraw.status,
+      created_at: withdraw.created_at,
+    }),
+  );
+
+  return finalResponse;
 }
