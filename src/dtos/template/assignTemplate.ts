@@ -1,5 +1,5 @@
 export interface assginDTO {
-  nama_product: string;
-  nama_pelanggan: string;
-  nama_toko: string;
+  name_product: string;
+  name_costumer: string;
+  name_shop: string;
 }

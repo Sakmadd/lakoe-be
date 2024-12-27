@@ -24,7 +24,7 @@ templateRouter.delete(
   templateController.deleteTemplates.bind(templateController),
 );
 templateRouter.get(
-  '/sign/:invo_id',
+  '/sign',
   authentication,
   templateController.assignTemplates.bind(templateController),
 );
