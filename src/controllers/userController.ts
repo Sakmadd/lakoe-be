@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import userService from '../services/userService';
 import { UserDetailType } from '../types/types';
 import ResponseDTO from '../dtos/responseDto';
+import { CONFIGS } from '../config/config';
 
 class userController {
   async getAllUsers(req: Request, res: Response) {
@@ -59,6 +60,8 @@ class userController {
 
   async getLoggedUser(req: Request, res: Response) {
     const loggedUser = res.locals.user;
+
+    console.log(CONFIGS.CLOUDINARY_API_KEY);
 
     const user = await userService.getLoggedUser(loggedUser);
 
