@@ -351,7 +351,11 @@ export async function getOrderByID(id: string) {
           url: true,
         },
       },
-      Recipient: true,
+      Recipient: {
+        include: {
+          Invoices: true,
+        },
+      },
     },
   });
 
