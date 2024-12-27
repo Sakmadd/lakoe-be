@@ -10,4 +10,5 @@ sellerDasboard.get(
   sellerController.getAllOrder.bind(sellerController),
 );
 
+// sellerDasboard.get('/order/id',sellerController.getOrderByIdOrder.bind(sellerController));
 export default sellerDasboard;

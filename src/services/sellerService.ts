@@ -52,5 +52,9 @@ class dashboardService {
       return serviceErrorHandler<getAllOrder[]>(error);
     }
   }
+
+  // async getOrderByIdOrder(id: string): Promise<ServiceResponseDTO<>>{
+
+  // }
 }
 export default new dashboardService();

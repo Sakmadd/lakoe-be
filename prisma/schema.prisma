@@ -21,6 +21,12 @@ enum Role {
   admin
 }
 
+enum withDrawStatus {
+  accepted
+  rejected
+  pending
+}
+
 model User {
   id       String @id @default(uuid())
   shop_id  String @unique
@@ -43,11 +49,13 @@ model Shop {
   logo        String?
   balance     Float   @default(0)
 
-  User     User?
-  location Location[]
-  Product  Product[]
-  Withdraw Withdraw[]
-  Invoices Invoices[]
+  Bank            BankAccount?
+  User            User?
+  location        Location[]
+  Product         Product[]
+  Withdraw        Withdraw[]
+  Invoices        Invoices[]
+  TemplateMessage TemplateMessage[]
 
   @@map("shops")
 }
@@ -183,6 +191,9 @@ model TemplateMessage {
   contain_message String
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  shop_id         String   @unique
+
+  shop Shop @relation(fields: [shop_id], references: [id])
 
   @@map("templateMessages")
 }
@@ -279,27 +290,32 @@ model Payment {
 }
 
 model BankAccount {
-  id       String     @id @default(uuid())
-  name     String
-  account  String
-  bank     String
+  id        String @id @default(uuid())
+  name      String
+  account   String
+  bank_code String
+  bank      String
+  shop_id   String @unique
+
+  shop     Shop       @relation(fields: [shop_id], references: [id])
   Withdraw Withdraw[]
 
   @@map("bankAccounts")
 }
 
+
 model Withdraw {
-  id              String      @id @default(uuid())
+  id              String         @id @default(uuid())
   bank_account_id String
   shop_id         String
-  reference_no    String
+  reference_no    String         @unique @default(uuid())
   amount          Float
   notes           String?
-  status          String
-  updated_at      DateTime    @default(now())
-  created_at      DateTime    @default(now())
-  BankAccount     BankAccount @relation(fields: [bank_account_id], references: [id])
-  Shop            Shop        @relation(fields: [shop_id], references: [id])
+  status          withDrawStatus
+  updated_at      DateTime       @default(now())
+  created_at      DateTime       @default(now())
+  BankAccount     BankAccount    @relation(fields: [bank_account_id], references: [id])
+  Shop            Shop           @relation(fields: [shop_id], references: [id])
 
   @@map("withdraws")
 }
