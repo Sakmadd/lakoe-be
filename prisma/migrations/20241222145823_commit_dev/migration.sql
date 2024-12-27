@@ -132,10 +132,9 @@ CREATE TABLE "invoices" (
     "id" TEXT NOT NULL,
     "recipient_id" TEXT NOT NULL,
     "shop_id" TEXT NOT NULL,
-    "price" DOUBLE PRECISION NOT NULL,
+    "prices" DOUBLE PRECISION NOT NULL,
     "service_charge" DOUBLE PRECISION NOT NULL,
     "invoice_number" TEXT NOT NULL,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "invoices_pkey" PRIMARY KEY ("id")
 );
@@ -194,7 +193,7 @@ CREATE TABLE "orderItems" (
     "id" TEXT NOT NULL,
     "order_id" TEXT NOT NULL,
     "product_id" TEXT NOT NULL,
-    "variant_combination_id" TEXT,
+    "variant_combination_id" TEXT NOT NULL,
     "quantity" INTEGER NOT NULL,
 
     CONSTRAINT "orderItems_pkey" PRIMARY KEY ("id")
