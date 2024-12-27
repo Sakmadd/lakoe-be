@@ -222,6 +222,7 @@ export interface BankAccountType {
   name: string;
   account: string;
   bank: string;
+  shop_id: string;
 }
 
 export interface WithdrawType {

@@ -235,6 +235,7 @@ export async function postBank(shop_id: string, body: bankAccount) {
     data: {
       name: body.name,
       account: body.account,
+      bank_code: body.bank_code,
       bank: body.bank,
       shop_id,
     },
@@ -274,4 +275,5 @@ export async function deleteBank(shop_id: string) {
       shop_id,
     },
   });
+  return result;
 }

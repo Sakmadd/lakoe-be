@@ -92,7 +92,6 @@ export async function updateWithdraw(
         notes: body.notes || '',
       },
     });
-    console.log('1');
 
     switch (withdraw.status) {
       case withDrawStatus.rejected:

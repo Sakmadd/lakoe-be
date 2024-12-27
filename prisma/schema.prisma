@@ -303,6 +303,7 @@ model BankAccount {
   @@map("bankAccounts")
 }
 
+
 model Withdraw {
   id              String         @id @default(uuid())
   bank_account_id String

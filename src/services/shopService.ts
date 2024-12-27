@@ -9,7 +9,7 @@ import {
   updateMainLocation,
 } from '../dtos/shop/updateLocationDTO';
 import uploader from '../libs/clodudinary2.0';
-import { bankAccount } from '../dtos/bankAccount/createBank';
+import { bankAccount, bankRes } from '../dtos/bankAccount/createBank';
 
 class shopService {
   async getShopDetail(
@@ -219,6 +219,7 @@ class shopService {
       return serviceErrorHandler<BankAccountType | null>(error);
     }
   }
+  async getAllBank() {}
 }
 
 export default new shopService();

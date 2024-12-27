@@ -11,6 +11,7 @@ import sellerDasboard from './sub-routes/sellerRoutes';
 import withdrawRoutes from './sub-routes/withdrawRoutes';
 import invoiceRoutes from './sub-routes/invoiceRoutes';
 import webhookRoutes from './sub-routes/webhookRoutes';
+import bankRouter from './sub-routes/banksRouter';
 
 const app = express();
 
@@ -20,10 +21,10 @@ app.use('/shops', authentication, shopsRoutes);
 app.use('/products', productsRoutes);
 app.use('/orders', orderRoutes);
 app.use('/admins', adminsRoutes);
-app.use('/template-message', templateRouter);
+app.use('/template-message', authentication, templateRouter);
 app.use('/seller', authentication, sellerDasboard);
 app.use('/withdraw', authentication, withdrawRoutes);
 app.use('/invoice', invoiceRoutes);
 app.use('/webhook', webhookRoutes);
-
+app.use('/bank', authentication, bankRouter);
 export const API_V1 = app;

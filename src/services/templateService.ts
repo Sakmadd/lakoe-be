@@ -19,11 +19,7 @@ class templateService {
         payload: template,
       });
     } catch (error) {
-      return serviceErrorHandler<TemplateType | null>({
-        error: true,
-        message: error.message,
-        payload: null,
-      });
+      return serviceErrorHandler<TemplateType | null>(error);
     }
   }
 

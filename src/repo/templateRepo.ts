@@ -55,7 +55,11 @@ class templateRepo {
     }
     return templates;
   }
+
   async findData(invo_id: string) {
+    if (!invo_id) {
+      throw new Error('id invoice tidak di temukan');
+    }
     const findData = await prisma.invoices.findUnique({
       where: { id: invo_id },
       select: {
@@ -99,6 +103,7 @@ class templateRepo {
   async assignTemplates(invo_id: string, shop_id: string) {
     try {
       const data = await this.findData(invo_id);
+      console.log(data);
 
       const templates = await prisma.templateMessage.findMany({
         where: {
@@ -111,13 +116,19 @@ class templateRepo {
           /\[([^\]]+)\]/g,
           (_, key) => {
             const formattedKey = key.trim().toLowerCase().replace(/ /g, '');
+            console.log(formattedKey);
+
             if (formattedKey === 'customername') {
+              console.log(data.customer);
+
               return data.customer;
             }
             if (formattedKey === 'storename') {
+              console.log(data.shop);
               return data.shop;
             }
             if (formattedKey === 'productname') {
+              console.log(data.products);
               return data.products[0];
             }
             return key;
