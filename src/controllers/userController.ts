@@ -61,8 +61,6 @@ class userController {
   async getLoggedUser(req: Request, res: Response) {
     const loggedUser = res.locals.user;
 
-    console.log(CONFIGS.CLOUDINARY_API_KEY);
-
     const user = await userService.getLoggedUser(loggedUser);
 
     if (!user) {
