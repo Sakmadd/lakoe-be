@@ -4,6 +4,7 @@ import { serviceErrorHandler } from '../utils/serviceErrorHandler';
 import * as invoiceRepo from '../repo/invoiceRepo';
 import { CreateOrderBiteshipResponseDTO } from '../dtos/invoice/createOrderBiteshipDTO';
 import { InvoiceBuyerDTO } from '../dtos/invoice/invoiceBuyerDTO';
+import { GetAllInvoiceBySellerId } from '../dtos/invoice/getAllInvoiceBySellerId';
 
 class invoiceService {
   async postToWa(
@@ -61,6 +62,22 @@ class invoiceService {
       return new ServiceResponseDTO<string>({
         error: false,
         message: 'Canceled',
+        payload: invoice,
+      });
+    } catch (error) {
+      serviceErrorHandler<null>(error);
+    }
+  }
+
+  async getAllInvoiceBySellerId(
+    id: string,
+  ): Promise<ServiceResponseDTO<GetAllInvoiceBySellerId[] | null>> {
+    try {
+      const invoice = await invoiceRepo.getAllInvoiceBySellerId(id);
+
+      return new ServiceResponseDTO<GetAllInvoiceBySellerId[]>({
+        error: false,
+        message: 'Invoices Found',
         payload: invoice,
       });
     } catch (error) {

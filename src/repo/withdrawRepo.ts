@@ -1,4 +1,5 @@
 import { withDrawStatus } from '@prisma/client';
+import { GetAllWithdrawSellerDTO } from '../dtos/seller/getAllWithdrawSellerDTO';
 import { CreateWithdrawDTO } from '../dtos/withdraw/createWithdrawDTO';
 import {
   updateWithdrawDTO,
@@ -53,6 +54,37 @@ export async function getAllWithdraw() {
   }));
 
   return response;
+}
+
+export async function getAllWithdrawSeller(
+  id: string,
+): Promise<GetAllWithdrawSellerDTO[]> {
+  const shop = await prisma.shop.findMany({
+    where: {
+      id: id,
+    },
+    select: {
+      Withdraw: true,
+    },
+  });
+
+  if (!shop) {
+    throw new Error('Shop not found');
+  }
+
+  if (shop.length === 0) {
+    return [];
+  }
+
+  const finalResponse: GetAllWithdrawSellerDTO[] = shop[0].Withdraw.map(
+    (withdraw) => ({
+      amount: withdraw.amount,
+      status: withdraw.status,
+      created_at: withdraw.created_at,
+    }),
+  );
+
+  return finalResponse;
 }
 export async function createWithdraw(body: CreateWithdrawDTO, shopId: string) {
   const withdraw = await prisma.withdraw.create({
@@ -151,53 +183,4 @@ async function handleAcceptedWithdraw(shop_id: string, id: string) {
     where: { id: shop_id },
     data: { balance: updatedBalance },
   });
-}
-
-export async function getWithdrawById(shop_id: string) {
-  const withdraws = await prisma.withdraw.findMany({
-    where: {
-      shop_id,
-    },
-    select: {
-      id: true,
-      reference_no: true,
-      amount: true,
-      status: true,
-      notes: true,
-      created_at: true,
-      updated_at: true,
-      bank_account_id: true,
-      Shop: {
-        select: {
-          id: true,
-          User: {
-            select: {
-              name: true,
-            },
-          },
-        },
-      },
-    },
-  });
-  if (!withdraws) {
-    throw new Error('No withdrawals found');
-  }
-
-  const response: WithdrawDTO[] = withdraws.map((withdraw) => ({
-    id: withdraw.id,
-    reference_no: withdraw.reference_no,
-    amount: withdraw.amount,
-    status: withdraw.status,
-    notes: withdraw.notes || null,
-    created_at: withdraw.created_at,
-    updated_at: withdraw.updated_at,
-    bank_account_id: withdraw.bank_account_id,
-    Shop: {
-      id: withdraw.Shop.id,
-      User: {
-        name: withdraw.Shop.User.name,
-      },
-    },
-  }));
-  return response;
 }

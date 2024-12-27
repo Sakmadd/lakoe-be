@@ -5,6 +5,7 @@ import {
   updateWithDrawID,
 } from '../dtos/withdraw/updateWithdrawDTO';
 import { WithdrawDTO } from '../dtos/withdraw/withdrawDTO';
+import { GetAllWithdrawSellerDTO } from '../dtos/seller/getAllWithdrawSellerDTO';
 import * as withdrawRepo from '../repo/withdrawRepo';
 import { WithdrawType } from '../types/types';
 import { serviceErrorHandler } from '../utils/serviceErrorHandler';
@@ -57,16 +58,32 @@ class withdrawService {
   }
   async getWithdrawById(
     shop_id: string,
-  ): Promise<ServiceResponseDTO<WithdrawDTO[] | null>> {
+  ): Promise<ServiceResponseDTO<GetAllWithdrawSellerDTO[] | null>> {
     try {
-      const getById = await withdrawRepo.getWithdrawById(shop_id);
-      return new ServiceResponseDTO<WithdrawDTO[]>({
+      const getById = await withdrawRepo.getAllWithdrawSeller(shop_id);
+      return new ServiceResponseDTO<GetAllWithdrawSellerDTO[]>({
         error: false,
         message: null,
         payload: getById,
       });
     } catch (error) {
-      return serviceErrorHandler<WithdrawDTO[] | null>(error);
+      return serviceErrorHandler<null>(error);
+    }
+  }
+
+  async getAllWithdrawSeller(
+    id: string,
+  ): Promise<ServiceResponseDTO<GetAllWithdrawSellerDTO[] | null>> {
+    try {
+      const withdraw = await withdrawRepo.getAllWithdrawSeller(id);
+
+      return new ServiceResponseDTO<GetAllWithdrawSellerDTO[]>({
+        error: false,
+        message: null,
+        payload: withdraw,
+      });
+    } catch (error) {
+      return serviceErrorHandler<null>(error);
     }
   }
 }

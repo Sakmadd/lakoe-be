@@ -8,6 +8,7 @@ import {
 } from '../dtos/orders/createOrderV2';
 import { GetOrderByIdDTO } from '../dtos/orders/getOrderByID';
 import { generateInvoiceNumber, shipmentLocation } from '../utils/order';
+import { OrderStatus } from '@prisma/client';
 
 export async function createOrder(data: CreateOrderRequestDTO) {
   try {
@@ -64,6 +65,11 @@ export async function createOrder(data: CreateOrderRequestDTO) {
         price: productTotalPrice,
         service_charge: data.courier_price,
         invoice_number: '',
+        OrderHistory: {
+          create: {
+            status: OrderStatus.unpaid,
+          },
+        },
       },
     });
 
