@@ -1,4 +1,10 @@
+import { withDrawStatus } from '@prisma/client';
 import { GetAllWithdrawSellerDTO } from '../dtos/seller/getAllWithdrawSellerDTO';
+import { CreateWithdrawDTO } from '../dtos/withdraw/createWithdrawDTO';
+import {
+  updateWithdrawDTO,
+  updateWithDrawID,
+} from '../dtos/withdraw/updateWithdrawDTO';
 import { WithdrawDTO } from '../dtos/withdraw/withdrawDTO';
 import { prisma } from '../libs/prisma';
 
@@ -79,4 +85,102 @@ export async function getAllWithdrawSeller(
   );
 
   return finalResponse;
+}
+export async function createWithdraw(body: CreateWithdrawDTO, shopId: string) {
+  const withdraw = await prisma.withdraw.create({
+    data: {
+      amount: body.amount,
+      status: withDrawStatus.pending,
+      notes: body.notes || '',
+      created_at: new Date(),
+      updated_at: new Date(),
+      Shop: {
+        connect: { id: shopId },
+      },
+      BankAccount: {
+        connect: { shop_id: shopId },
+      },
+    },
+    include: {
+      Shop: true,
+      BankAccount: true,
+    },
+  });
+  return withdraw;
+}
+
+export async function updateWithdraw(
+  { shop_id, id }: updateWithDrawID,
+  body: updateWithdrawDTO,
+) {
+  try {
+    const withdraw = await prisma.withdraw.update({
+      where: {
+        id,
+        shop_id,
+      },
+      data: {
+        status: body.status,
+        notes: body.notes || '',
+      },
+    });
+
+    switch (withdraw.status) {
+      case withDrawStatus.rejected:
+        return {
+          error: true,
+          message: 'Withdraw rejected',
+          data: null,
+        };
+
+      case withDrawStatus.accepted:
+        await handleAcceptedWithdraw(shop_id, id);
+        return {
+          error: false,
+          message: 'Withdraw accepted',
+          data: null,
+        };
+      case withDrawStatus.pending:
+        return {
+          error: false,
+          message: 'Withdraw pending',
+          data: null,
+        };
+      default:
+        return {
+          error: true,
+          message: 'Invalid withdraw status',
+          data: null,
+        };
+    }
+  } catch (error) {
+    console.error('Error updating withdraw:', error);
+    return {
+      error: true,
+      message: 'An error occurred while processing withdraw',
+      data: null,
+    };
+  }
+}
+async function handleAcceptedWithdraw(shop_id: string, id: string) {
+  const shop = await prisma.shop.findUnique({
+    where: { id: shop_id },
+    select: { balance: true },
+  });
+
+  const withdraw = await prisma.withdraw.findUnique({
+    where: { id, shop_id },
+    select: { amount: true },
+  });
+
+  if (!shop || !withdraw) {
+    throw new Error('Shop or Withdraw not found');
+  }
+
+  const updatedBalance = shop.balance - withdraw.amount;
+
+  await prisma.shop.update({
+    where: { id: shop_id },
+    data: { balance: updatedBalance },
+  });
 }

@@ -1,5 +1,7 @@
 import ServiceResponseDTO from '../dtos/serviceResponseDto';
 import { addTemplateDTO } from '../dtos/shop/addTemplateMassageDTO';
+import { assginDTO } from '../dtos/template/assignTemplate';
+import { ResTemplateType } from '../dtos/template/restemplate';
 import templateRepo from '../repo/templateRepo';
 import { TemplateType } from '../types/types';
 import { serviceErrorHandler } from '../utils/serviceErrorHandler';
@@ -7,20 +9,17 @@ import { serviceErrorHandler } from '../utils/serviceErrorHandler';
 class templateService {
   async createTemplate(
     bodyTemplate: addTemplateDTO,
+    shop_id: string,
   ): Promise<ServiceResponseDTO<TemplateType | null>> {
     try {
-      const template = await templateRepo.createTemplate(bodyTemplate);
+      const template = await templateRepo.createTemplate(bodyTemplate, shop_id);
       return new ServiceResponseDTO<TemplateType>({
         error: false,
         message: null,
         payload: template,
       });
     } catch (error) {
-      return serviceErrorHandler<TemplateType | null>({
-        error: true,
-        message: error.message,
-        payload: null,
-      });
+      return serviceErrorHandler<TemplateType | null>(error);
     }
   }
 
@@ -80,6 +79,22 @@ class templateService {
         message: error.message,
         payload: null,
       };
+    }
+  }
+  async assignTemplates(
+    invo_id: string,
+    shop_id: string,
+  ): Promise<ServiceResponseDTO<ResTemplateType[] | null>> {
+    try {
+      await templateRepo.findData(invo_id);
+      const assign = await templateRepo.assignTemplates(invo_id, shop_id);
+      return new ServiceResponseDTO<ResTemplateType[]>({
+        error: false,
+        message: null,
+        payload: assign,
+      });
+    } catch (error) {
+      return serviceErrorHandler<ResTemplateType[]>(error);
     }
   }
 }

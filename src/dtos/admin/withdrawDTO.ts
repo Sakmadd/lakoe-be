@@ -1,8 +1,8 @@
+import { withDrawStatus } from '@prisma/client';
+
 export interface WithdrawDTO {
-  id: string;
-  referenceNo: string;
   amount: number;
-  status: string;
+  status: withDrawStatus;
   notes: string | null;
   updatedAt: Date;
   createdAt: Date;
@@ -11,7 +11,6 @@ export interface WithdrawDTO {
 }
 
 interface BankAccountDTO {
-  id: string;
   name: string;
   account: string;
   bank: string;

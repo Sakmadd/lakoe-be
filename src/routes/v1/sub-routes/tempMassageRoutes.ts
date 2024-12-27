@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import templateController from '../../../controllers/templateController';
+import { authentication } from '../../../middlewares/authentication';
 
 const templateRouter = Router();
 
@@ -21,5 +22,10 @@ templateRouter.patch(
 templateRouter.delete(
   '/delete/:id',
   templateController.deleteTemplates.bind(templateController),
+);
+templateRouter.get(
+  '/sign/:invo_id',
+  authentication,
+  templateController.assignTemplates.bind(templateController),
 );
 export default templateRouter;

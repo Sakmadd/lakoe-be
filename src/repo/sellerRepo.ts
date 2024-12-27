@@ -1,4 +1,5 @@
-import { GetAllWithdrawSellerDTO } from '../dtos/seller/getAllWithdrawSellerDTO';
+import { OrderStatus } from '@prisma/client';
+import { sellerGraphRes } from '../dtos/seller/sellerDTO';
 import { prisma } from '../libs/prisma';
 
 class sellerRepo {
@@ -37,16 +38,52 @@ class sellerRepo {
   async getGraph(shop_id: string) {
     const graph = await prisma.orderHistory.findMany({
       where: {
-        status: 'done',
+        status: OrderStatus.done,
         Invoice: {
-          is: {
-            shop_id,
-          },
+          shop_id,
         },
       },
     });
-    return graph;
+    type month = any;
+    const initialMonth: month = {
+      January: 0,
+      February: 0,
+      March: 0,
+      April: 0,
+      May: 0,
+      June: 0,
+      July: 0,
+      August: 0,
+      September: 0,
+      October: 0,
+      November: 0,
+      December: 0,
+    };
+    const monthCounts = graph.reduce(
+      (acc, item) => {
+        const date = new Date(item.timestamp);
+        const monthName = new Intl.DateTimeFormat('en-US', {
+          month: 'long',
+        }).format(date);
+
+        if (monthName in acc) {
+          acc[monthName as keyof month]++;
+        }
+        return acc;
+      },
+      { ...initialMonth },
+    );
+
+    const response: sellerGraphRes[] = [
+      {
+        status: OrderStatus.done,
+        perMonth: monthCounts,
+      },
+    ];
+
+    return response;
   }
+
   async getAllOrder(shop_id: string) {
     const [products, order] = await Promise.all([
       prisma.product.findMany({

@@ -1,0 +1,16 @@
+export const AllBanks = [
+  { name: 'Bank Central Asia (BCA)', code_bank: 'bca', bank: 'BCA' },
+  { name: 'Bank Mandiri', code_bank: '008', bank: 'Mandiri' },
+  { name: 'Bank Negara Indonesia (BNI)', code_bank: 'bni', bank: 'BNI' },
+  { name: 'Bank Rakyat Indonesia (BRI)', code_bank: 'bri', bank: 'BRI' },
+  { name: 'Bank Syariah Indonesia (BSI)', code_bank: 'bsi', bank: 'BSI' },
+  { name: 'Bank CIMB Niaga', code_bank: 'cimb', bank: 'CIMB' },
+  { name: 'Bank Danamon', code_bank: 'danamon', bank: 'Danamon' },
+  { name: 'Bank Permata', code_bank: 'permata', bank: 'Permata' },
+  { name: 'Bank Panin', code_bank: 'panin', bank: 'Panin' },
+  { name: 'Bank Mega', code_bank: 'mega_tbk', bank: 'Mega' },
+  { name: 'Bank Tabungan Negara (BTN)', code_bank: 'btn', bank: 'BTN' },
+  { name: 'Bank UOB Indonesia', code_bank: 'uob', bank: 'UOB' },
+  { name: 'Bank OCBC NISP', code_bank: 'ocbc', bank: 'OCBC NISP' },
+  { name: 'Bank Maybank Indonesia', code_bank: 'maybank', bank: 'Maybank' },
+];

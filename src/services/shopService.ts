@@ -1,5 +1,5 @@
 import ServiceResponseDTO from '../dtos/serviceResponseDto';
-import { LocationType, ShopType } from '../types/types';
+import { BankAccountType, LocationType, ShopType } from '../types/types';
 import * as shopRepo from '../repo/shopRepo';
 import { serviceErrorHandler } from '../utils/serviceErrorHandler';
 import { ShopUpdateDTO } from '../dtos/shop/shopUpdateDTO';
@@ -9,6 +9,7 @@ import {
   updateMainLocation,
 } from '../dtos/shop/updateLocationDTO';
 import uploader from '../libs/clodudinary2.0';
+import { bankAccount, bankRes } from '../dtos/bankAccount/createBank';
 
 class shopService {
   async getShopDetail(
@@ -173,6 +174,52 @@ class shopService {
       });
     }
   }
+
+  async postBank(
+    shop_id: string,
+    body: bankAccount,
+  ): Promise<ServiceResponseDTO<BankAccountType | null>> {
+    try {
+      const result = await shopRepo.postBank(shop_id, body);
+      return new ServiceResponseDTO<BankAccountType>({
+        error: false,
+        message: 'Bank has been added ',
+        payload: result,
+      });
+    } catch (error) {
+      return serviceErrorHandler<BankAccountType | null>(error);
+    }
+  }
+  async updateBank(
+    shop_id: string,
+    body: bankAccount,
+  ): Promise<ServiceResponseDTO<BankAccountType | null>> {
+    try {
+      const result = await shopRepo.updateBank(shop_id, body);
+      return new ServiceResponseDTO<BankAccountType>({
+        error: false,
+        message: 'Bank has been updated ',
+        payload: result,
+      });
+    } catch (error) {
+      return serviceErrorHandler<BankAccountType | null>(error);
+    }
+  }
+  async deleteBank(
+    shop_id: string,
+  ): Promise<ServiceResponseDTO<BankAccountType>> {
+    try {
+      const result = await shopRepo.deleteBank(shop_id);
+      return new ServiceResponseDTO<BankAccountType>({
+        error: false,
+        message: 'Bank has been delete ',
+        payload: null,
+      });
+    } catch (error) {
+      return serviceErrorHandler<BankAccountType | null>(error);
+    }
+  }
+  async getAllBank() {}
 }
 
 export default new shopService();
