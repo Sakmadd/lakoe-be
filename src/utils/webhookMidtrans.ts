@@ -41,15 +41,6 @@ export async function updatePaymentStatus(orderId: string, status: string) {
     throw new Error(`Invoice with order_id "${orderId}" not found.`);
   }
 
-  if (update.status === 'pending') {
-    await prisma.orderHistory.create({
-      data: {
-        invoice_id: findInvoiceID.Recipient.Invoices.id,
-        status: OrderStatus.unpaid,
-      },
-    });
-  }
-
   if (update.status === 'paid') {
     await prisma.orderHistory.create({
       data: {

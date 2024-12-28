@@ -6,6 +6,8 @@ export async function updateOrderStatus(orderId: string, status: string) {
     throw new Error('Invalid order ID or status.');
   }
 
+  console.log(orderId, status);
+
   const findInvoiceID = await prisma.courier.findFirst({
     where: {
       biteship_order_id: orderId,
@@ -33,6 +35,76 @@ export async function updateOrderStatus(orderId: string, status: string) {
       data: {
         invoice_id: findInvoiceID.invoice_id,
         status: OrderStatus.done,
+      },
+    });
+
+    const findOrderDetails = await prisma.courier.findFirst({
+      where: {
+        biteship_order_id: orderId,
+      },
+      select: {
+        order: {
+          select: {
+            OrderItem: {
+              select: {
+                product_id: true,
+                variant_combination_id: true,
+                quantity: true,
+                Product: {
+                  select: {
+                    shop_id: true,
+                    price: true,
+                    VariantOptionCombination: {
+                      select: {
+                        id: true,
+                        price: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const orderItem = findOrderDetails?.order?.OrderItem;
+
+    if (!orderItem) {
+      throw new Error(`Order details not found for order_id "${orderId}".`);
+    }
+
+    const { Product, variant_combination_id, quantity } = orderItem;
+
+    if (!Product?.shop_id) {
+      throw new Error('Shop information not found for the product.');
+    }
+
+    let price = Product?.price;
+
+    if (
+      variant_combination_id &&
+      Product?.VariantOptionCombination?.length > 0
+    ) {
+      const variantCombination = Product.VariantOptionCombination.find(
+        (variant) => variant.id === variant_combination_id,
+      );
+      price = variantCombination?.price || price;
+    }
+
+    if (price == null) {
+      throw new Error('Price information not found.');
+    }
+
+    const totalRevenue = price * quantity;
+
+    await prisma.shop.update({
+      where: { id: Product.shop_id },
+      data: {
+        balance: {
+          increment: totalRevenue,
+        },
       },
     });
   }
