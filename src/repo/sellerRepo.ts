@@ -130,7 +130,9 @@ class sellerRepo {
     }
     const result = order.map((order) => {
       const relatedProduct = products.find((product) =>
-        product.OrderItem.some((item) => item.Product.id === order.id),
+        product.OrderItem.some(
+          (item) => item.Product.shop_id === order.shop_id,
+        ),
       );
 
       return {

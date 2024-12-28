@@ -1,6 +1,5 @@
 import ServiceResponseDTO from '../dtos/serviceResponseDto';
 import { addTemplateDTO } from '../dtos/shop/addTemplateMassageDTO';
-import { assginDTO } from '../dtos/template/assignTemplate';
 import { ResTemplateType } from '../dtos/template/restemplate';
 import templateRepo from '../repo/templateRepo';
 import { TemplateType } from '../types/types';
@@ -82,19 +81,18 @@ class templateService {
     }
   }
   async assignTemplates(
-    invo_id: string,
-    shop_id: string,
-  ): Promise<ServiceResponseDTO<ResTemplateType[] | null>> {
+    template_id: string,
+    invoice_id: string,
+  ): Promise<ServiceResponseDTO<ResTemplateType | null>> {
     try {
-      await templateRepo.findData(invo_id);
-      const assign = await templateRepo.assignTemplates(invo_id, shop_id);
-      return new ServiceResponseDTO<ResTemplateType[]>({
+      const assign = await templateRepo.findData(template_id, invoice_id);
+      return new ServiceResponseDTO<ResTemplateType>({
         error: false,
         message: null,
         payload: assign,
       });
     } catch (error) {
-      return serviceErrorHandler<ResTemplateType[]>(error);
+      return serviceErrorHandler<ResTemplateType>(error);
     }
   }
 }
