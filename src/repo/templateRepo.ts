@@ -1,17 +1,18 @@
 import e from 'express';
 import { addTemplateDTO } from '../dtos/shop/addTemplateMassageDTO';
+import { assginDTO } from '../dtos/template/assignTemplate';
+import { ResTemplateType } from '../dtos/template/restemplate';
 import { prisma } from '../libs/prisma';
 
 class templateRepo {
   async createTemplate(bodyTemplate: addTemplateDTO, shop_id: string) {
+    const dataContain = {
+      title: bodyTemplate.title,
+      contain_message: '[product name], [costumer name], [shop name]',
+      shop_id,
+    };
     const template = await prisma.templateMessage.create({
-      data: {
-        title: bodyTemplate.title,
-        contain_message: bodyTemplate.contain_message,
-        shop: {
-          connect: { id: shop_id },
-        },
-      },
+      data: dataContain,
     });
     if (!template) {
       throw new Error('Template not found');
@@ -55,33 +56,25 @@ class templateRepo {
     }
     return templates;
   }
-
-  async findData(invo_id: string) {
-    if (!invo_id) {
-      throw new Error('id invoice tidak di temukan');
-    }
-    const findData = await prisma.invoices.findUnique({
-      where: { id: invo_id },
-      select: {
-        Shop: {
-          select: {
-            name: true,
-          },
-        },
-        Recipient: {
-          select: {
-            name: true,
-          },
-        },
-        Payment: {
-          select: {
-            Order: {
-              select: {
-                OrderItem: {
-                  select: {
-                    Product: {
-                      select: {
-                        name: true,
+  x;
+  async findData(template_id: string, invoice_id: string) {
+    const template = await prisma.templateMessage.findUnique({
+      where: { id: template_id },
+    });
+    const [product, recipient, shop] = await Promise.all([
+      prisma.invoices.findUnique({
+        where: { id: invoice_id },
+        select: {
+          Payment: {
+            select: {
+              Order: {
+                select: {
+                  OrderItem: {
+                    select: {
+                      Product: {
+                        select: {
+                          name: true,
+                        },
                       },
                     },
                   },
@@ -90,62 +83,45 @@ class templateRepo {
             },
           },
         },
-      },
-    });
-    const formattedData = {
-      customer: findData.Recipient?.name || 'Unknown Customer',
-      shop: findData.Shop?.name || 'Unknown Shop',
-      products: findData.Payment?.Order?.OrderItem || 'Unknown Product',
-    };
-    return formattedData;
-  }
-
-  async assignTemplates(invo_id: string, shop_id: string) {
-    try {
-      const data = await this.findData(invo_id);
-      console.log(data);
-
-      const templates = await prisma.templateMessage.findMany({
-        where: {
-          shop_id,
-        },
-      });
-
-      const processedTemplates = templates.map((template) => {
-        const newContent = template.contain_message.replace(
-          /\[([^\]]+)\]/g,
-          (_, key) => {
-            const formattedKey = key.trim().toLowerCase().replace(/ /g, '');
-            console.log(formattedKey);
-
-            if (formattedKey === 'customername') {
-              console.log(data.customer);
-
-              return data.customer;
-            }
-            if (formattedKey === 'storename') {
-              console.log(data.shop);
-              return data.shop;
-            }
-            if (formattedKey === 'productname') {
-              console.log(data.products);
-              return data.products[0];
-            }
-            return key;
+      }),
+      prisma.invoices.findUnique({
+        where: { id: invoice_id },
+        select: {
+          Recipient: {
+            select: {
+              name: true,
+            },
           },
-        );
+        },
+      }),
+      prisma.invoices.findUnique({
+        where: { id: invoice_id },
+        select: {
+          Shop: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      }),
+    ]);
 
-        return {
-          ...template,
-          content: newContent,
-        };
-      });
+    const response: assginDTO = {
+      name_product: product.Payment?.Order?.OrderItem.Product.name,
+      name_costumer: recipient.Recipient?.name,
+      name_shop: shop.Shop?.name,
+    };
 
-      return processedTemplates;
-    } catch (error) {
-      console.error('Error in assignTemplates:', error);
-      throw error;
-    }
+    const message = template.contain_message
+      .replace(/\[product name\]/g, response.name_product)
+      .replace(/\[costumer name\]/g, response.name_costumer)
+      .replace(/\[shop name\]/g, response.name_shop);
+
+    const result: ResTemplateType = {
+      title: template.title,
+      contain_message: message,
+    };
+    return result;
   }
 }
 

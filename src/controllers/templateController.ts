@@ -22,7 +22,7 @@ class templateController {
   }
   async createTemplates(req: Request, res: Response) {
     const bodyTemplate: addTemplateDTO = req.body;
-    const shop_id = res.locals.shop_id;
+    const shop_id = res.locals.user.shop_id;
     const template = await templateService.createTemplate(
       bodyTemplate,
       shop_id,
@@ -82,9 +82,12 @@ class templateController {
     });
   }
   async assignTemplates(req: Request, res: Response) {
-    const { invo_id } = req.params;
-    const shop_id = res.locals.shop_id;
-    const template = await templateService.assignTemplates(invo_id, shop_id);
+    const template_id = req.query.template_id as string;
+    const invoice_id = req.query.invoice_id as string;
+    const template = await templateService.assignTemplates(
+      template_id,
+      invoice_id,
+    );
 
     if (!template) {
       return {
