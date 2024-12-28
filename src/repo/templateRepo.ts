@@ -7,7 +7,7 @@ class templateRepo {
   async createTemplate(bodyTemplate: addTemplateDTO, shop_id: string) {
     const dataContain = {
       title: bodyTemplate.title,
-      contain_message: '[name_product], [name_costumer], [name_shop]',
+      contain_message: '[product name], [costumer name], [shop name]',
       shop_id,
     };
     const template = await prisma.templateMessage.create({
@@ -112,9 +112,9 @@ class templateRepo {
     };
 
     const message = template.contain_message
-      .replace(/\[name_product\]/g, response.name_product)
-      .replace(/\[name_costumer\]/g, response.name_costumer)
-      .replace(/\[name_shop\]/g, response.name_shop);
+      .replace(/\[product name\]/g, response.name_product)
+      .replace(/\[costumer name\]/g, response.name_costumer)
+      .replace(/\[shop name\]/g, response.name_shop);
 
     const result: ResTemplateType = {
       title: template.title,
