@@ -27,10 +27,6 @@ class invoiceController {
     );
   }
 
-  async getInvoiceSeller(req: Request, res: Response) {
-    const { id } = req.params;
-  }
-
   async createOrderBiteship(req: Request, res: Response) {
     const { id } = req.params;
 
@@ -111,10 +107,12 @@ class invoiceController {
     const { error, message, payload } =
       await invoiceService.getAllInvoiceBySellerId(id);
 
+    console.log(payload);
+
     if (error) {
       return res.status(404).json(
         new ResponseDTO({
-          error: error,
+          error: true,
           message: message,
           data: null,
         }),
@@ -123,7 +121,7 @@ class invoiceController {
 
     return res.status(200).json(
       new ResponseDTO({
-        error: error,
+        error: false,
         message: message,
         data: payload,
       }),
