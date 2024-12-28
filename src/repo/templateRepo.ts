@@ -1,4 +1,3 @@
-import e from 'express';
 import { addTemplateDTO } from '../dtos/shop/addTemplateMassageDTO';
 import { assginDTO } from '../dtos/template/assignTemplate';
 import { ResTemplateType } from '../dtos/template/restemplate';

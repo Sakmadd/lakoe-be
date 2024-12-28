@@ -1,6 +1,6 @@
 import ServiceResponseDTO from '../dtos/serviceResponseDto';
 import { addTemplateDTO } from '../dtos/shop/addTemplateMassageDTO';
-import { resTemplateAll, ResTemplateType } from '../dtos/template/restemplate';
+import { ResTemplateType } from '../dtos/template/restemplate';
 import templateRepo from '../repo/templateRepo';
 import { TemplateType } from '../types/types';
 import { serviceErrorHandler } from '../utils/serviceErrorHandler';
