@@ -1,9 +1,8 @@
 import express from 'express';
-import { CONFIGS } from './config/config';
 import { API_V1 } from './routes/v1/indexRoutesV1';
 import cors from 'cors';
 const app = express();
-const port = CONFIGS.PORT;
+const port = 3000;
 
 app.use(cors());
 app.use(express.json());

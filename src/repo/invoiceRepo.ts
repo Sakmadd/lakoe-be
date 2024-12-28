@@ -543,7 +543,6 @@ export async function getAllInvoiceBySellerId(id: string) {
 
     return finalResponse;
   } catch (error) {
-    console.log(error);
     throw new Error(`Error fetching invoices for seller ${id}: ${error}`);
   }
 }

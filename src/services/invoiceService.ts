@@ -81,7 +81,11 @@ class invoiceService {
         payload: invoice,
       });
     } catch (error) {
-      serviceErrorHandler<null>(error);
+      return new ServiceResponseDTO<GetAllInvoiceBySellerId[]>({
+        error: true,
+        message: error.message,
+        payload: null,
+      });
     }
   }
 }

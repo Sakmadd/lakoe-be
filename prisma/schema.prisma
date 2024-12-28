@@ -191,7 +191,7 @@ model TemplateMessage {
   contain_message String
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  shop_id         String   @unique
+  shop_id         String  
 
   shop Shop @relation(fields: [shop_id], references: [id])
 
