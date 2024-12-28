@@ -64,14 +64,16 @@ class templateService {
     }
   }
 
-  async getTemplateMassage() {
+  async getTemplateMassage(
+    shop_id: string,
+  ): Promise<ServiceResponseDTO<TemplateType[] | null>> {
     try {
-      const template = await templateRepo.getTemplateMassage();
-      return {
+      const template = await templateRepo.getTemplateMassage(shop_id);
+      return new ServiceResponseDTO<TemplateType[]>({
         error: false,
         message: null,
         payload: template,
-      };
+      });
     } catch (error) {
       return {
         error: true,

@@ -117,9 +117,8 @@ class sellerRepo {
             },
           },
           OrderHistory: {
-            select: {
-              status: true,
-              timestamp: true,
+            orderBy: {
+              timestamp: 'desc',
             },
           },
         },
