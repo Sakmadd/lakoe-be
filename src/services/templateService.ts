@@ -1,6 +1,5 @@
 import ServiceResponseDTO from '../dtos/serviceResponseDto';
 import { addTemplateDTO } from '../dtos/shop/addTemplateMassageDTO';
-import { assginDTO } from '../dtos/template/assignTemplate';
 import { ResTemplateType } from '../dtos/template/restemplate';
 import templateRepo from '../repo/templateRepo';
 import { TemplateType } from '../types/types';

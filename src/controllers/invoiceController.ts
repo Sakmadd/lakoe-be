@@ -27,10 +27,6 @@ class invoiceController {
     );
   }
 
-  async getInvoiceSeller(req: Request, res: Response) {
-    const { id } = req.params;
-  }
-
   async createOrderBiteship(req: Request, res: Response) {
     const { id } = req.params;
 
@@ -99,6 +95,33 @@ class invoiceController {
     return res.status(200).json(
       new ResponseDTO({
         error: error,
+        message: message,
+        data: payload,
+      }),
+    );
+  }
+
+  async getAllInvoiceBySellerId(req: Request, res: Response) {
+    const id = res.locals.user.shop_id;
+
+    const { error, message, payload } =
+      await invoiceService.getAllInvoiceBySellerId(id);
+
+    console.log(payload);
+
+    if (error) {
+      return res.status(404).json(
+        new ResponseDTO({
+          error: true,
+          message: message,
+          data: null,
+        }),
+      );
+    }
+
+    return res.status(200).json(
+      new ResponseDTO({
+        error: false,
         message: message,
         data: payload,
       }),

@@ -90,8 +90,12 @@ class shopController {
     const body: ShopUpdateDTO = req.body;
 
     if (req.files && req.files['logo']) {
-      const logoFile = (req.files['logo'] as Express.Multer.File[])[0];
-      body.logo = await uploader(logoFile);
+      try {
+        const logoFile = (req.files['logo'] as Express.Multer.File[])[0];
+        body.logo = await uploader(logoFile);
+      } catch (error) {
+        console.log(error);
+      }
     }
 
     const { error, message, payload } = await shopService.updateShop(body, id);

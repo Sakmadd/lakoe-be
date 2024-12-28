@@ -8,6 +8,7 @@ import {
 } from '../dtos/orders/createOrderV2';
 import { GetOrderByIdDTO } from '../dtos/orders/getOrderByID';
 import { generateInvoiceNumber, shipmentLocation } from '../utils/order';
+import { OrderStatus } from '@prisma/client';
 
 export async function createOrder(data: CreateOrderRequestDTO) {
   try {
@@ -64,6 +65,11 @@ export async function createOrder(data: CreateOrderRequestDTO) {
         price: productTotalPrice,
         service_charge: data.courier_price,
         invoice_number: '',
+        OrderHistory: {
+          create: {
+            status: OrderStatus.unpaid,
+          },
+        },
       },
     });
 
@@ -290,18 +296,20 @@ export async function shipmentRates(data: RatesRequestDTO) {
       jnt: 'https://i.pinimg.com/originals/27/33/d4/2733d452329a7a5a73e3922a36e69370.png',
     };
 
-    const finalResponse: RatesResponseDTO[] = response.data.pricing.map(
-      (item: any) => ({
-        price: item.price,
-        origin_area_id: originId,
-        destination_area_id: destinationId,
-        company: item.company,
-        courier_name: item.courier_name,
-        courier_code: item.courier_code,
-        courier_type: item.type,
-        courier_image: courierImages[item.courier_code] || '',
-      }),
+    const regRates = response.data.pricing.filter(
+      (item: any) => item.type && item.type.toLowerCase() === 'reg',
     );
+
+    const finalResponse: RatesResponseDTO[] = regRates.map((item: any) => ({
+      price: item.price,
+      origin_area_id: originId,
+      destination_area_id: destinationId,
+      company: item.company,
+      courier_name: item.courier_name,
+      courier_code: item.courier_code,
+      courier_type: item.type,
+      courier_image: courierImages[item.courier_code] || '',
+    }));
 
     return finalResponse;
   } catch (error) {
@@ -343,7 +351,11 @@ export async function getOrderByID(id: string) {
           url: true,
         },
       },
-      Recipient: true,
+      Recipient: {
+        include: {
+          Invoices: true,
+        },
+      },
     },
   });
 
