@@ -56,6 +56,7 @@ class templateRepo {
     }
     return templates;
   }
+
   async findData(template_id: string, invoice_id: string) {
     const template = await prisma.templateMessage.findUnique({
       where: { id: template_id },
