@@ -1,4 +1,3 @@
-import e from 'express';
 import { addTemplateDTO } from '../dtos/shop/addTemplateMassageDTO';
 import { assginDTO } from '../dtos/template/assignTemplate';
 import { ResTemplateType } from '../dtos/template/restemplate';
@@ -41,8 +40,9 @@ class templateRepo {
     return deleteTemplate;
   }
 
-  async getTemplateMassage() {
+  async getTemplateMassage(shop_id: string) {
     const templates = await prisma.templateMessage.findMany({
+      where: { shop_id },
       select: {
         id: true,
         title: true,
@@ -56,7 +56,7 @@ class templateRepo {
     }
     return templates;
   }
-  x;
+
   async findData(template_id: string, invoice_id: string) {
     const template = await prisma.templateMessage.findUnique({
       where: { id: template_id },

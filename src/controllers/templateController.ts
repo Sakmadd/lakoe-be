@@ -5,7 +5,8 @@ import { assginDTO } from '../dtos/template/assignTemplate';
 
 class templateController {
   async getTemplateMassage(req: Request, res: Response) {
-    const template = await templateService.getTemplateMassage();
+    const shop_id = res.locals.user.shop_id;
+    const template = await templateService.getTemplateMassage(shop_id);
     if (!template) {
       return res.status(404).json({
         error: true,
