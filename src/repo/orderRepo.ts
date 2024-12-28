@@ -264,7 +264,8 @@ export async function shipmentRates(data: RatesRequestDTO) {
       origin_latitude: mainLocation.latitude,
       destination_longitude: data.longitude,
       destination_latitude: data.latitude,
-      couriers: 'paxel,jne,sicepat,jnt',
+      couriers:
+        'paxel,jne,sicepat,jnt,tiki,lion,idexpress,rpx,jdl,anteraja,sap,',
       items: [
         {
           name: data.items.name,
@@ -294,6 +295,15 @@ export async function shipmentRates(data: RatesRequestDTO) {
       jne: 'https://upload.wikimedia.org/wikipedia/commons/9/92/New_Logo_JNE.png',
       sicepat: 'https://pakar.co.id/storage/2019/08/si-cepat.png',
       jnt: 'https://i.pinimg.com/originals/27/33/d4/2733d452329a7a5a73e3922a36e69370.png',
+      tiki: 'https://golektruk.com/blog/wp-content/uploads/2023/04/Logo-TIKI-1024x380.png',
+      lion: 'https://erika-production.nos.jkt-1.neo.id/headers-mobile/75/42/4275/Lion_Parcel_Logo_Carrier.png',
+      idexpess:
+        'https://play-lh.googleusercontent.com/_0_UTLEd1lHhGeTLom4bsaBIEIsZYbDl_DDBf12xARuAib_exFQ9_DpKOX16eCrg_g',
+      rpx: 'https://apps.rpx.co.id/alpha/assets/img/logo_apps.png',
+      jdl: 'https://media.licdn.com/dms/image/v2/C560BAQEppBO4zTeIkA/company-logo_200_200/company-logo_200_200/0/1662104899868/jdl_express_indonesia_logo?e=2147483647&v=beta&t=Mkv73faVOLdCxXKYrSjQLqRl8vthChwiO99hKILwx9w',
+      anteraja:
+        'https://webstoriess.enkosa.com/wp-content/uploads/2024/01/Download-Logo-Anteraja-PNG.png',
+      sap: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi4YKh9-Dc55qA8KOdhIInqM0ReevgCLVOnix96PU6kPGIWQurPmxey_gAnATVLH3lQI4qoqSVlEs-81n3L-newAU0cRqGoin-QbGDeTG9z0Jz7585BC_XJ4HA7Oi2S8suFzPT2Agcx265E8cfEYvpHrJp7mYThlwrd0T_3lVKHaqQnCTxuNLpXxxrlpA/s1844/Logo%20SAP%20Express%20Courier.png',
     };
 
     const regRates = response.data.pricing.filter(

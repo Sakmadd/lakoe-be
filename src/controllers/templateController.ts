@@ -22,7 +22,8 @@ class templateController {
   }
   async createTemplates(req: Request, res: Response) {
     const bodyTemplate: addTemplateDTO = req.body;
-    const shop_id = res.locals.shop_id;
+    const shop_id = res.locals.user.shop_id;
+
     const template = await templateService.createTemplate(
       bodyTemplate,
       shop_id,

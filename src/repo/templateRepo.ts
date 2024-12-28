@@ -4,15 +4,18 @@ import { prisma } from '../libs/prisma';
 
 class templateRepo {
   async createTemplate(bodyTemplate: addTemplateDTO, shop_id: string) {
+    console.log(shop_id);
+
     const template = await prisma.templateMessage.create({
       data: {
         title: bodyTemplate.title,
         contain_message: bodyTemplate.contain_message,
-        shop: {
-          connect: { id: shop_id },
-        },
+        shop_id: shop_id,
       },
     });
+
+    console.log(template);
+
     if (!template) {
       throw new Error('Template not found');
     }
