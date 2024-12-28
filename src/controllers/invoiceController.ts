@@ -107,8 +107,6 @@ class invoiceController {
     const { error, message, payload } =
       await invoiceService.getAllInvoiceBySellerId(id);
 
-    console.log(payload);
-
     if (error) {
       return res.status(404).json(
         new ResponseDTO({
