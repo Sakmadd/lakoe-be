@@ -1,6 +1,8 @@
+import { withDrawStatus } from '@prisma/client';
+
 export interface CreateWithdrawDTO {
   amount: number;
   reference_no: string;
-  status: string;
+  status: withDrawStatus;
   notes: string | null;
 }
