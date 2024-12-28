@@ -1,6 +1,6 @@
 import ServiceResponseDTO from '../dtos/serviceResponseDto';
 import { addTemplateDTO } from '../dtos/shop/addTemplateMassageDTO';
-import { ResTemplateType } from '../dtos/template/restemplate';
+import { resTemplateAll, ResTemplateType } from '../dtos/template/restemplate';
 import templateRepo from '../repo/templateRepo';
 import { TemplateType } from '../types/types';
 import { serviceErrorHandler } from '../utils/serviceErrorHandler';
@@ -64,14 +64,16 @@ class templateService {
     }
   }
 
-  async getTemplateMassage() {
+  async getTemplateMassage(
+    shop_id: string,
+  ): Promise<ServiceResponseDTO<TemplateType[] | null>> {
     try {
-      const template = await templateRepo.getTemplateMassage();
-      return {
+      const template = await templateRepo.getTemplateMassage(shop_id);
+      return new ServiceResponseDTO<TemplateType[]>({
         error: false,
         message: null,
         payload: template,
-      };
+      });
     } catch (error) {
       return {
         error: true,
