@@ -11,6 +11,7 @@ templateRouter.get(
 
 templateRouter.post(
   '/template',
+  authentication,
   templateController.createTemplates.bind(templateController),
 );
 
