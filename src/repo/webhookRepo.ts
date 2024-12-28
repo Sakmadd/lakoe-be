@@ -44,8 +44,6 @@ export async function biteshipStatus(data: BiteshipStatusRequestDTO) {
       status = await updateOrderStatus(data.order_id, 'delivered');
     }
 
-    console.log(status);
-
     return { status };
   } catch (error) {
     console.error('Error processing Biteship webhook:', error);

@@ -6,6 +6,8 @@ export async function updateOrderStatus(orderId: string, status: string) {
     throw new Error('Invalid order ID or status.');
   }
 
+  console.log(orderId, status);
+
   const findInvoiceID = await prisma.courier.findFirst({
     where: {
       biteship_order_id: orderId,
@@ -35,6 +37,7 @@ export async function updateOrderStatus(orderId: string, status: string) {
         status: OrderStatus.done,
       },
     });
+
     const findOrderDetails = await prisma.courier.findFirst({
       where: {
         biteship_order_id: orderId,
@@ -66,8 +69,6 @@ export async function updateOrderStatus(orderId: string, status: string) {
       },
     });
 
-    console.log('Ini order detail', findOrderDetails);
-
     const orderItem = findOrderDetails?.order?.OrderItem;
 
     if (!orderItem) {
@@ -96,11 +97,7 @@ export async function updateOrderStatus(orderId: string, status: string) {
       throw new Error('Price information not found.');
     }
 
-    console.log('Price before : ', price);
-
     const totalRevenue = price * quantity;
-
-    console.log('Price After : ', totalRevenue);
 
     await prisma.shop.update({
       where: { id: Product.shop_id },
