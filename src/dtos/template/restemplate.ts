@@ -1,4 +1,4 @@
 export interface ResTemplateType {
-  title: string;
-  contain_message: string;
+  title: any;
+  contain_message: any;
 }

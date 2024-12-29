@@ -48,13 +48,14 @@ class withdrawService {
     { shop_id, id }: updateWithDrawID,
     body: updateWithdrawDTO,
   ) {
-    await withdrawRepo.updateWithdraw(
+    const wd = await withdrawRepo.updateWithdraw(
       {
         shop_id,
         id,
       },
       body,
     );
+    return wd;
   }
   async getWithdrawById(
     shop_id: string,

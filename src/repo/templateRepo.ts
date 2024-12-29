@@ -1,3 +1,4 @@
+import { title } from 'process';
 import { addTemplateDTO } from '../dtos/shop/addTemplateMassageDTO';
 import { assginDTO } from '../dtos/template/assignTemplate';
 import { ResTemplateType } from '../dtos/template/restemplate';
@@ -7,7 +8,8 @@ class templateRepo {
   async createTemplate(bodyTemplate: addTemplateDTO, shop_id: string) {
     const dataContain = {
       title: bodyTemplate.title,
-      contain_message: '[product name], [costumer name], [shop name]',
+      contain_message: bodyTemplate.contain_message,
+      // '[product name], [costumer name], [shop name]'
       shop_id,
     };
     const template = await prisma.templateMessage.create({
@@ -56,10 +58,10 @@ class templateRepo {
     }
     return templates;
   }
-  async findData(template_id: string, invoice_id: string) {
-    const template = await prisma.templateMessage.findUnique({
-      where: { id: template_id },
-    });
+  async findData(invoice_id: string) {
+    let template: any;
+    template = await prisma.templateMessage.findMany();
+
     const [product, recipient, shop] = await Promise.all([
       prisma.invoices.findUnique({
         where: { id: invoice_id },
@@ -111,15 +113,14 @@ class templateRepo {
       name_shop: shop.Shop?.name,
     };
 
-    const message = template.contain_message
-      .replace(/\[product name\]/g, response.name_product)
-      .replace(/\[costumer name\]/g, response.name_costumer)
-      .replace(/\[shop name\]/g, response.name_shop);
+    const result: ResTemplateType[] = template.map((item) => ({
+      title: item.title,
+      contain_message: item.contain_message
+        .replace(/\[product name\]/g, response.name_product)
+        .replace(/\[costumer name\]/g, response.name_costumer)
+        .replace(/\[shop name\]/g, response.name_shop),
+    }));
 
-    const result: ResTemplateType = {
-      title: template.title,
-      contain_message: message,
-    };
     return result;
   }
 }

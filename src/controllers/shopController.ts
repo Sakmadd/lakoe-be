@@ -6,6 +6,7 @@ import uploader from '../libs/cloudinary';
 import { LocationType } from '../types/types';
 import { updateMainLocation } from '../dtos/shop/updateLocationDTO';
 import { bankAccount } from '../dtos/bankAccount/createBank';
+import { prisma } from '../libs/prisma';
 
 class shopController {
   async getShop(req: Request, res: Response) {
@@ -279,8 +280,12 @@ class shopController {
     const shop_id = res.locals.user.shop_id;
     const body: bankAccount = req.body;
     const post = await shopService.postBank(shop_id, body);
-
-    if (!post) {
+    const checkshopId = await prisma.bankAccount.findUnique({
+      where: {
+        shop_id,
+      },
+    });
+    if (!post && checkshopId) {
       return res.status(404).json({
         error: true,
         message: 'No bank cannot created',
@@ -354,6 +359,24 @@ class shopController {
       message: 'bank found',
       data: AllBanks,
     });
+  }
+  async getBankSeller(req: Request, res: Response) {
+    const shop_id = res.locals.user.shop_id;
+    const bankSeller = await shopService.getBankSeller(shop_id);
+
+    if (!bankSeller) {
+      return res.status(404).json({
+        error: true,
+        message: 'No bank seller found',
+        data: null,
+      });
+    } else {
+      return res.status(200).json({
+        error: false,
+        message: 'bank seller found',
+        data: bankSeller,
+      });
+    }
   }
 }
 

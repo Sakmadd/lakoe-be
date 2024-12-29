@@ -89,6 +89,7 @@ export async function updateShop(body: ShopUpdateDTO, id: string) {
       User: true,
       location: true,
       Withdraw: true,
+      Bank: true,
     },
   });
 
@@ -113,6 +114,7 @@ export async function updateShop(body: ShopUpdateDTO, id: string) {
     },
     location: shop.location,
     Withdraw: shop.Withdraw,
+    Bank: shop.Bank ?? {},
   };
 
   return finalData;
@@ -231,32 +233,47 @@ export async function deleteLocation(id: string) {
 }
 
 export async function postBank(shop_id: string, body: bankAccount) {
-  const bank = await prisma.bankAccount.create({
-    data: {
-      name: body.name,
-      account: body.account,
-      bank_code: body.bank_code,
-      bank: body.bank,
-      shop_id,
-    },
+  const existingBank = await prisma.bankAccount.findFirst({
+    where: { shop_id },
   });
 
-  if (!bank) {
-    throw new Error('Bank account not created');
+  let bank: any;
+
+  if (existingBank) {
+    bank = await prisma.bankAccount.update({
+      where: { id: existingBank.id },
+      data: {
+        name: body.name,
+        account: body.account,
+        bank_code: body.bank_code,
+        bank: body.bank,
+      },
+    });
+  } else {
+    bank = await prisma.bankAccount.create({
+      data: {
+        name: body.name,
+        account: body.account,
+        bank_code: body.bank_code,
+        bank: body.bank,
+        shop_id,
+      },
+    });
   }
 
   return bank;
 }
 
 export async function updateBank(shop_id: string, body: bankAccount) {
-  const findShop = await prisma.bankAccount.findUnique({
+  const findShop = await prisma.shop.findUnique({
     where: {
-      shop_id,
+      id: shop_id,
     },
   });
   if (!findShop) {
     throw new Error('Shop not found');
   }
+
   const result = await prisma.bankAccount.update({
     where: {
       shop_id,
@@ -264,6 +281,7 @@ export async function updateBank(shop_id: string, body: bankAccount) {
     data: {
       name: body.name,
       account: body.account,
+      bank_code: body.bank_code,
       bank: body.bank,
     },
   });
@@ -273,6 +291,21 @@ export async function deleteBank(shop_id: string) {
   const result = await prisma.bankAccount.delete({
     where: {
       shop_id,
+    },
+  });
+  return result;
+}
+export async function getBank(shop_id: string) {
+  const result = await prisma.bankAccount.findUnique({
+    where: {
+      shop_id,
+    },
+    select: {
+      name: true,
+      account: true,
+      bank: true,
+      bank_code: true,
+      shop_id: true,
     },
   });
   return result;
