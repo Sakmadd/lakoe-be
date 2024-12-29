@@ -61,11 +61,6 @@ class templateRepo {
     let template: any;
     template = await prisma.templateMessage.findMany();
 
-
-  async findData(template_id: string, invoice_id: string) {
-    const template = await prisma.templateMessage.findUnique({
-      where: { id: template_id },
-    });
     const [product, recipient, shop] = await Promise.all([
       prisma.invoices.findUnique({
         where: { id: invoice_id },
