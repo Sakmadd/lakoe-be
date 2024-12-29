@@ -89,7 +89,7 @@ export async function getAllWithdrawSeller(
 export async function createWithdraw(body: CreateWithdrawDTO, shopId: string) {
   const withdraw = await prisma.withdraw.create({
     data: {
-      amount: body.amount,
+      amount: Number(body.amount),
       status: withDrawStatus.pending,
       notes: body.notes || '',
       created_at: new Date(),
