@@ -479,6 +479,7 @@ export async function getAllInvoiceBySellerId(id: string) {
             phone: true,
             Order: {
               select: {
+                Courier: true,
                 OrderItem: {
                   select: {
                     product_id: true,
@@ -531,6 +532,8 @@ export async function getAllInvoiceBySellerId(id: string) {
 
       const latestStatus = invoice.OrderHistory[0]?.status;
 
+      const courier = invoice.Recipient.Order.Courier;
+
       return {
         invoice_id: invoice.id,
         status: latestStatus,
@@ -538,6 +541,19 @@ export async function getAllInvoiceBySellerId(id: string) {
         invoice_number: invoice.invoice_number,
         created_at: invoice.created_at,
         product: products,
+        courier: {
+          id: courier.id,
+          invoice_id: courier.invoice_id,
+          order_id: courier.order_id,
+          biteship_order_id: courier.biteship_order_id,
+          origin_area_id: courier.origin_area_id,
+          price: courier.price,
+          courier_company: courier.courier_company,
+          courier_code: courier.courier_code,
+          courier_type: courier.courier_type,
+          tracking_id: courier.tracking_id,
+          waybill_id: courier.waybill_id,
+        },
       };
     });
 
