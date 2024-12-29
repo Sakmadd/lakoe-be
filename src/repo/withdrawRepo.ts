@@ -7,6 +7,7 @@ import {
 } from '../dtos/withdraw/updateWithdrawDTO';
 import { WithdrawDTO } from '../dtos/withdraw/withdrawDTO';
 import { prisma } from '../libs/prisma';
+import ServiceResponseDTO from '../dtos/serviceResponseDto';
 
 export async function getAllWithdraw() {
   const withdraws = await prisma.withdraw.findMany({
@@ -22,9 +23,10 @@ export async function getAllWithdraw() {
       Shop: {
         select: {
           id: true,
+          name: true,
           User: {
             select: {
-              name: true,
+              email: true,
             },
           },
         },
@@ -47,8 +49,9 @@ export async function getAllWithdraw() {
     bank_account_id: withdraw.bank_account_id,
     Shop: {
       id: withdraw.Shop.id,
+      name: withdraw.Shop.name,
       User: {
-        name: withdraw.Shop.User.name,
+        email: withdraw.Shop.User.email,
       },
     },
   }));
@@ -64,6 +67,7 @@ export async function getAllWithdrawSeller(
       id: id,
     },
     select: {
+      id: true,
       Withdraw: true,
     },
   });
@@ -78,6 +82,7 @@ export async function getAllWithdrawSeller(
 
   const finalResponse: GetAllWithdrawSellerDTO[] = shop[0].Withdraw.map(
     (withdraw) => ({
+      id: withdraw.id,
       amount: withdraw.amount,
       status: withdraw.status,
       created_at: withdraw.created_at,
@@ -91,7 +96,7 @@ export async function createWithdraw(body: CreateWithdrawDTO, shopId: string) {
     data: {
       amount: Number(body.amount),
       status: withDrawStatus.pending,
-      notes: body.notes || '',
+      notes: body.notes,
       created_at: new Date(),
       updated_at: new Date(),
       Shop: {
@@ -100,10 +105,6 @@ export async function createWithdraw(body: CreateWithdrawDTO, shopId: string) {
       BankAccount: {
         connect: { shop_id: shopId },
       },
-    },
-    include: {
-      Shop: true,
-      BankAccount: true,
     },
   });
   return withdraw;
@@ -123,35 +124,25 @@ export async function updateWithdraw(
         status: body.status,
         notes: body.notes || '',
       },
+      select: {
+        amount: true,
+        status: true,
+      },
     });
 
-    switch (withdraw.status) {
-      case withDrawStatus.rejected:
-        return {
-          error: true,
-          message: 'Withdraw rejected',
-          data: null,
-        };
-
-      case withDrawStatus.accepted:
-        await handleAcceptedWithdraw(shop_id, id);
-        return {
-          error: false,
-          message: 'Withdraw accepted',
-          data: null,
-        };
-      case withDrawStatus.pending:
-        return {
-          error: false,
-          message: 'Withdraw pending',
-          data: null,
-        };
-      default:
-        return {
-          error: true,
-          message: 'Invalid withdraw status',
-          data: null,
-        };
+    if (body.status === 'accepted') {
+      await handleAcceptedWithdraw(shop_id, id);
+      return {
+        error: false,
+        message: 'Withdraw accepted',
+        data: withdraw,
+      };
+    } else {
+      return {
+        error: true,
+        message: 'Withdraw rejected',
+        data: withdraw,
+      };
     }
   } catch (error) {
     console.error('Error updating withdraw:', error);
@@ -169,7 +160,7 @@ async function handleAcceptedWithdraw(shop_id: string, id: string) {
   });
 
   const withdraw = await prisma.withdraw.findUnique({
-    where: { id, shop_id },
+    where: { id: id, shop_id: shop_id },
     select: { amount: true },
   });
 

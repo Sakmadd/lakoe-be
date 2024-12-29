@@ -16,5 +16,5 @@ interface ShopDTO {
 }
 
 interface UserDTO {
-  name: string;
+  email: string;
 }

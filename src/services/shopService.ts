@@ -219,7 +219,21 @@ class shopService {
       return serviceErrorHandler<BankAccountType | null>(error);
     }
   }
-  async getAllBank() {}
+  async getBankSeller(
+    shop_id: string,
+  ): Promise<ServiceResponseDTO<BankAccountType | null>> {
+    try {
+      const bank = await shopRepo.getBank(shop_id);
+
+      return new ServiceResponseDTO<BankAccountType>({
+        error: false,
+        message: 'its your account bank ',
+        payload: bank,
+      });
+    } catch (error) {
+      return serviceErrorHandler<BankAccountType | null>(error);
+    }
+  }
 }
 
 export default new shopService();
