@@ -83,12 +83,11 @@ class templateController {
     });
   }
   async assignTemplates(req: Request, res: Response) {
-    // const template_id = req.query.template_id as string;
     const invoice_id = req.query.invoice_id as string;
-    const template = await templateService.assignTemplates(
-      // template_id,
-      invoice_id,
-    );
+    const shop_id = req.query.shop_id as string;
+    // console.log(invoice_id);
+
+    const template = await templateService.assignTemplates(invoice_id, shop_id);
 
     if (!template) {
       return {
