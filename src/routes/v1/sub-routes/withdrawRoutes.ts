@@ -12,8 +12,8 @@ withdrawRoutes.post(
   withdrawController.createWithdraw.bind(withdrawController),
 );
 withdrawRoutes.patch(
-  '/update/:id',
-  withdrawController.checkWithdraw.bind(withdrawController),
+  '/update',
+  withdrawController.updateWithdraw.bind(withdrawController),
 );
 withdrawRoutes.get(
   '/seller',

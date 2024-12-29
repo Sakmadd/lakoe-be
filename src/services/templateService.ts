@@ -83,18 +83,17 @@ class templateService {
     }
   }
   async assignTemplates(
-    template_id: string,
     invoice_id: string,
-  ): Promise<ServiceResponseDTO<ResTemplateType | null>> {
+  ): Promise<ServiceResponseDTO<ResTemplateType[] | null>> {
     try {
-      const assign = await templateRepo.findData(template_id, invoice_id);
-      return new ServiceResponseDTO<ResTemplateType>({
+      const assign = await templateRepo.findData(invoice_id);
+      return new ServiceResponseDTO<ResTemplateType[]>({
         error: false,
         message: null,
         payload: assign,
       });
     } catch (error) {
-      return serviceErrorHandler<ResTemplateType>(error);
+      return serviceErrorHandler<ResTemplateType[]>(error);
     }
   }
 }
