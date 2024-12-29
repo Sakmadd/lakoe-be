@@ -1,11 +1,8 @@
+import { GetAllWithdrawSellerDTO } from '../dtos/seller/getAllWithdrawSellerDTO';
 import ServiceResponseDTO from '../dtos/serviceResponseDto';
 import { CreateWithdrawDTO } from '../dtos/withdraw/createWithdrawDTO';
-import {
-  updateWithdrawDTO,
-  updateWithDrawID,
-} from '../dtos/withdraw/updateWithdrawDTO';
+import { updateWithdrawDTO } from '../dtos/withdraw/updateWithdrawDTO';
 import { WithdrawDTO } from '../dtos/withdraw/withdrawDTO';
-import { GetAllWithdrawSellerDTO } from '../dtos/seller/getAllWithdrawSellerDTO';
 import * as withdrawRepo from '../repo/withdrawRepo';
 import { WithdrawType } from '../types/types';
 import { serviceErrorHandler } from '../utils/serviceErrorHandler';
@@ -44,19 +41,44 @@ class withdrawService {
       return serviceErrorHandler<WithdrawType | null>(error);
     }
   }
-  async updateWithDraw(
-    { shop_id, id }: updateWithDrawID,
-    body: updateWithdrawDTO,
-  ) {
-    const wd = await withdrawRepo.updateWithdraw(
-      {
-        shop_id,
-        id,
-      },
-      body,
-    );
-    return wd;
+  async updateWithDraw(body: updateWithdrawDTO) {
+    try {
+      const wd = await withdrawRepo.updateWithdraw(body);
+
+      if (!wd) {
+        return {
+          error: true,
+          message: 'failed update withdraw',
+          data: wd,
+        };
+      }
+
+      if (body.status === 'rejected') {
+        return {
+          error: false,
+          message: 'success',
+          data: wd,
+        };
+      }
+
+      const result = await withdrawRepo.handleAcceptedWithdraw(
+        wd.shop_id,
+        wd.id,
+      );
+
+      return {
+        error: false,
+        message: 'success',
+        data: {
+          wd,
+          result,
+        },
+      };
+    } catch (error) {
+      console.log(error);
+    }
   }
+
   async getWithdrawById(
     shop_id: string,
   ): Promise<ServiceResponseDTO<GetAllWithdrawSellerDTO[] | null>> {

@@ -42,21 +42,24 @@ class withdrawController {
     });
   }
 
-  async checkWithdraw(req: Request, res: Response) {
+  async updateWithdraw(req: Request, res: Response) {
     try {
-      const shop_id = res.locals.user.shop_id;
-      const { id } = req.params;
-
       const body: updateWithdrawDTO = req.body;
-      const update = await withdrawService.updateWithDraw(
-        { shop_id, id },
-        body,
-      );
+      const { data, error, message } =
+        await withdrawService.updateWithDraw(body);
+
+      if (error) {
+        return res.status(400).json({
+          error: false,
+          message: message,
+          data: data,
+        });
+      }
 
       return res.status(200).json({
         error: false,
         message: 'Withdraw updated successfully',
-        data: update,
+        data: data,
       });
     } catch (error) {
       console.log(error);
