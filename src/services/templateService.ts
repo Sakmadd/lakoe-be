@@ -84,9 +84,10 @@ class templateService {
   }
   async assignTemplates(
     invoice_id: string,
+    shop_id: string,
   ): Promise<ServiceResponseDTO<ResTemplateType[] | null>> {
     try {
-      const assign = await templateRepo.findData(invoice_id);
+      const assign = await templateRepo.findData(invoice_id, shop_id);
       return new ServiceResponseDTO<ResTemplateType[]>({
         error: false,
         message: null,
