@@ -40,6 +40,7 @@ export interface ShopType {
   Location?: LocationType[];
   Product?: ProductType[];
   Withdraw?: WithdrawType[];
+  bankAccount?: BankAccountType;
   User?: UserType;
 }
 
@@ -218,9 +219,9 @@ export interface PaymentType {
 }
 
 export interface BankAccountType {
-  id: string;
   name: string;
   account: string;
+  bank_code: string;
   bank: string;
   shop_id: string;
 }
