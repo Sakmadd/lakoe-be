@@ -1,6 +1,7 @@
 import { withDrawStatus } from '@prisma/client';
 
 export interface updateWithdrawDTO {
+  id: string;
   status: withDrawStatus;
   notes: string | null;
 }

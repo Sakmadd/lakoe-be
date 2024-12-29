@@ -1,13 +1,9 @@
 import { withDrawStatus } from '@prisma/client';
 import { GetAllWithdrawSellerDTO } from '../dtos/seller/getAllWithdrawSellerDTO';
 import { CreateWithdrawDTO } from '../dtos/withdraw/createWithdrawDTO';
-import {
-  updateWithdrawDTO,
-  updateWithDrawID,
-} from '../dtos/withdraw/updateWithdrawDTO';
+import { updateWithdrawDTO } from '../dtos/withdraw/updateWithdrawDTO';
 import { WithdrawDTO } from '../dtos/withdraw/withdrawDTO';
 import { prisma } from '../libs/prisma';
-import ServiceResponseDTO from '../dtos/serviceResponseDto';
 
 export async function getAllWithdraw() {
   const withdraws = await prisma.withdraw.findMany({
@@ -110,58 +106,30 @@ export async function createWithdraw(body: CreateWithdrawDTO, shopId: string) {
   return withdraw;
 }
 
-export async function updateWithdraw(
-  { shop_id, id }: updateWithDrawID,
-  body: updateWithdrawDTO,
-) {
+export async function updateWithdraw(body: updateWithdrawDTO) {
   try {
     const withdraw = await prisma.withdraw.update({
       where: {
-        id,
-        shop_id,
+        id: body.id,
       },
       data: {
         status: body.status,
         notes: body.notes || '',
       },
-      select: {
-        amount: true,
-        status: true,
-      },
     });
 
-    if (body.status === 'accepted') {
-      await handleAcceptedWithdraw(shop_id, id);
-      return {
-        error: false,
-        message: 'Withdraw accepted',
-        data: withdraw,
-      };
-    } else {
-      return {
-        error: true,
-        message: 'Withdraw rejected',
-        data: withdraw,
-      };
-    }
+    return withdraw;
   } catch (error) {
-    console.error('Error updating withdraw:', error);
-    return {
-      error: true,
-      message: 'An error occurred while processing withdraw',
-      data: null,
-    };
+    console.log('Error updating withdraw:', error);
   }
 }
-async function handleAcceptedWithdraw(shop_id: string, id: string) {
+export async function handleAcceptedWithdraw(shop_id: string, id: string) {
   const shop = await prisma.shop.findUnique({
     where: { id: shop_id },
-    select: { balance: true },
   });
 
   const withdraw = await prisma.withdraw.findUnique({
-    where: { id: id, shop_id: shop_id },
-    select: { amount: true },
+    where: { id },
   });
 
   if (!shop || !withdraw) {
@@ -170,8 +138,10 @@ async function handleAcceptedWithdraw(shop_id: string, id: string) {
 
   const updatedBalance = shop.balance - withdraw.amount;
 
-  await prisma.shop.update({
+  const response = await prisma.shop.update({
     where: { id: shop_id },
     data: { balance: updatedBalance },
   });
+
+  return response;
 }
